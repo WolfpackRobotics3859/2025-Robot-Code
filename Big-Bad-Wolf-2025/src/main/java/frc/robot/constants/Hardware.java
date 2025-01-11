@@ -8,6 +8,6 @@ package frc.robot.constants;
 public class Hardware
 {
     //CORAL SHOOTER
-    public static final int CORAL_SHOOTER_MOTOR = 1;
+    public static final int CORAL_PLACER_MOTOR = 1;
 
 }

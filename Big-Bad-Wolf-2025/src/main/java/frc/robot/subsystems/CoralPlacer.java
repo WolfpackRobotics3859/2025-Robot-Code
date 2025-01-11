@@ -12,13 +12,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Global;
 import frc.robot.constants.Hardware;
 
-public class CoralShooter extends SubsystemBase
+public class CoralPlacer extends SubsystemBase
 {
-  private final TalonFX m_CoralShooterMotor = new TalonFX(Hardware.CORAL_SHOOTER_MOTOR);
-  /**Constructor: When a Coral Shooter is instantiated everything in the constructor runs
+  private final TalonFX m_CoralPlacerMotor = new TalonFX(Hardware.CORAL_PLACER_MOTOR);
+  /**Constructor: When a Coral placer is instantiated everything in the constructor runs
    * currently no parameters
   */
-  public CoralShooter()
+  public CoralPlacer()
   {
 
   }
@@ -32,10 +32,10 @@ public class CoralShooter extends SubsystemBase
     switch(controlMode)
     {
       case VOLTAGE:
-        setShooterVoltage(value);
+        setPlacerVoltage(value);
         break;
       case PERCENT:
-        setShooterPercentage(value);
+        setPlacerPercentage(value);
         break;
       case POSITION:
         System.out.print("MODE: POSITION IS NOT AVAILABLE FOR CORAL SHOOTER");
@@ -46,22 +46,22 @@ public class CoralShooter extends SubsystemBase
     }
   }
 
-  /** Sets voltage for shooter motor
+  /** Sets voltage for placer motor
    * @param voltage amount of volts
    */
-  public void setShooterVoltage(double voltage)
+  public void setPlacerVoltage(double voltage)
   {
     VoltageOut voltageRequest = new VoltageOut(voltage);
-    m_CoralShooterMotor.setControl(voltageRequest);
+    m_CoralPlacerMotor.setControl(voltageRequest);
   }
 
-  /** Sets shooter motor to work at a percentage of the max power it can.
+  /** Sets placer motor to work at a percentage of the max power it can.
    * @param percentage percentage of max power motor works at
    */
-  public void setShooterPercentage(double percentage)
+  public void setPlacerPercentage(double percentage)
   {
     DutyCycleOut dutyCycleRequest = new DutyCycleOut(percentage);
-    m_CoralShooterMotor.setControl(dutyCycleRequest);
+    m_CoralPlacerMotor.setControl(dutyCycleRequest);
   }
 
   @Override
