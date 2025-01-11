@@ -15,6 +15,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Elevator;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.AlgaeIntake;
+import frc.robot.subsystems.CoralPlacer;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -27,6 +28,8 @@ public class RobotContainer
   public static final CommandSwerveDrivetrain m_Drivetrain = TunerConstants.createDrivetrain(); 
   public static final Elevator m_Elevator = new Elevator();
   private final AlgaeIntake m_AlgaeIntake = new AlgaeIntake();
+  private final CoralPlacer m_CoralPlacer = new CoralPlacer();
+
 
   private final CommandXboxController m_DriverController = new CommandXboxController(0);
   private final CommandXboxController m_CoDriverController = new CommandXboxController(1);
