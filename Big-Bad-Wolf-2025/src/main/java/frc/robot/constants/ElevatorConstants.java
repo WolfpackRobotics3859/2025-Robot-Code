@@ -15,7 +15,7 @@ public class ElevatorConstants
 
     // Limit Values
     public static final double ELEVATOR_TOP_LIMIT = 0.82;
-    public static final double ELEVATOR_BOTTOM_LIMIT = 0.06;
+    public static final double ELEVATOR_BOTTOM_LIMIT = 0.1;
 
     // Misc Values
     public static final double ELEVATOR_FEED_FORWARD = 0.2;

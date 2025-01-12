@@ -45,8 +45,8 @@ public class RobotContainer
    */
   private void configureBindings() 
   {
-    m_driverController.rightTrigger().whileTrue(new ElevatorDown(m_Elevator));
-    m_driverController.leftTrigger().whileTrue(new ElevatorUp(m_Elevator));
+    m_driverController.leftTrigger().whileTrue(new ElevatorDown(m_Elevator));
+    m_driverController.rightTrigger().whileTrue(new ElevatorUp(m_Elevator));
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     //empty for now
   }

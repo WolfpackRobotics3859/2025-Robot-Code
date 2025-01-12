@@ -31,14 +31,14 @@ public class ElevatorDown extends Command
   @Override
   public void execute()
   {
-    m_Elevator.elevatorRequest(Global.MODE.VOLTAGE, -5);
+    m_Elevator.elevatorRequest(Global.MODE.VOLTAGE, -1);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted)
   {
-
+    m_Elevator.elevatorRequest(Global.MODE.VOLTAGE, 0);
   }
 
   // Returns true when the command should end.

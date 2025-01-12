@@ -39,6 +39,7 @@ public class ElevatorZero extends Command
   @Override
   public void end(boolean interrupted)
   {
+    m_Elevator.elevatorRequest(Global.MODE.VOLTAGE, 0);
 
   }
 

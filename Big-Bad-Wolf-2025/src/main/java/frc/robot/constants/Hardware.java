@@ -8,8 +8,8 @@ package frc.robot.constants;
 public class Hardware
 {
     //ELEVATOR
-    public static final int ELEVATOR_MOTOR_1 = 1;
-    public static final int ELEVATOR_MOTOR_2 = 2;
+    public static final int ELEVATOR_MOTOR_1 = 11;
+    public static final int ELEVATOR_MOTOR_2 = 12;
 
     //EXAMPLE
 

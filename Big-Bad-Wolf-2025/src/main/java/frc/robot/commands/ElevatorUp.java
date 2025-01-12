@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Elevator;
+import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.Global;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -31,13 +32,14 @@ public class ElevatorUp extends Command
   @Override
   public void execute()
   {
-    m_Elevator.elevatorRequest(Global.MODE.VOLTAGE, 5);
+    m_Elevator.elevatorRequest(Global.MODE.VOLTAGE, 1);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted)
   {
+    m_Elevator.elevatorRequest(Global.MODE.VOLTAGE, 0);
 
   }
 
