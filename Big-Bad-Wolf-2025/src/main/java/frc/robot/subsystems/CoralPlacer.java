@@ -27,7 +27,7 @@ public class CoralPlacer extends SubsystemBase
    * @param controlMode
    * @param value
    */
-  public void CoralShooterRequest(Global.MODE controlMode, double value)
+  public void CoralPlacerRequest(Global.MODE controlMode, double value)
   {
     switch(controlMode)
     {
@@ -49,7 +49,7 @@ public class CoralPlacer extends SubsystemBase
   /** Sets voltage for placer motor
    * @param voltage amount of volts
    */
-  public void setPlacerVoltage(double voltage)
+  private void setPlacerVoltage(double voltage)
   {
     VoltageOut voltageRequest = new VoltageOut(voltage);
     m_CoralPlacerMotor.setControl(voltageRequest);
@@ -58,7 +58,7 @@ public class CoralPlacer extends SubsystemBase
   /** Sets placer motor to work at a percentage of the max power it can.
    * @param percentage percentage of max power motor works at
    */
-  public void setPlacerPercentage(double percentage)
+  private void setPlacerPercentage(double percentage)
   {
     DutyCycleOut dutyCycleRequest = new DutyCycleOut(percentage);
     m_CoralPlacerMotor.setControl(dutyCycleRequest);
