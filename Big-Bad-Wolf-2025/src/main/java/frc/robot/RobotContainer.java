@@ -7,6 +7,9 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.ElevatorDown;
+import frc.robot.commands.ElevatorUp;
+import frc.robot.constants.controller.OperatorConstants;
 import frc.robot.subsystems.Elevator;
 
 /**
@@ -19,12 +22,16 @@ public class RobotContainer
 {
   // The robot's subsystems and commands are defined here...
   private final Elevator m_Elevator = new Elevator();
+  
+  private final CommandXboxController m_driverController =
+      new CommandXboxController(OperatorConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() 
   {
     // Configure the trigger bindings
     configureBindings();
+    System.out.println("I hate people");  
   }
 
   /**
@@ -38,6 +45,8 @@ public class RobotContainer
    */
   private void configureBindings() 
   {
+    m_driverController.rightTrigger().whileTrue(new ElevatorDown(m_Elevator));
+    m_driverController.leftTrigger().whileTrue(new ElevatorUp(m_Elevator));
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     //empty for now
   }
