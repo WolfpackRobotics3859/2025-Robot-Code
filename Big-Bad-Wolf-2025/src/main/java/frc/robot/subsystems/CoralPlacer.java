@@ -14,13 +14,13 @@ import frc.robot.constants.Hardware;
 
 public class CoralPlacer extends SubsystemBase
 {
-  private final TalonFX m_CoralPlacerMotor = new TalonFX(Hardware.CORAL_PLACER_MOTOR);
+  private final TalonFX m_CoralPlacerMotor;
   /**Constructor: When a Coral placer is instantiated everything in the constructor runs
    * currently no parameters
   */
   public CoralPlacer()
   {
-
+    m_CoralPlacerMotor = new TalonFX(Hardware.CORAL_PLACER_MOTOR);
   }
   
   /**based on the control mode and value input into the parameters will call a method through a command
