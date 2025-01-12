@@ -4,13 +4,24 @@
 
 package frc.robot;
 
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.Autos;
-import frc.robot.commands.ExampleCommand;
-import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.commands.Drive;
+import frc.robot.constants.TunerConstants;
+import frc.robot.subsystems.Drivetrain;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.function.Supplier;
+
+import org.json.simple.parser.ParseException;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.FileVersionException;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -19,45 +30,109 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
 
-  // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController =
-      new CommandXboxController(OperatorConstants.kDriverControllerPort);
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  public RobotContainer() {
-    // Configure the trigger bindings
-    configureBindings();
+  // Subsystems
+  private final Drivetrain m_Drivetrain = new Drivetrain(TunerConstants.DRIVETRAIN_CONSTANTS, 250, TunerConstants.FRONT_LEFT,
+                                                         TunerConstants.FRONT_RIGHT, TunerConstants.BACK_LEFT, TunerConstants.BACK_RIGHT);
+
+  //contoller
+  private final CommandXboxController controllerOne = new CommandXboxController(0); // primary controlelr
+  private final Supplier<Double> m_PrimaryControllerLeftY = () -> -controllerOne.getLeftY() * m_Drivetrain.axisModifier;
+  private final Supplier<Double> m_PrimaryControllerLeftX = () -> -controllerOne.getLeftX() * m_Drivetrain.axisModifier;
+  private final Supplier<Double> m_PrimaryControllerRightX = () -> -controllerOne.getRightX();
+
+  private SendableChooser<Command> autoChooser;
+
+
+  /** The container for the robot. Contains subsystems, OI devices, and commands. 
+     * @throws ParseException 
+     * @throws IOException 
+     * @throws FileVersionException */
+     
+    public RobotContainer() throws FileVersionException, IOException, ParseException 
+  {
+    this.configureAutoChooser();
+    this.configureBindings();
   }
 
-  /**
-   * Use this method to define your trigger->command mappings. Triggers can be created via the
-   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
-   * predicate, or via the named factories in {@link
-   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
-   * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-   * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-   * joysticks}.
-   */
-  private void configureBindings() {
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    new Trigger(m_exampleSubsystem::exampleCondition)
-        .onTrue(new ExampleCommand(m_exampleSubsystem));
+  private void configureAutoChooser() throws FileVersionException, IOException, ParseException {
 
-    // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
-    // cancelling on release.
-    m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+    autoChooser = AutoBuilder.buildAutoChooser();
+        
+    //if no paths are selected
+    autoChooser.setDefaultOption(null, AutoBuilder.followPath(null));
+
+    //paths
+    PathPlannerPath algaetoProc = PathPlannerPath.fromPathFile("AlgaeToProc");
+    PathPlannerPath blueReefToAlgae = PathPlannerPath.fromPathFile("BlueReefToAlgae");
+    PathPlannerPath midBlueToReef = PathPlannerPath.fromPathFile("MidBlueToReef");
+    PathPlannerPath redAlgaeToProc = PathPlannerPath.fromPathFile("RedAlgaeToProc");
+    PathPlannerPath redReefToAlgae = PathPlannerPath.fromPathFile("RedReefToAlgae");
+    PathPlannerPath redTopToReef = PathPlannerPath.fromPathFile("RedTopToReef");
+
+    //autos
+    List<PathPlannerPath> autoPathBlue = PathPlannerAuto.getPathGroupFromAutoFile("1Coral1AlgaeBlue");
+    List<PathPlannerPath> autoPathRed = PathPlannerAuto.getPathGroupFromAutoFile("1Coral1AlgaeRed");
+
+
+    //adding paths to autoChooser
+    autoChooser.addOption("AlgaeToProc", AutoBuilder.followPath(algaetoProc));
+    autoChooser.addOption("BlueReefToAlgae", AutoBuilder.followPath(blueReefToAlgae));
+    autoChooser.addOption("MidBlueToReef", AutoBuilder.followPath(midBlueToReef));
+    autoChooser.addOption("RedAlgaeToProc", AutoBuilder.followPath(redAlgaeToProc));
+    autoChooser.addOption("RedReefToAlgae", AutoBuilder.followPath(redReefToAlgae));
+    autoChooser.addOption("RedTopToReef", AutoBuilder.followPath(redTopToReef));
+
+    //adding auto to autoChooser
+    autoChooser.addOption("1Coral1AlgaeBlue", AutoBuilder.followPath((PathPlannerPath) autoPathBlue));
+    autoChooser.addOption("1Coral1AlgaeRed", AutoBuilder.followPath((PathPlannerPath) autoPathRed));
+
+    /** 
+    Psuedocode for auto routines:
+
+    Autonomous Routine 1: "Score and Move"
+    Start at initial position
+    Drive to scoring position using "MidBlueToReef" path
+    Score Game Piece
+    Drive to game piece using "BlueReefToAlgae" path
+    Pick up game piece
+    Drive to second scoring position using "AlgaeToProc" path
+    Score Game Piece
+    End
+
+    it would look like:
+
+    PathPlannerPath scorePath = PathPlannerPath.fromPathFile("MidBlueToReef");
+    PathPlannerPath pickupPath = PathPlannerPath.fromPathFile("BlueReefToAlgae");
+    PathPlannerPath secondScorePath = PathPlannerPath.fromPathFile("AlgaeToProc");
+
+    Command autoRoutine = Commands.sequence(
+    AutoBuilder.followPath(scorePath),
+    new ScoreGamePieceCommand(),      //this will be created and actually be code that scores a game piece
+    AutoBuilder.followPath(pickupPath),
+    new PickupGamePieceCommand(),     //this will be created and acutally be code that picks up the game piece
+    AutoBuilder.followPath(secondScorePath),
+    new SecondScoreGamePieceCommand()   //this will be created and actually be code that scores a game piece
+    );
+*/ 
+
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+}
+
+  public void startTeleopCommands()
+  {
+    m_Drivetrain.getDefaultCommand().schedule();
   }
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
-    return Autos.exampleAuto(m_exampleSubsystem);
+  private void configureBindings() 
+  {
+    m_Drivetrain.setDefaultCommand(new Drive(m_Drivetrain, m_PrimaryControllerLeftY, m_PrimaryControllerLeftX, m_PrimaryControllerRightX));
+  }
+  
+  
+  public Command getAutonomousCommand() throws FileVersionException, IOException, ParseException 
+  {
+    return autoChooser.getSelected();
   }
 }
