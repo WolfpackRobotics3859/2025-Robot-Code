@@ -24,7 +24,7 @@ public class ElevatorUp extends Command
   @Override
   public void initialize()
   {
-
+    System.out.print("R TRIGGER ELEVATOR UP");
   }
 
   // Called every time the scheduler runs while the command is scheduled.

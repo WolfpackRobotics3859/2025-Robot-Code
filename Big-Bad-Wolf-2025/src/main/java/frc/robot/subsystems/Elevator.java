@@ -62,6 +62,7 @@ public class Elevator extends SubsystemBase
   {
     VoltageOut voltageRequest = new VoltageOut(voltage);
     m_ElevatorMotor1.setControl(voltageRequest);
+    System.out.print("VOLTAGE");
   }
 
   /** Sets elevator motor to work at a percentage of the max power it can.
@@ -71,6 +72,8 @@ public class Elevator extends SubsystemBase
   {
     DutyCycleOut dutyCycleRequest = new DutyCycleOut(percentage);
     m_ElevatorMotor1.setControl(dutyCycleRequest);
+    System.out.print("PERCENTAGE");
+
   }
 
   /** Sets elevator position
@@ -80,6 +83,8 @@ public class Elevator extends SubsystemBase
   {
     MotionMagicVoltage positionRequest = new MotionMagicVoltage(position);
     m_ElevatorMotor1.setControl(positionRequest);
+    System.out.print("POSITION");
+
   }
 
   /**Stops movement and discourages any further movement
@@ -89,6 +94,8 @@ public class Elevator extends SubsystemBase
   {
     StaticBrake brakeRequest = new StaticBrake();
     m_ElevatorMotor1.setControl(brakeRequest);
+    System.out.print("BRAKE");
+
   }
 
   @Override

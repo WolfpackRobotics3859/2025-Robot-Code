@@ -24,7 +24,7 @@ public class ElevatorDown extends Command
   @Override
   public void initialize()
   {
-
+    System.out.print("L TRIGGER ELEVATOR DOWN");
   }
 
   // Called every time the scheduler runs while the command is scheduled.

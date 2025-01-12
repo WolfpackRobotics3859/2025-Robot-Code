@@ -25,7 +25,7 @@ public class ElevatorZero extends Command
   @Override
   public void initialize()
   {
-
+    System.out.print("DEFAULT ELEVATOR ZERO");
   }
 
   // Called every time the scheduler runs while the command is scheduled.
