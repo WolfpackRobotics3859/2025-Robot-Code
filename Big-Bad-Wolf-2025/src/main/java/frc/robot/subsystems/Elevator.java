@@ -17,8 +17,8 @@ import frc.robot.constants.Hardware;
 
 public class Elevator extends SubsystemBase
 {
-  private final TalonFX m_ElevatorMotor1 = new TalonFX(Hardware.ELEVATOR_MOTOR_1);
-  private final TalonFX m_ElevatorMotor2 = new TalonFX(Hardware.ELEVATOR_MOTOR_2);
+  private final TalonFX m_ElevatorMotor1;
+  private final TalonFX m_ElevatorMotor2;
 
   /**Constructor which runs anything in it upon initialization
    * Follower: Sets motor 2 to follow whatever motor 1 does
@@ -28,6 +28,9 @@ public class Elevator extends SubsystemBase
    */
   public Elevator()
   {
+    m_ElevatorMotor1 = new TalonFX(Hardware.ELEVATOR_MOTOR_1);
+    m_ElevatorMotor2 = new TalonFX(Hardware.ELEVATOR_MOTOR_2);
+
     Follower followRequest = new Follower(Hardware.ELEVATOR_MOTOR_1, false);
     m_ElevatorMotor2.setControl(followRequest);
   }
