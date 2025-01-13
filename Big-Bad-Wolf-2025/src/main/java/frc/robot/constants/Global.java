@@ -13,6 +13,7 @@ public class Global
         PERCENT,
         VOLTAGE,
         POSITION,
-        BRAKE
+        BRAKE,
+        VELOCITY
     }
 }

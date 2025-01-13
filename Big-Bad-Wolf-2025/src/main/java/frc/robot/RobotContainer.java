@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.IntakeCoral;
 import frc.robot.subsystems.CoralPlacer;
 
 /**
@@ -19,10 +20,12 @@ public class RobotContainer
 {
   // The robot's subsystems and commands are defined here...
   private final CoralPlacer m_CoralPlacer = new CoralPlacer();
+  private final CommandXboxController controller = new CommandXboxController(0); // My joystick
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() 
   {
+    controller.rightTrigger().whileTrue(new IntakeCoral(m_CoralPlacer));
     // Configure the trigger bindings
     configureBindings();
   }
@@ -38,6 +41,7 @@ public class RobotContainer
    */
   private void configureBindings() 
   {
+
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     //empty for now
   }

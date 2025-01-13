@@ -10,4 +10,10 @@ public class Hardware
     //CORAL PLACER
     public static final int CORAL_PLACER_MOTOR = 1;
 
+    //  Temporary for testing
+    public static final int SHOOTER_MOTOR_1_ID = 14;
+    public static final int SHOOTER_MOTOR_2_ID = 15;
+    public static final int WRIST_MOTOR_ID = 13;
+    public static final int FEEDER_MOTOR_ID = 16;
+
 }
