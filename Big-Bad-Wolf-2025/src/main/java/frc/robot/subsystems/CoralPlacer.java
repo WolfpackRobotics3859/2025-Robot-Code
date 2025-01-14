@@ -33,11 +33,15 @@ public class CoralPlacer extends SubsystemBase
   {
     m_CoralPlacerMotor = new TalonFX(Hardware.CORAL_PLACER_MOTOR);
     m_BackLaser = new TimeOfFlight(0);
+
+    shooterWrist.getConfigurator().apply(CoralPlacerConstants.WRIST_MOTOR_CONFIGURATION);
+    shooterRollerTop.getConfigurator().apply(CoralPlacerConstants.SHOOTER_MOTOR_1_CONFIGURATION);
+    shooterRollerBottom.getConfigurator().apply(CoralPlacerConstants.SHOOTER_MOTOR_2_CONFIGURATION);
   }
 
   public boolean CoralInPlace()
   {
-    return this.m_BackLaser.getRange() < CoralPlacerConstants.BACK_LASER_LIMIT;
+    return this.m_BackLaser.getRange() > CoralPlacerConstants.BACK_LASER_LIMIT;
   }
   
   public void setMotor(CoralPlacerConstants.MOTOR motor, Global.MODE controlMode, double value){

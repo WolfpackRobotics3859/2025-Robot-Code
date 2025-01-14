@@ -32,7 +32,7 @@ public class IntakeCoral extends Command {
   public void execute()
   {
     
-    if(m_CoralPlacer.CoralInPlace())
+    if(!m_CoralPlacer.CoralInPlace())
     {
       m_CoralPlacer.stopVoltage();
     }else {
