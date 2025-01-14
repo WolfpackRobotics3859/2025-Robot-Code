@@ -20,12 +20,10 @@ public class RobotContainer
 {
   // The robot's subsystems and commands are defined here...
   private final CoralPlacer m_CoralPlacer = new CoralPlacer();
-  private final CommandXboxController controller = new CommandXboxController(0); // My joystick
-
+  private final CommandXboxController controller = new CommandXboxController(0);
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() 
   {
-    controller.rightTrigger().whileTrue(new IntakeCoral(m_CoralPlacer));
     // Configure the trigger bindings
     configureBindings();
   }
@@ -41,7 +39,7 @@ public class RobotContainer
    */
   private void configureBindings() 
   {
-
+    controller.rightTrigger().whileTrue(new IntakeCoral(m_CoralPlacer));
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     //empty for now
   }
