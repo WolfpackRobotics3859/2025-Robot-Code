@@ -4,6 +4,12 @@
 
 package frc.robot;
 
+import java.io.IOException;
+
+import org.json.simple.parser.ParseException;
+
+import com.pathplanner.lib.util.FileVersionException;
+
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -11,20 +17,23 @@ import edu.wpi.first.wpilibj.RobotBase;
  * you are doing, do not modify this file except to change the parameter class to the startRobot
  * call.
  */
-public final class Main 
-{
-  private Main() 
-  {
-
-  }
+public final class Main {
+  private Main() {}
 
   /**
    * Main initialization function. Do not perform any initialization here.
    *
    * <p>If you change your main robot class, change the parameter type.
    */
-  public static void main(String... args) 
-  {
-    RobotBase.startRobot(Robot::new);
+  public static void main(String... args) {
+    RobotBase.startRobot(() -> {
+      try {
+        return new Robot();
+      } catch (FileVersionException | IOException | ParseException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+            return null;
+    });
   }
 }
