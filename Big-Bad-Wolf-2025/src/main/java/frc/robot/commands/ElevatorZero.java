@@ -25,21 +25,21 @@ public class ElevatorZero extends Command
   @Override
   public void initialize()
   {
-    System.out.print("DEFAULT ELEVATOR ZERO");
+    m_Elevator.elevatorRequest(Global.MODE.POSITION, ElevatorConstants.ELEVATOR_BOTTOM_LIMIT);
+    System.out.println("A ELEVATOR ZERO");
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute()
   {
-    m_Elevator.elevatorRequest(Global.MODE.POSITION, ElevatorConstants.ELEVATOR_BOTTOM_LIMIT);
+    
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted)
   {
-    m_Elevator.elevatorRequest(Global.MODE.VOLTAGE, 0);
 
   }
 
@@ -47,6 +47,6 @@ public class ElevatorZero extends Command
   @Override
   public boolean isFinished()
   {
-    return false;
+    return true;
   }
 }

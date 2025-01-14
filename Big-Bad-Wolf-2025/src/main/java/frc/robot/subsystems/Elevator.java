@@ -9,9 +9,11 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.Global;
 import frc.robot.constants.Hardware;
 
@@ -19,6 +21,8 @@ public class Elevator extends SubsystemBase
 {
   private final TalonFX m_ElevatorMotor1 = new TalonFX(Hardware.ELEVATOR_MOTOR_1);
   private final TalonFX m_ElevatorMotor2 = new TalonFX(Hardware.ELEVATOR_MOTOR_2);
+
+  //private final CANcoder m_CANCoder = new CANcoder(Hardware.ELEVATOR_CANCODER_ID);
 
   /**Constructor which runs anything in it upon initialization
    * Follower: Sets motor 2 to follow whatever motor 1 does
@@ -28,6 +32,9 @@ public class Elevator extends SubsystemBase
    */
   public Elevator()
   {
+    m_ElevatorMotor1.getConfigurator().apply(ElevatorConstants.ELEVATOR_MOTOR_1_CONFIG);
+    m_ElevatorMotor2.getConfigurator().apply(ElevatorConstants.ELEVATOR_MOTOR_2_CONFIG);
+
     Follower followRequest = new Follower(Hardware.ELEVATOR_MOTOR_1, false);
     m_ElevatorMotor2.setControl(followRequest);
   }
@@ -62,7 +69,7 @@ public class Elevator extends SubsystemBase
   {
     VoltageOut voltageRequest = new VoltageOut(voltage);
     m_ElevatorMotor1.setControl(voltageRequest);
-    System.out.print("VOLTAGE");
+    System.out.println("VOLTAGE");
   }
 
   /** Sets elevator motor to work at a percentage of the max power it can.
@@ -72,7 +79,7 @@ public class Elevator extends SubsystemBase
   {
     DutyCycleOut dutyCycleRequest = new DutyCycleOut(percentage);
     m_ElevatorMotor1.setControl(dutyCycleRequest);
-    System.out.print("PERCENTAGE");
+    System.out.println("PERCENTAGE");
 
   }
 
@@ -83,7 +90,7 @@ public class Elevator extends SubsystemBase
   {
     MotionMagicVoltage positionRequest = new MotionMagicVoltage(position);
     m_ElevatorMotor1.setControl(positionRequest);
-    System.out.print("POSITION");
+    System.out.println("POSITION");
 
   }
 
@@ -94,7 +101,7 @@ public class Elevator extends SubsystemBase
   {
     StaticBrake brakeRequest = new StaticBrake();
     m_ElevatorMotor1.setControl(brakeRequest);
-    System.out.print("BRAKE");
+    System.out.println("BRAKE");
 
   }
 

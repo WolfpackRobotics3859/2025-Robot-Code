@@ -8,7 +8,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ElevatorDown;
+import frc.robot.commands.ElevatorMax;
 import frc.robot.commands.ElevatorUp;
+import frc.robot.commands.ElevatorZero;
+import frc.robot.commands.ElevatorMiddle;
 import frc.robot.constants.controller.OperatorConstants;
 import frc.robot.subsystems.Elevator;
 
@@ -23,15 +26,13 @@ public class RobotContainer
   // The robot's subsystems and commands are defined here...
   private final Elevator m_Elevator = new Elevator();
   
-  private final CommandXboxController m_driverController =
-      new CommandXboxController(OperatorConstants.kDriverControllerPort);
+  private final CommandXboxController m_driverController = new CommandXboxController(OperatorConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() 
   {
     // Configure the trigger bindings
     configureBindings();
-    System.out.println("I hate people");  
   }
 
   /**
@@ -47,6 +48,9 @@ public class RobotContainer
   {
     m_driverController.leftTrigger().whileTrue(new ElevatorDown(m_Elevator));
     m_driverController.rightTrigger().whileTrue(new ElevatorUp(m_Elevator));
+    m_driverController.a().onTrue(new ElevatorZero(m_Elevator));
+    m_driverController.x().onTrue(new ElevatorMiddle(m_Elevator));
+    m_driverController.y().onTrue(new ElevatorMax(m_Elevator));
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     //empty for now
   }

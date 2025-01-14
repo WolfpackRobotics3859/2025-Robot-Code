@@ -6,14 +6,15 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Elevator;
+import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.Global;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class ElevatorUp extends Command
+public class ElevatorMiddle extends Command
 {
   private final Elevator m_Elevator;
   /** Creates a new ElevatorUp. */
-  public ElevatorUp(Elevator elevator)
+  public ElevatorMiddle(Elevator elevator)
   {
     this.m_Elevator = elevator;
     // Use addRequirements() here to declare subsystem dependencies.
@@ -24,21 +25,21 @@ public class ElevatorUp extends Command
   @Override
   public void initialize()
   {
-    System.out.println("R TRIGGER ELEVATOR UP");
+    m_Elevator.elevatorRequest(Global.MODE.POSITION, ElevatorConstants.BAR_BOTTOM_CLEAR/2);
+    System.out.println("X ELEVATOR MIDDLE");
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute()
   {
-    m_Elevator.elevatorRequest(Global.MODE.VOLTAGE, 1);
+
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted)
   {
-    m_Elevator.elevatorRequest(Global.MODE.VOLTAGE, 0);
 
   }
 
@@ -46,6 +47,6 @@ public class ElevatorUp extends Command
   @Override
   public boolean isFinished()
   {
-    return false;
+    return true;
   }
 }
