@@ -14,7 +14,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Elevator;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.subsystems.AlgaeIntakeSubsystem;
+import frc.robot.subsystems.AlgaeIntake;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -26,7 +26,7 @@ public class RobotContainer
 {
   public static final CommandSwerveDrivetrain m_Drivetrain = TunerConstants.createDrivetrain(); 
   public static final Elevator m_Elevator = new Elevator();
-  private final AlgaeIntakeSubsystem m_AlgaeIntake = new AlgaeIntakeSubsystem();
+  private final AlgaeIntake m_AlgaeIntake = new AlgaeIntake();
 
   private final CommandXboxController m_DriverController = new CommandXboxController(0);
   private final CommandXboxController m_CoDriverController = new CommandXboxController(1);

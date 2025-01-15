@@ -8,106 +8,68 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
-public class Robot extends TimedRobot 
-{
+public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private final RobotContainer m_robotContainer;
 
-  public Robot() 
-  {
+  public Robot() {
     m_robotContainer = new RobotContainer();
   }
 
   @Override
-  public void robotPeriodic() 
-  {
+  public void robotPeriodic() {
     CommandScheduler.getInstance().run(); 
   }
 
   @Override
-  public void disabledInit() 
-  {
-    //empty for now
-  }
+  public void disabledInit() {}
 
   @Override
-  public void disabledPeriodic() 
-  {
-    //empty for now
-  }
+  public void disabledPeriodic() {}
 
   @Override
-  public void disabledExit() 
-  {
-    //empty for now
-  }
+  public void disabledExit() {}
 
   @Override
-  public void autonomousInit() 
-  {
+  public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
-    if (m_autonomousCommand != null) 
-    {
+    if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
   }
 
   @Override
-  public void autonomousPeriodic() 
-  {
-    //empty for now
-  }
+  public void autonomousPeriodic() {}
 
   @Override
-  public void autonomousExit() 
-  {
-    //empty for now
-  }
+  public void autonomousExit() {}
 
   @Override
-  public void teleopInit() 
-  {
-    if (m_autonomousCommand != null) 
-    {
+  public void teleopInit() {
+    if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
   }
 
   @Override
-  public void teleopPeriodic() 
-  {
-    //empty for now
-  }
+  public void teleopPeriodic() {}
 
   @Override
-  public void teleopExit() 
-  {
-    //empty for now
-  }
+  public void teleopExit() {}
 
   @Override
-  public void testInit() 
-  {
+  public void testInit() {
     CommandScheduler.getInstance().cancelAll();
   }
 
   @Override
-  public void testPeriodic() 
-  {
-    // empty for now
-  }
+  public void testPeriodic() {}
 
   @Override
-  public void testExit() 
-  {
-    //empty for now
-  }
+  public void testExit() {}
 
   @Override
-  public void simulationPeriodic() 
-  {
-    //empty for now
-  }
+  public void simulationPeriodic() {}
 }
