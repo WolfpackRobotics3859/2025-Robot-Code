@@ -15,17 +15,18 @@ import frc.robot.constants.Hardware;
 public class CoralPlacer extends SubsystemBase
 {
   private final TalonFX m_CoralPlacerMotor;
-  /**Constructor: When a Coral placer is instantiated everything in the constructor runs
-   * currently no parameters
+  /**
+   * Coral Placer subsystem.
   */
   public CoralPlacer()
   {
     m_CoralPlacerMotor = new TalonFX(Hardware.CORAL_PLACER_MOTOR);
   }
   
-  /**based on the control mode and value input into the parameters will call a method through a command
-   * @param controlMode
-   * @param value
+  /**
+   * Sets the control mode and value input calling appropriate methods.
+   * @param controlMode Mode to set motor input
+   * @param value motor input
    */
   public void CoralPlacerRequest(Global.MODE controlMode, double value)
   {
@@ -46,7 +47,8 @@ public class CoralPlacer extends SubsystemBase
     }
   }
 
-  /** Sets voltage for placer motor
+  /** 
+   * Sets voltage for placer motor.
    * @param voltage amount of volts
    */
   private void setPlacerVoltage(double voltage)
@@ -55,7 +57,8 @@ public class CoralPlacer extends SubsystemBase
     m_CoralPlacerMotor.setControl(voltageRequest);
   }
 
-  /** Sets placer motor to work at a percentage of the max power it can.
+  /** 
+   * Sets placer motor to work at a percentage of the max power it can.
    * @param percentage percentage of max power motor works at
    */
   private void setPlacerPercentage(double percentage)

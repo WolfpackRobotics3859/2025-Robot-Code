@@ -27,8 +27,8 @@ public class RobotContainer
 {
   public static final CommandSwerveDrivetrain m_Drivetrain = TunerConstants.createDrivetrain(); 
   public static final Elevator m_Elevator = new Elevator();
-  private final AlgaeIntake m_AlgaeIntake = new AlgaeIntake();
-  private final CoralPlacer m_CoralPlacer = new CoralPlacer();
+  public static final AlgaeIntake m_AlgaeIntake = new AlgaeIntake();
+  public static final CoralPlacer m_CoralPlacer = new CoralPlacer();
 
 
   private final CommandXboxController m_DriverController = new CommandXboxController(0);

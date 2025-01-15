@@ -19,8 +19,6 @@ public class Hardware
     public static final int ALGAE_CLEANER_WRIST_MOTOR_ID = 5;
     public static final int ALGAE_CLEANER_SHOOTER_MOTOR_ID = 6;
 
-    //CORAL SHOOTER
-    public static final int CORAL_SHOOTER_MOTOR = 7;
-
-
+    //CORAL PLACER
+    public static final int CORAL_PLACER_MOTOR = 7;
 }
