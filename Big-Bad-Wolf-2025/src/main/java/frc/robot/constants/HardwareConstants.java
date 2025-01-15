@@ -8,5 +8,5 @@ package frc.robot.constants;
 public class HardwareConstants 
 {
     public static final int ALGAE_CLEANER_WRIST_MOTOR_ID = 3;
-    public static final int ALGAE_CLEANER_ROLLER_MOTOR_ID = 4;
+    public static final int ALGAE_CLEANER_SHOOTER_MOTOR_ID = 4;
 }

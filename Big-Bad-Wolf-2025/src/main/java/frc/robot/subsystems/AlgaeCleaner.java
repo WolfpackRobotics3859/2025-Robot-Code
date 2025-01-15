@@ -13,39 +13,39 @@ import frc.robot.constants.AlgaeCleanerConstants;
 import frc.robot.constants.HardwareConstants;
 
 /**
- * Creates a new Algae Cleaner subsystem.
+ * Algae Cleaner subsystem.
  */
-public class AlgaeCleanerSubsystem extends SubsystemBase 
+public class AlgaeCleaner extends SubsystemBase 
 {
   // Creates new Algae Cleaner roller and wrist motors.
-  private final TalonFX m_AlgaeCleanerRollerMotor = new TalonFX(HardwareConstants.ALGAE_CLEANER_ROLLER_MOTOR_ID);
+  private final TalonFX m_AlgaeCleanerShooterMotor = new TalonFX(HardwareConstants.ALGAE_CLEANER_SHOOTER_MOTOR_ID);
   private final TalonFX m_AlgaeCleanerWristMotor = new TalonFX(HardwareConstants.ALGAE_CLEANER_WRIST_MOTOR_ID);
 
-  // Algae Cleaner subsystem constructor
-  public AlgaeCleanerSubsystem() 
+  /**
+   *  Algae Cleaner subsystem constructor.
+   */
+  public AlgaeCleaner() 
   {
-    m_AlgaeCleanerRollerMotor.getConfigurator().apply(AlgaeCleanerConstants.ALGAE_CLEANER_ROLLER_GAINS);
+    m_AlgaeCleanerShooterMotor.getConfigurator().apply(AlgaeCleanerConstants.ALGAE_CLEANER_ROLLER_GAINS);
     m_AlgaeCleanerWristMotor.getConfigurator().apply(AlgaeCleanerConstants.ALGAE_CLENAER_WRIST_CONFIGURATION);
   }
 
   /**
-   * Sets the roller voltage for the Algae Cleaner roller motor.
-   * @param cleanerVoltage Takes a paramater of voltage (how fast the motor rotates).
+   * Sets the shooter voltage for the Algae Cleaner shooter motor.
+   * @param cleanerVoltage the voltage to set cleaner motor to.
    */
   public void setCleanerRollerVoltage(double cleanerVoltage)
   {
-    VoltageOut setCleanerVoltage = new VoltageOut(cleanerVoltage);
-    m_AlgaeCleanerRollerMotor.setControl(setCleanerVoltage);
+    m_AlgaeCleanerShooterMotor.setControl(new VoltageOut(cleanerVoltage));
   }
 
   /**
-   * Sets the wrist position for the Algae Cleaner roller motor.
-   * @param cleanerPosition Takes a parameter of position (where cleaner arm is located in space).
+   * Sets the wrist position for the Algae Cleaner motor.
+   * @param cleanerPosition position to set the Algae Cleaner wrist.
    */
   public void setCleanerWristPosition(double cleanerPosition)
   {
-    MotionMagicVoltage setCleanerPosition = new MotionMagicVoltage(cleanerPosition);
-    m_AlgaeCleanerWristMotor.setControl(setCleanerPosition);
+    m_AlgaeCleanerWristMotor.setControl(new MotionMagicVoltage(cleanerPosition));
   }
 
   @Override
