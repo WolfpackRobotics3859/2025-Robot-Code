@@ -10,7 +10,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.AlgaeCleanerConstants;
-import frc.robot.constants.HardwareConstants;
+import frc.robot.constants.Hardware;
 
 /**
  * Algae Cleaner subsystem.
@@ -18,8 +18,8 @@ import frc.robot.constants.HardwareConstants;
 public class AlgaeCleaner extends SubsystemBase 
 {
   // Creates new Algae Cleaner roller and wrist motors.
-  private final TalonFX m_AlgaeCleanerShooterMotor = new TalonFX(HardwareConstants.ALGAE_CLEANER_SHOOTER_MOTOR_ID);
-  private final TalonFX m_AlgaeCleanerWristMotor = new TalonFX(HardwareConstants.ALGAE_CLEANER_WRIST_MOTOR_ID);
+  private final TalonFX m_AlgaeCleanerShooterMotor = new TalonFX(Hardware.ALGAE_CLEANER_SHOOTER_MOTOR_ID);
+  private final TalonFX m_AlgaeCleanerWristMotor = new TalonFX(Hardware.ALGAE_CLEANER_WRIST_MOTOR_ID);
 
   /**
    *  Algae Cleaner subsystem constructor.
