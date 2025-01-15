@@ -4,7 +4,7 @@
 
 package frc.robot.constants;
 
-/** Add your docs here. */
+// Instantiating constants for hardware.
 public class Hardware
 {
     //ELEVATOR
@@ -12,5 +12,9 @@ public class Hardware
     public static final int ELEVATOR_MOTOR_2 = 2;
 
     //EXAMPLE
+
+    //ALGAE INTAKE
+    public static final int ALGAE_INTAKE_ROLLER_MOTOR_ID = 1;
+    public static final int ALGAE_INTAKE_WRIST_MOTOR_ID = 2;
 
 }
