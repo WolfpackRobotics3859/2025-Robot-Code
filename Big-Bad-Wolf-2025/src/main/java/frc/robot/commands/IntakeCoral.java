@@ -31,13 +31,15 @@ public class IntakeCoral extends Command {
   @Override
   public void execute()
   {
-    
+    // m_CoralPlacer.setMotor(CoralPlacerConstants.MOTOR.SHOOTER_MOTOR_1, Global.MODE.VOLTAGE, CoralPlacerConstants.SHOOTER_ROLLER_1_INTAKE_VELOCITY);
+    // m_CoralPlacer.setMotor(CoralPlacerConstants.MOTOR.SHOOTER_MOTOR_2, Global.MODE.VOLTAGE, CoralPlacerConstants.SHOOTER_ROLLER_2_INTAKE_VELOCITY);
     if(!m_CoralPlacer.CoralInPlace())
     {
       m_CoralPlacer.stopVoltage();
-    }else {
-      m_CoralPlacer.setMotor(CoralPlacerConstants.MOTOR.SHOOTER_MOTOR_1, Global.MODE.VELOCITY, CoralPlacerConstants.SHOOTER_ROLLER_1_INTAKE_VELOCITY);
-      m_CoralPlacer.setMotor(CoralPlacerConstants.MOTOR.SHOOTER_MOTOR_2, Global.MODE.VELOCITY, CoralPlacerConstants.SHOOTER_ROLLER_2_INTAKE_VELOCITY);
+    }else{
+      m_CoralPlacer.setMotor(CoralPlacerConstants.MOTOR.SHOOTER_MOTOR_1, Global.MODE.VOLTAGE, CoralPlacerConstants.SHOOTER_ROLLER_1_INTAKE_VELOCITY);
+      m_CoralPlacer.setMotor(CoralPlacerConstants.MOTOR.FEEDER_MOTOR, Global.MODE.VOLTAGE, CoralPlacerConstants.SHOOTER_FEEDER_INTAKE_VOLTAGE);
+      m_CoralPlacer.setMotor(CoralPlacerConstants.MOTOR.SHOOTER_MOTOR_2, Global.MODE.VOLTAGE, CoralPlacerConstants.SHOOTER_ROLLER_2_INTAKE_VELOCITY);
 
     }
   }

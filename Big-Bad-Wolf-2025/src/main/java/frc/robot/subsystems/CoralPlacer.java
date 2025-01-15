@@ -67,7 +67,7 @@ public class CoralPlacer extends SubsystemBase
   
 //select motor in correspondance to previously selected mode above----------------
   private void setMotorVoltage(CoralPlacerConstants.MOTOR motor, double voltage){
-    MotionMagicVoltage voltageRequest = new MotionMagicVoltage(voltage);
+    VoltageOut voltageRequest = new VoltageOut(voltage);
     switch(motor){
 
         case SHOOTER_MOTOR_1:
@@ -97,7 +97,7 @@ public class CoralPlacer extends SubsystemBase
     switch(motor){
 
         case SHOOTER_MOTOR_1:
-          shooterRollerTop.setControl(velocityRequest);
+        shooterRollerTop.setControl(velocityRequest);
           break;
 
         case SHOOTER_MOTOR_2:
