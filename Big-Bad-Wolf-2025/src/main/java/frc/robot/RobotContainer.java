@@ -26,6 +26,7 @@ public class RobotContainer
   {
     // Configure the trigger bindings
     configureBindings();
+    configureDefaultCommands();
   }
 
   /**
@@ -37,9 +38,15 @@ public class RobotContainer
    * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
    * joysticks}.
    */
+
+  private void configureDefaultCommands()
+  {
+    m_CoralPlacer.setDefaultCommand(new IntakeCoral(m_CoralPlacer));
+  }
+
   private void configureBindings() 
   {
-    controller.rightTrigger().whileTrue(new IntakeCoral(m_CoralPlacer));
+    //controller.rightTrigger().whileTrue(new IntakeCoral(m_CoralPlacer));
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     //empty for now
   }

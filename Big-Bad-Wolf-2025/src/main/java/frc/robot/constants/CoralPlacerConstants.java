@@ -33,6 +33,9 @@ public class CoralPlacerConstants
     public static final double WRIST_MAX_DOWN_POSITION = 0.3;
     public static final double WRIST_MAX_UP_POSIION = 0.71;
 
+    public static final double ULTRASONIC_RANGE_LIMIT = 8;  
+
+
     // Motor Configs
     public static final Slot0Configs SHOOTER_1_GAINS = new Slot0Configs()
         .withKP(0.094562).withKI(0).withKD(0)

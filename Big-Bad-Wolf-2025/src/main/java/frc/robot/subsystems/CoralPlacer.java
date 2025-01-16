@@ -7,10 +7,12 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.playingwithfusion.TimeOfFlight;
 
+import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.CoralPlacerConstants;
 import frc.robot.constants.Global;
@@ -26,13 +28,19 @@ public class CoralPlacer extends SubsystemBase
   private final TalonFX feederRoller = new TalonFX(Hardware.FEEDER_MOTOR_ID);
 
   public final TimeOfFlight m_BackLaser;
+  public final Ultrasonic m_FrontUltrasonic;
   /**Constructor: When a Coral placer is instantiated everything in the constructor runs
    * currently no parameters
   */
   public CoralPlacer()
   {
     m_CoralPlacerMotor = new TalonFX(Hardware.CORAL_PLACER_MOTOR);
+
     m_BackLaser = new TimeOfFlight(0);
+    m_FrontUltrasonic = new Ultrasonic(Hardware.ULTRASONIC_FRONT_TRIG, Hardware.ULTRASONIC_FRONT_ECHO);
+
+    m_FrontUltrasonic.setEnabled(true);
+    m_FrontUltrasonic.setAutomaticMode(true);
 
     shooterWrist.getConfigurator().apply(CoralPlacerConstants.WRIST_MOTOR_CONFIGURATION);
     shooterRollerTop.getConfigurator().apply(CoralPlacerConstants.SHOOTER_MOTOR_1_CONFIGURATION);
@@ -42,6 +50,12 @@ public class CoralPlacer extends SubsystemBase
   public boolean CoralInPlace()
   {
     return this.m_BackLaser.getRange() > CoralPlacerConstants.BACK_LASER_LIMIT;
+  }
+  
+  public boolean coralDetected()
+  {
+    return this.m_FrontUltrasonic.getRangeInches() > CoralPlacerConstants.ULTRASONIC_RANGE_LIMIT 
+      && this.m_FrontUltrasonic.getRangeInches() < 20;
   }
   
   public void setMotor(CoralPlacerConstants.MOTOR motor, Global.MODE controlMode, double value){
@@ -59,6 +73,9 @@ public class CoralPlacer extends SubsystemBase
       case PERCENT:
         this.setMotorPercent(motor, value);
         break;
+      case BRAKE:
+      this.setMotorBrake(motor, value);
+      break;
       default:
         System.out.println("WARNING: That is not a mood (mode).");
         break;
@@ -171,6 +188,33 @@ public class CoralPlacer extends SubsystemBase
           break;
     }
   }
+
+  private void setMotorBrake(CoralPlacerConstants.MOTOR motor, double placeholder){
+    StaticBrake brakeRequest = new StaticBrake();
+    switch(motor){
+
+        case SHOOTER_MOTOR_1:
+          shooterRollerTop.setControl(brakeRequest);
+          break;
+
+        case SHOOTER_MOTOR_2:
+          shooterRollerBottom.setControl(brakeRequest);
+          break;
+
+        case WRIST_MOTOR:
+          shooterWrist.setControl(brakeRequest);
+          break;
+
+        case FEEDER_MOTOR:
+          feederRoller.setControl(brakeRequest);
+          break;
+            
+        default:
+          System.out.println("WARNING: That motor doesn't exist!");
+          break;
+    }
+  }
+
 
   public void stopVoltage()
   {

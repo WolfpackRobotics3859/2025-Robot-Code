@@ -24,23 +24,39 @@ public class IntakeCoral extends Command {
   @Override
   public void initialize()
   {
-    m_CoralPlacer.setMotor(CoralPlacerConstants.MOTOR.WRIST_MOTOR, Global.MODE.POSITION, CoralPlacerConstants.SHOOTER_INTAKE_WRIST_ANGLE);
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute()
   {
+    m_CoralPlacer.setMotor(CoralPlacerConstants.MOTOR.WRIST_MOTOR, Global.MODE.POSITION, CoralPlacerConstants.SHOOTER_INTAKE_WRIST_ANGLE);
+
+    System.out.println("Back Laser: " + m_CoralPlacer.m_BackLaser.getRange());
+    System.out.println("Front Ultrasonic: " + m_CoralPlacer.m_FrontUltrasonic.getRangeInches());
+
     // m_CoralPlacer.setMotor(CoralPlacerConstants.MOTOR.SHOOTER_MOTOR_1, Global.MODE.VOLTAGE, CoralPlacerConstants.SHOOTER_ROLLER_1_INTAKE_VELOCITY);
     // m_CoralPlacer.setMotor(CoralPlacerConstants.MOTOR.SHOOTER_MOTOR_2, Global.MODE.VOLTAGE, CoralPlacerConstants.SHOOTER_ROLLER_2_INTAKE_VELOCITY);
-    if(!m_CoralPlacer.CoralInPlace())
+    if (!m_CoralPlacer.coralDetected())
     {
-      m_CoralPlacer.stopVoltage();
+      System.out.println("Coral Detected");
+      if(m_CoralPlacer.CoralInPlace())
+      {
+        System.out.println("Coral Intaking");
+        m_CoralPlacer.setMotor(CoralPlacerConstants.MOTOR.SHOOTER_MOTOR_1, Global.MODE.VOLTAGE, CoralPlacerConstants.SHOOTER_ROLLER_1_INTAKE_VELOCITY);
+        m_CoralPlacer.setMotor(CoralPlacerConstants.MOTOR.FEEDER_MOTOR, Global.MODE.VOLTAGE, CoralPlacerConstants.SHOOTER_FEEDER_INTAKE_VOLTAGE);
+        m_CoralPlacer.setMotor(CoralPlacerConstants.MOTOR.SHOOTER_MOTOR_2, Global.MODE.VOLTAGE, CoralPlacerConstants.SHOOTER_ROLLER_2_INTAKE_VELOCITY);
+      }else{
+        //coralplacerconstants are placeholder values because its a staticbrake which doesnt need any
+        System.out.println("Coral In");
+        m_CoralPlacer.setMotor(CoralPlacerConstants.MOTOR.SHOOTER_MOTOR_1, Global.MODE.BRAKE, CoralPlacerConstants.SHOOTER_ROLLER_1_INTAKE_VELOCITY);
+        m_CoralPlacer.setMotor(CoralPlacerConstants.MOTOR.FEEDER_MOTOR, Global.MODE.BRAKE, CoralPlacerConstants.SHOOTER_FEEDER_INTAKE_VOLTAGE);
+        m_CoralPlacer.setMotor(CoralPlacerConstants.MOTOR.SHOOTER_MOTOR_2, Global.MODE.BRAKE, CoralPlacerConstants.SHOOTER_ROLLER_2_INTAKE_VELOCITY);
+      }
     }else{
-      m_CoralPlacer.setMotor(CoralPlacerConstants.MOTOR.SHOOTER_MOTOR_1, Global.MODE.VOLTAGE, CoralPlacerConstants.SHOOTER_ROLLER_1_INTAKE_VELOCITY);
-      m_CoralPlacer.setMotor(CoralPlacerConstants.MOTOR.FEEDER_MOTOR, Global.MODE.VOLTAGE, CoralPlacerConstants.SHOOTER_FEEDER_INTAKE_VOLTAGE);
-      m_CoralPlacer.setMotor(CoralPlacerConstants.MOTOR.SHOOTER_MOTOR_2, Global.MODE.VOLTAGE, CoralPlacerConstants.SHOOTER_ROLLER_2_INTAKE_VELOCITY);
-
+      System.out.println("Voltage Stopped (IntakeCoral)");
+      m_CoralPlacer.stopVoltage();
     }
   }
 
@@ -48,12 +64,13 @@ public class IntakeCoral extends Command {
   @Override
   public void end(boolean interrupted)
   {
-    m_CoralPlacer.stopVoltage();
+  
   }
 
   // Returns true when the command should end.
   @Override
-  public boolean isFinished() {
+  public boolean isFinished()
+  {
     return false;
   }
 }

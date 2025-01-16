@@ -16,5 +16,8 @@ public class Hardware
     public static final int WRIST_MOTOR_ID = 13;
     public static final int FEEDER_MOTOR_ID = 16;
     public static final int SHOOTER_WRIST_CANCODER_ID = 6;
+    public static final int ULTRASONIC_FRONT_TRIG = 5;
+    public static final int ULTRASONIC_FRONT_ECHO = 6;
+
 
 }
