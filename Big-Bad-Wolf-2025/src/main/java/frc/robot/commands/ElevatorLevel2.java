@@ -10,11 +10,11 @@ import frc.robot.constants.Global;
 import frc.robot.subsystems.Elevator;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class ElevatorPosition2 extends Command 
+public class ElevatorLevel2 extends Command 
 {
    private final Elevator m_Elevator;
   /** Creates a new ElevatorPosition1. */
-  public ElevatorPosition2(Elevator p_Elevator) 
+  public ElevatorLevel2(Elevator p_Elevator) 
   {
     this.m_Elevator = p_Elevator;
     // Use addRequirements() here to declare subsystem dependencies.
@@ -29,7 +29,7 @@ public class ElevatorPosition2 extends Command
   @Override
   public void initialize() 
   {
-    m_Elevator.elevatorRequest(Global.MODE.POSITION, ElevatorConstants.ELEVATOR_POSITION_2);
+    m_Elevator.elevatorRequest(Global.MODE.POSITION, ElevatorConstants.ELEVATOR_LEVEL_2);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
