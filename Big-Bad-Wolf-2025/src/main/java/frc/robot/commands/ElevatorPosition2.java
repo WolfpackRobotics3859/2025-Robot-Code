@@ -21,6 +21,10 @@ public class ElevatorPosition2 extends Command
     addRequirements(this.m_Elevator);
   }
 
+  /**Will set elevator to the position called from ElevatorConstants
+   * @param Global.MODE.POSITION sets motor to the position mode
+   * @param ElevatorConstants.ELEVATOR_POSITION_0 Coral L3 position
+   */
   // Called when the command is initially scheduled.
   @Override
   public void initialize() 
@@ -32,9 +36,11 @@ public class ElevatorPosition2 extends Command
   @Override
   public void execute() 
   {
-    
+    //intentionally empty
   }
 
+  /**Once command ends sets motors to brake mode, making it resistant to external force
+   */
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) 

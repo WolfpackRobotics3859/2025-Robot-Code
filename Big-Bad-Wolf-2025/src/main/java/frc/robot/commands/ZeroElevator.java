@@ -22,6 +22,10 @@ public class ZeroElevator extends Command
     addRequirements(this.m_Elevator);
   }
 
+  /**Will set elevator to the position called from ElevatorConstants
+   * @param Global.MODE.POSITION sets motor to the position mode
+   * @param ElevatorConstants.ELEVATOR_POSITION_0 the zero position for the elevator (possibly Coral L1)
+   */
   // Called when the command is initially scheduled.
   @Override
   public void initialize() 
@@ -33,9 +37,11 @@ public class ZeroElevator extends Command
   @Override
   public void execute() 
   {
-
+    //intentionally empty
   }
 
+  /**Once command ends sets motors to brake mode, making it resistant to external force
+   */
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) 

@@ -25,9 +25,11 @@ public class ElevatorDown extends Command
   @Override
   public void initialize() 
   {
-
+    //intentionally empty
   }
 
+  /**While trigger is held down applies constant voltage to move the bot down
+   */
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() 
@@ -35,6 +37,8 @@ public class ElevatorDown extends Command
     m_Elevator.elevatorRequest(Global.MODE.VOLTAGE, ElevatorConstants.ELEVATOR_DOWN_VOLTAGE);
   }
 
+  /**Once command ends sets motors to brake mode, making it resistant to external force
+   */
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) 
