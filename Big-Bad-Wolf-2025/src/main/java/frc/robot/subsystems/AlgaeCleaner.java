@@ -12,12 +12,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.AlgaeCleanerConstants;
 import frc.robot.constants.Hardware;
 
-/**
- * Algae Cleaner subsystem.
- */
+// Algae Cleaner subsystem.
 public class AlgaeCleaner extends SubsystemBase 
 {
-  // Creates new Algae Cleaner roller and wrist motors.
   private final TalonFX m_AlgaeCleanerShooterMotor = new TalonFX(Hardware.ALGAE_CLEANER_SHOOTER_MOTOR_ID);
   private final TalonFX m_AlgaeCleanerWristMotor = new TalonFX(Hardware.ALGAE_CLEANER_WRIST_MOTOR_ID);
 
@@ -32,7 +29,7 @@ public class AlgaeCleaner extends SubsystemBase
 
   /**
    * Sets the shooter voltage for the Algae Cleaner shooter motor.
-   * @param cleanerVoltage the voltage to set cleaner motor to.
+   * @param cleanerVoltage Assigns voltage to the motors (amount of applicable torque).
    */
   public void setCleanerRollerVoltage(double cleanerVoltage)
   {
@@ -41,7 +38,7 @@ public class AlgaeCleaner extends SubsystemBase
 
   /**
    * Sets the wrist position for the Algae Cleaner motor.
-   * @param cleanerPosition position to set the Algae Cleaner wrist.
+   * @param cleanerPosition Assigns wrist position to the motors (where cleaner arm is located in space).
    */
   public void setCleanerWristPosition(double cleanerPosition)
   {
