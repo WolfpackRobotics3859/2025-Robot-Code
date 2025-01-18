@@ -30,7 +30,7 @@ public class ZeroElevator extends Command
   @Override
   public void initialize() 
   {
-    m_Elevator.elevatorRequest(Global.MODE.POSITION, ElevatorConstants.ELEVATOR_LEVEL_0);
+    m_Elevator.elevatorRequest(Global.MODE.POSITION, ElevatorConstants.ELEVATOR_LEVEL_ZERO);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
