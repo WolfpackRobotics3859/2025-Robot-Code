@@ -13,7 +13,7 @@ import frc.robot.subsystems.Elevator;
 public class ElevatorLevelThree extends Command 
 {
    private final Elevator m_Elevator;
-  /** Creates a new ElevatorPosition1. */
+  /** Creates a new ElevatorLevelThree. */
   public ElevatorLevelThree(Elevator p_Elevator) 
   {
     this.m_Elevator = p_Elevator;
@@ -21,9 +21,7 @@ public class ElevatorLevelThree extends Command
     addRequirements(this.m_Elevator);
   }
 
-  /**Will set elevator to the position called from ElevatorConstants
-   * @param Global.MODE.POSITION sets motor to the position mode
-   * @param ElevatorConstants.ELEVATOR_POSITION_3 Coral L4 position
+  /**Sets elevator to Level 3
    */
   // Called when the command is initially scheduled.
   @Override
@@ -39,13 +37,13 @@ public class ElevatorLevelThree extends Command
     //intentionally empty
   }
 
-  /**Once command ends sets motors to brake mode, making it resistant to external force
+  /**Once command ends shuts off motor voltage
    */
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) 
   {
-    m_Elevator.elevatorRequest(Global.MODE.BRAKE, 0);
+    m_Elevator.elevatorRequest(Global.MODE.VOLTAGE, 0); 
   }
 
   // Returns true when the command should end.

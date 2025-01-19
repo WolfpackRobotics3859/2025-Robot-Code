@@ -1,4 +1,3 @@
-
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
@@ -11,26 +10,24 @@ import frc.robot.constants.Global;
 import frc.robot.subsystems.Elevator;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class ZeroElevator extends Command 
+public class ElevatorLevelFour extends Command 
 {
-  private final Elevator m_Elevator;
-  /** Creates a new ZeroElevator. */
-  public ZeroElevator(Elevator p_Elevator)
+   private final Elevator m_Elevator;
+  /** Creates a new ElevatorLevelFour. */
+  public ElevatorLevelFour(Elevator p_Elevator) 
   {
     this.m_Elevator = p_Elevator;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(this.m_Elevator);
   }
 
-  /**Will set elevator to the position called from ElevatorConstants
-   * @param Global.MODE.POSITION sets motor to the position mode
-   * @param ElevatorConstants.ELEVATOR_POSITION_0 the zero position for the elevator (possibly Coral L1)
+  /**Sets elevator to Level 4
    */
   // Called when the command is initially scheduled.
   @Override
   public void initialize() 
   {
-    m_Elevator.elevatorRequest(Global.MODE.POSITION, ElevatorConstants.ELEVATOR_LEVEL_ZERO);
+    m_Elevator.elevatorRequest(Global.MODE.POSITION, ElevatorConstants.ELEVATOR_LEVEL_FOUR);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -40,13 +37,13 @@ public class ZeroElevator extends Command
     //intentionally empty
   }
 
-  /**Once command ends sets motors to brake mode, making it resistant to external force
+  /**Once command ends shuts off motor voltage
    */
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) 
   {
-    m_Elevator.elevatorRequest(Global.MODE.BRAKE, 0);
+    m_Elevator.elevatorRequest(Global.MODE.VOLTAGE, 0); 
   }
 
   // Returns true when the command should end.

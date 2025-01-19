@@ -28,6 +28,8 @@ public class ElevatorUp extends Command
     //intentionally empty
   }
 
+  /**Applies voltage for elevator to go up
+   */
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() 
@@ -35,13 +37,13 @@ public class ElevatorUp extends Command
     m_Elevator.elevatorRequest(Global.MODE.VOLTAGE, ElevatorConstants.ELEVATOR_UP_VOLTAGE);
   }
 
-  /**Once command ends sets motors to brake mode, making it resistant to external force
+  /**Once command ends shuts off motor voltage
    */
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) 
   {
-    m_Elevator.elevatorRequest(Global.MODE.BRAKE, 0);
+    m_Elevator.elevatorRequest(Global.MODE.VOLTAGE, 0);  
   }
 
   // Returns true when the command should end.

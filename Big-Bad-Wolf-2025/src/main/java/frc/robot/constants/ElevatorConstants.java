@@ -8,10 +8,10 @@ package frc.robot.constants;
 public class ElevatorConstants 
 {
 //All values are filler values and units until further testing
-    public static final double ELEVATOR_LEVEL_ZERO = 0;
-    public static final double ELEVATOR_LEVEL_ONE = 10;
-    public static final double ELEVATOR_LEVEL_TWO = 20;
-    public static final double ELEVATOR_LEVEL_THREE = 30;
+    public static final double ELEVATOR_ZERO_POSITION = 0;
+    public static final double ELEVATOR_LEVEL_TWO = 10;
+    public static final double ELEVATOR_LEVEL_THREE = 20;
+    public static final double ELEVATOR_LEVEL_FOUR = 30;
 
     public static final double ELEVATOR_UP_VOLTAGE = 4;
     public static final double ELEVATOR_DOWN_VOLTAGE = -4;
