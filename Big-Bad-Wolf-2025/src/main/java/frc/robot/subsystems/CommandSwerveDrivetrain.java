@@ -96,7 +96,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             // Optionally apply feedforward
             module.getCurrentState();
     }
-
     /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
     private final SysIdRoutine m_sysIdRoutineTranslation = new SysIdRoutine(
         new SysIdRoutine.Config(
@@ -327,6 +326,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         m_simNotifier.startPeriodic(kSimLoopPeriod);
     }
     
+
     public Supplier<Pose2d> getPoseSupplier() {
         // Return a supplier that fetches the robot's current pose
         return this::getPose;

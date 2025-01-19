@@ -9,8 +9,17 @@ import java.io.IOException;
 
 import org.json.simple.parser.ParseException;
 
+
+import java.io.IOException;
+
+import org.json.simple.parser.ParseException;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.util.FileVersionException;
+
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -55,24 +64,24 @@ public class RobotContainer
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+  
+  private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
   public Command forwardDynamicCommand;
   public Command reverseDynamicCommand; 
   public Command forwardQuasistaticCommand;
   public Command reverseQuasistaticCommand;
-    private final SendableChooser<Command> autoChooser = new SendableChooser<>();
-
-  /** The container for the robot. Contains subsystems, OI devices, and commands. 
-     * @throws ParseException 
-     * @throws IOException 
-     * @throws FileVersionException */
-    public RobotContainer() throws FileVersionException, IOException, ParseException 
+  
+  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  public RobotContainer() throws FileVersionException, IOException, ParseException 
   {
     this.initializeSubsystems();
     this.configureBindings();
     this.configureCharacterizationBindings(); // REMOVE FROM COMPETITION BUILD (REMOVE_BEFORE_COMP)
-    this.configureAutoCommands();
-    this.configureAutoChooser();
+    configureAutoCommands();
+    configureAutoChooser();
+
+    SmartDashboard.putData("Auto Selector", autoChooser);
   }
 
   public static SubsystemManager getSubsystemManager()
@@ -140,6 +149,7 @@ public class RobotContainer
     CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
     Elevator elevator = m_Manager.getSubsystemOfType(Elevator.class).get();
 
+
     //default doing nothing
     autoChooser.setDefaultOption("SIT_STAY", Commands.none());
 
@@ -152,12 +162,7 @@ public class RobotContainer
   public Command getAutonomousCommand() 
   {
     Command selectedCommand = autoChooser.getSelected();
-    if (selectedCommand != null) {
-        System.out.println("Scheduling Autonomous Command: " + selectedCommand.getName());
-        selectedCommand.schedule();
-    } else {
-        System.out.println("No Autonomous Command Selected");
-    }
+    System.out.println("Selected Auto: " + selectedCommand.getName());
     return selectedCommand;
   }
 }
