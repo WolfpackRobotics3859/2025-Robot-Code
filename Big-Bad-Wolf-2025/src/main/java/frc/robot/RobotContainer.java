@@ -52,7 +52,7 @@ public class RobotContainer
 {
   // Store subsystems in a public manager so other objects can easily cache them.
   public static final SubsystemManager m_Manager = new SubsystemManager();
-  
+
   private final CommandXboxController m_DriverController = new CommandXboxController(0);
   private final CommandXboxController m_CoDriverController = new CommandXboxController(1);
   
@@ -66,8 +66,8 @@ public class RobotContainer
   public Command reverseDynamicCommand; 
   public Command forwardQuasistaticCommand;
   public Command reverseQuasistaticCommand;
-  private final SendableChooser<Command> autoChooser = new SendableChooser<>();
-  
+    private final SendableChooser<Command> autoChooser = new SendableChooser<>();
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. 
      * @throws ParseException 
      * @throws IOException 
@@ -77,10 +77,8 @@ public class RobotContainer
     this.initializeSubsystems();
     this.configureBindings();
     this.configureCharacterizationBindings(); // REMOVE FROM COMPETITION BUILD (REMOVE_BEFORE_COMP)
-    configureAutoCommands();
-    configureAutoChooser();
-
-    SmartDashboard.putData("Auto Selector", autoChooser);
+    this.configureAutoCommands();
+    this.configureAutoChooser();
   }
 
   public static SubsystemManager getSubsystemManager()
@@ -93,7 +91,6 @@ public class RobotContainer
     m_Manager.addSubsystem(TunerConstants.createDrivetrain());
     m_Manager.addSubsystem(new Elevator());
     m_Manager.addSubsystem(new AlgaeIntake());
-    m_Manager.addSubsystem(new AlgaeCleaner());
     m_Manager.addSubsystem(new CoralPlacer());
 
     SmartDashboard.putData("Auto Selector", autoChooser);
@@ -113,6 +110,8 @@ public class RobotContainer
         )
     );
 
+      m_DriverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
+      m_DriverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
       m_DriverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
       m_DriverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
   }
@@ -153,6 +152,7 @@ public class RobotContainer
     autoChooser.setDefaultOption("SIT_STAY", Commands.none());
 
     //autos
+    autoChooser.addOption("MID_BLUE_TO_REEF", new MidBlueToReef(drivetrain, elevator));
     autoChooser.addOption("MID_BLUE_TO_REEF", new MidBlueToReef(drivetrain, elevator));
     //autoChooser.addOption("RED_TOP_TO_REEF", new RedTopToReef(m_Drivetrain, m_Elevator));
     
