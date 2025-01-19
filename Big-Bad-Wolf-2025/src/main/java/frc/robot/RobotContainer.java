@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Elevator;
+import frc.robot.utilities.SubsystemManager;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.CoralPlacer;
@@ -25,11 +26,8 @@ import frc.robot.subsystems.CoralPlacer;
  */
 public class RobotContainer 
 {
-  public static final CommandSwerveDrivetrain m_Drivetrain = TunerConstants.createDrivetrain(); 
-  public static final Elevator m_Elevator = new Elevator();
-  public static final AlgaeIntake m_AlgaeIntake = new AlgaeIntake();
-  public static final CoralPlacer m_CoralPlacer = new CoralPlacer();
-
+  // Store subsystems in a public manager so other objects can easily cache them.
+  public static final SubsystemManager m_Manager = new SubsystemManager();
 
   private final CommandXboxController m_DriverController = new CommandXboxController(0);
   private final CommandXboxController m_CoDriverController = new CommandXboxController(1);
@@ -40,40 +38,60 @@ public class RobotContainer
 
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
-  public Command forwardDynamicCommand = m_Drivetrain.sysIdDynamic(Direction.kForward);
-  public Command reverseDynamicCommand = m_Drivetrain.sysIdDynamic(Direction.kReverse);
-  public Command forwardQuasistaticCommand = m_Drivetrain.sysIdQuasistatic(Direction.kForward);
-  public Command reverseQuasistaticCommand = m_Drivetrain.sysIdQuasistatic(Direction.kReverse);
+  public Command forwardDynamicCommand;
+  public Command reverseDynamicCommand; 
+  public Command forwardQuasistaticCommand;
+  public Command reverseQuasistaticCommand;
   
-  
-
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() 
   {
-    configureBindings();
-    configureCharacterizationBindings(); // REMOVE FROM COMPETITION BUILD (REMOVE_BEFORE_COMP)
+    this.initializeSubsystems();
+    this.configureBindings();
+    this.configureCharacterizationBindings(); // REMOVE FROM COMPETITION BUILD (REMOVE_BEFORE_COMP)
+  }
+
+  public static SubsystemManager getSubsystemManager()
+  {
+    return m_Manager;
+  }
+
+  private void initializeSubsystems()
+  {
+    m_Manager.addSubsystem(TunerConstants.createDrivetrain());
+    m_Manager.addSubsystem(new Elevator());
+    m_Manager.addSubsystem(new AlgaeIntake());
+    m_Manager.addSubsystem(new CoralPlacer());
   }
 
   private void configureBindings() 
   {
-      // Note that X is defined as forward according to WPILib convention,
-      // and Y is defined as to the left according to WPILib convention.
-      m_Drivetrain.setDefaultCommand(
-          // Drivetrain will execute this command periodically
-          m_Drivetrain.applyRequest(() ->
-              drive.withVelocityX(-m_DriverController.getLeftY() * TunerConstants.MaxSpeed) // Drive forward with negative Y (forward)
-                  .withVelocityY(-m_DriverController.getLeftX() * TunerConstants.MaxSpeed) // Drive left with negative X (left)
-                  .withRotationalRate(-m_DriverController.getRightX() * TunerConstants.MaxAngularRate) // Drive counterclockwise with negative X (left)
-          )
-      );
+    CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
 
-      m_DriverController.a().whileTrue(m_Drivetrain.applyRequest(() -> brake));
-  
-      m_DriverController.leftBumper().onTrue(m_Drivetrain.runOnce(() -> m_Drivetrain.seedFieldCentric()));
+    drivetrain.setDefaultCommand
+    (
+        m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get().applyRequest(() ->
+            drive.withVelocityX(-m_DriverController.getLeftY() * TunerConstants.MaxSpeed)
+                 .withVelocityY(-m_DriverController.getLeftX() * TunerConstants.MaxSpeed)
+                 .withRotationalRate(-m_DriverController.getRightX() * TunerConstants.MaxAngularRate)
+        )
+    );
+
+      m_DriverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
+      m_DriverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
   }
 
+  /*
+   * Configures the bindings for characterization subroutines. Shouldn't be bound in a competition environment.
+   */
   private void configureCharacterizationBindings()
   {
+    CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
+    forwardDynamicCommand = drivetrain.sysIdDynamic(Direction.kForward);
+    reverseDynamicCommand = drivetrain.sysIdDynamic(Direction.kReverse);
+    forwardQuasistaticCommand = drivetrain.sysIdQuasistatic(Direction.kForward);
+    reverseQuasistaticCommand = drivetrain.sysIdQuasistatic(Direction.kReverse);
+
     SmartDashboard.putData("Forward Dynamic", this.forwardDynamicCommand);
     SmartDashboard.putData("Reverse Dynamic", this.reverseDynamicCommand);
     SmartDashboard.putData("Forward Quasistatic", this.forwardQuasistaticCommand);
