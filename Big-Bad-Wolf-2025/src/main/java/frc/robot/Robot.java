@@ -50,13 +50,11 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       System.out.println("Auto init");
 
-      System.out.println("Auto init");
-
       m_autonomousCommand.schedule();
     }
     else {
       System.out.println("No autonomous command selected");
-    }
+  }
   }
 
   @Override

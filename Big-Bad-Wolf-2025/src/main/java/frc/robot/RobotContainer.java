@@ -9,11 +9,6 @@ import java.io.IOException;
 
 import org.json.simple.parser.ParseException;
 
-
-import java.io.IOException;
-
-import org.json.simple.parser.ParseException;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -66,16 +61,18 @@ public class RobotContainer
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-  
-  private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
   public Command forwardDynamicCommand;
   public Command reverseDynamicCommand; 
   public Command forwardQuasistaticCommand;
   public Command reverseQuasistaticCommand;
+  private final SendableChooser<Command> autoChooser = new SendableChooser<>();
   
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  public RobotContainer() throws FileVersionException, IOException, ParseException 
+  /** The container for the robot. Contains subsystems, OI devices, and commands. 
+     * @throws ParseException 
+     * @throws IOException 
+     * @throws FileVersionException */
+    public RobotContainer() throws FileVersionException, IOException, ParseException 
   {
     this.initializeSubsystems();
     this.configureBindings();
