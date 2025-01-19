@@ -4,6 +4,12 @@
 
 package frc.robot;
 
+import java.io.IOException;
+
+import org.json.simple.parser.ParseException;
+
+import com.pathplanner.lib.util.FileVersionException;
+
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -13,7 +19,7 @@ public class Robot extends TimedRobot {
 
   private final RobotContainer m_robotContainer;
 
-  public Robot() {
+  public Robot() throws FileVersionException, IOException, ParseException  {
     m_robotContainer = new RobotContainer();
   }
 
@@ -36,8 +42,13 @@ public class Robot extends TimedRobot {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
+      System.out.println("Auto init");
+
       m_autonomousCommand.schedule();
     }
+    else {
+      System.out.println("No autonomous command selected");
+  }
   }
 
   @Override

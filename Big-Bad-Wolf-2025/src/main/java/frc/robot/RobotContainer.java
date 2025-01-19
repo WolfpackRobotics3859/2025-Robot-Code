@@ -4,8 +4,17 @@
 
 package frc.robot;
 
+
+import java.io.IOException;
+
+import org.json.simple.parser.ParseException;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.util.FileVersionException;
+
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -16,6 +25,9 @@ import frc.robot.subsystems.Elevator;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.CoralPlacer;
+import frc.robot.commands.autos.MidBlueToReef;
+import frc.robot.commands.autos.RedTopToReef;
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -46,12 +58,20 @@ public class RobotContainer
   public Command reverseQuasistaticCommand = m_Drivetrain.sysIdQuasistatic(Direction.kReverse);
   
   
+  private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  public RobotContainer() 
+  /** The container for the robot. Contains subsystems, OI devices, and commands. 
+     * @throws ParseException 
+     * @throws IOException 
+     * @throws FileVersionException */
+    public RobotContainer() throws FileVersionException, IOException, ParseException 
   {
     configureBindings();
     configureCharacterizationBindings(); // REMOVE FROM COMPETITION BUILD (REMOVE_BEFORE_COMP)
+    configureAutoCommands();
+    configureAutoChooser();
+
+    SmartDashboard.putData("Auto Selector", autoChooser);
   }
 
   private void configureBindings() 
@@ -77,11 +97,30 @@ public class RobotContainer
     SmartDashboard.putData("Forward Dynamic", this.forwardDynamicCommand);
     SmartDashboard.putData("Reverse Dynamic", this.reverseDynamicCommand);
     SmartDashboard.putData("Forward Quasistatic", this.forwardQuasistaticCommand);
-    SmartDashboard.putData("Reverse Quasistatic", this.reverseQuasistaticCommand);
+    SmartDashboard.putData("Reverse Quasistatic", this.reverseQuasistaticCommand); 
+  }
+
+  private void configureAutoCommands() throws FileVersionException, IOException, ParseException
+  {
+    NamedCommands.registerCommand("MID_BLUE_TO_REEF", new MidBlueToReef(m_Drivetrain, m_Elevator));
+    //NamedCommands.registerCommand("RED_TOP_TO_REEF", new RedTopToReef(m_Drivetrain, m_Elevator));
+  }
+
+  private void configureAutoChooser() throws FileVersionException, IOException, ParseException
+  {
+    //default doing nothing
+    autoChooser.setDefaultOption("SIT_STAY", Commands.none());
+
+    //autos
+    autoChooser.addOption("MID_BLUE_TO_REEF", new MidBlueToReef(m_Drivetrain, m_Elevator));
+    //autoChooser.addOption("RED_TOP_TO_REEF", new RedTopToReef(m_Drivetrain, m_Elevator));
+    
   }
 
   public Command getAutonomousCommand() 
   {
-      return Commands.print("No autonomous command configured");
+    Command selectedCommand = autoChooser.getSelected();
+    System.out.println("Selected Auto: " + selectedCommand.getName());
+    return selectedCommand;
   }
 }

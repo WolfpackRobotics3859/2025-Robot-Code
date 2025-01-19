@@ -2,18 +2,35 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
+import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.util.DriveFeedforwards;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
@@ -21,13 +38,10 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-
+import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 
-/**
- * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
- * Subsystem so it can easily be used in command-based projects.
- */
+
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem 
 {
     private static final double kSimLoopPeriod = 0.005; // 5 ms
@@ -46,6 +60,48 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private final SwerveRequest.SysIdSwerveSteerGains m_steerCharacterization = new SwerveRequest.SysIdSwerveSteerGains();
     private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization = new SwerveRequest.SysIdSwerveRotation();
 
+    //Pose2d setup
+    private Pose2d currentPose = new Pose2d(
+        new Translation2d(0, 0),
+        new Rotation2d()
+        );
+
+    //current pose getter
+    public Pose2d getPose()
+    {
+        return currentPose;
+    } 
+
+    public void updatePose(Pose2d newPose) {
+        // Update the current pose 
+        currentPose = newPose;
+    }
+    
+    //Chassis Speed setup
+    private ChassisSpeeds currentChassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
+
+    //Getter method for ChassisSpeeds
+    public ChassisSpeeds getChassisSpeeds() {
+        return currentChassisSpeeds;
+    }
+
+    //update ChassisSpeeds
+    public void updateChassisSpeeds(ChassisSpeeds newSpeeds) {
+        currentChassisSpeeds = newSpeeds;
+    }
+
+    //module state getter
+    private void setSwerveModuleState(int moduleIndex, SwerveModuleState moduleStates, DriveFeedforwards driveFeedforwards) {
+            // Retrieve the specific module (e.g., via an array or list of modules)
+            SwerveModule module = getModules()[moduleIndex];
+        
+            // Apply the desired state to the module
+            module.getCurrentState();
+        
+            // Optionally apply feedforward
+            module.getCurrentState();
+    }
+    
     /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
     private final SysIdRoutine m_sysIdRoutineTranslation = new SysIdRoutine(
         new SysIdRoutine.Config(
@@ -109,6 +165,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     /* The SysId routine to test */
     private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineTranslation;
 
+
     /**
      * Constructs a CTRE SwerveDrivetrain using the specified constants.
      * <p>
@@ -119,6 +176,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * @param drivetrainConstants   Drivetrain-wide constants for the swerve drive
      * @param modules               Constants for each specific module
      */
+
     public CommandSwerveDrivetrain(
         SwerveDrivetrainConstants drivetrainConstants,
         SwerveModuleConstants<?, ?, ?>... modules
@@ -128,6 +186,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         {
             startSimThread();
         }
+
+        configurePathPlanner();
     }
 
     /**
@@ -263,4 +323,55 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         });
         m_simNotifier.startPeriodic(kSimLoopPeriod);
     }
+
+    public Supplier<Pose2d> getPoseSupplier() {
+        // Return a supplier that fetches the robot's current pose
+        return this::getPose;
+    }
+    
+        // Supplier for ChassisSpeeds
+    public Supplier<ChassisSpeeds> getChassisSpeedsSupplier() {
+        return this::getChassisSpeeds;
+    }
+
+    private void configurePathPlanner()
+  {
+     final BiConsumer<ChassisSpeeds, DriveFeedforwards> chassisConsumer = (chassisSpeeds, driveFeedforwards) -> {
+        SwerveDriveKinematics kinematics = getKinematics();
+        SwerveModuleState[] moduleStates = kinematics.toSwerveModuleStates(chassisSpeeds);
+    
+        SwerveDriveKinematics.desaturateWheelSpeeds(moduleStates, TunerConstants.MaxSpeed);
+    
+        for (int i = 0; i < moduleStates.length; i++) {
+            setSwerveModuleState(i, moduleStates[i], driveFeedforwards);
+        }
+    };    
+    
+    RobotConfig robotConfig = new RobotConfig(
+        TunerConstants.MaxSpeed,
+        TunerConstants.MaxAngularRate,
+        new ModuleConfig(
+            m_lastSimTime, 
+            kSimLoopPeriod, 
+            m_lastSimTime, 
+            DCMotor.getFalcon500Foc(kNumConfigAttempts), 
+            m_drivetrainId, 
+            kNumConfigAttempts),        
+        0
+        );
+
+    AutoBuilder.configure(
+        this::getPose,
+        this::resetPose, 
+        this::getChassisSpeeds, 
+        chassisConsumer, 
+        new PPHolonomicDriveController(
+            new PIDConstants(kSimLoopPeriod, m_drivetrainId, kNumConfigAttempts), 
+            new PIDConstants(kSimLoopPeriod, m_drivetrainId, kNumConfigAttempts)
+            ), 
+        robotConfig,
+        () -> DriverStation.getAlliance().orElse(Alliance.Blue)==Alliance.Red, 
+        this
+        );
+  }
 }
