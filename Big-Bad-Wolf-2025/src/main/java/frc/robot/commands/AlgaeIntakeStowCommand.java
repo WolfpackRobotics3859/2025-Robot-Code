@@ -8,23 +8,27 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.AlgaeIntakeConstants;
 import frc.robot.subsystems.AlgaeIntake;
 
-// Creates a new Algae Ground Intake command.
-public class AlgaeIntakeGroundCommand extends Command 
+// Creates a new Algae Intake Stow command.
+public class AlgaeIntakeStowCommand extends Command 
 {
   private final AlgaeIntake m_AlgaeIntake;
 
-  public AlgaeIntakeGroundCommand(AlgaeIntake algaeIntake) 
+  /**
+   * Algae Intake Stow command constructor.
+   * @param algaeIntake Algae Intake subsystem.
+   */
+  public AlgaeIntakeStowCommand(AlgaeIntake algaeIntake) 
   {
     this.m_AlgaeIntake = algaeIntake;
-    addRequirements(m_AlgaeIntake);  
+    addRequirements(m_AlgaeIntake);    
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() 
   {
-    m_AlgaeIntake.setWristPosition(AlgaeIntakeConstants.ALGAE_INTAKE_WRIST_GROUND_POSITION);
-    m_AlgaeIntake.setRollerVoltage(AlgaeIntakeConstants.ALGAE_INTAKE_ROLLER_VOLTAGE);
+    m_AlgaeIntake.setWristPosition(AlgaeIntakeConstants.ALGAE_INTAKE_WRIST_DEFAULT_POSITION);
+    m_AlgaeIntake.setRollerVoltage(AlgaeIntakeConstants.ALGAE_INTAKE_ROLLER_DEFAULT_VOLTAGE);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
