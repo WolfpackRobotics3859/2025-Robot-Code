@@ -20,7 +20,7 @@ public class AlgaeCleanerConstants
     public static final double ALGAE_CLEANER_WRIST_EXPEL_POSITION = 0;
 
     public static final double ALGAE_CLEANER_ROLLER_DEFAULT_VOLTAGE = 0;
-    public static final double ALGAE_CLEANER_ROLLER_VOLTAGE = 0;
+    public static final double ALGAE_CLEANER_INTAKING_ROLLER_VOLTAGE = 0;
     public static final double ALGAE_CLEANER_ROLLER_EXPEL_VOLTAGE = 0;
 
     // Insert roller gain values when determined.

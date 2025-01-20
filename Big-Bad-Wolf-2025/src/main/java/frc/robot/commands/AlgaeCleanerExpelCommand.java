@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.AlgaeCleanerConstants;
 import frc.robot.subsystems.AlgaeCleaner;
 
-// Creates a new Algae Cleaner command.
+// Creates a new Algae Cleaner Expel command.
 public class AlgaeCleanerExpelCommand extends Command 
 {
   private final AlgaeCleaner m_AlgaeCleaner;
@@ -27,15 +27,15 @@ public class AlgaeCleanerExpelCommand extends Command
   @Override
   public void initialize() 
   {
-    // Intentionally Empty.
+    m_AlgaeCleaner.setCleanerWristPosition(AlgaeCleanerConstants.ALGAE_CLEANER_WRIST_EXPEL_POSITION);
+    m_AlgaeCleaner.setCleanerRollerVoltage(AlgaeCleanerConstants.ALGAE_CLEANER_ROLLER_EXPEL_VOLTAGE);  
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() 
   {
-    m_AlgaeCleaner.setCleanerWristPosition(AlgaeCleanerConstants.ALGAE_CLEANER_WRIST_EXPEL_POSITION);
-    m_AlgaeCleaner.setCleanerRollerVoltage(AlgaeCleanerConstants.ALGAE_CLEANER_ROLLER_EXPEL_VOLTAGE);
+    // Intentionally Empty.
   }
 
   // Called once the command ends or is interrupted.
