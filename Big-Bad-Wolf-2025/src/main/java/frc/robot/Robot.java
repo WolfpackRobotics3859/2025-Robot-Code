@@ -48,7 +48,7 @@ public class Robot extends TimedRobot {
     }
     else {
       System.out.println("No autonomous command selected");
-  }
+    }
   }
 
   @Override

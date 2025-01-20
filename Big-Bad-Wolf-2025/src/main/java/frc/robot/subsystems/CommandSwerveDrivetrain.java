@@ -13,7 +13,6 @@ import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
@@ -24,7 +23,6 @@ import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -61,21 +59,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization = new SwerveRequest.SysIdSwerveRotation();
 
     //Pose2d setup
-    private Pose2d currentPose = new Pose2d(
-        new Translation2d(0, 0),
-        new Rotation2d()
-        );
+    private Pose2d currentPose = new Pose2d();
 
     //current pose getter
     public Pose2d getPose()
     {
         return currentPose;
     } 
-
-    public void updatePose(Pose2d newPose) {
-        // Update the current pose 
-        currentPose = newPose;
-    }
     
     //Chassis Speed setup
     private ChassisSpeeds currentChassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
@@ -89,11 +79,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public void updateChassisSpeeds(ChassisSpeeds newSpeeds) {
         currentChassisSpeeds = newSpeeds;
     }
-
-    //module state getter
+    
+     //module state getter
     private void setSwerveModuleState(int moduleIndex, SwerveModuleState moduleStates, DriveFeedforwards driveFeedforwards) {
             // Retrieve the specific module (e.g., via an array or list of modules)
-            SwerveModule module = getModules()[moduleIndex];
+            SwerveModule<TalonFX, TalonFX, CANcoder> module = getModules()[moduleIndex];
         
             // Apply the desired state to the module
             module.getCurrentState();
@@ -101,7 +91,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             // Optionally apply feedforward
             module.getCurrentState();
     }
-    
+
     /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
     private final SysIdRoutine m_sysIdRoutineTranslation = new SysIdRoutine(
         new SysIdRoutine.Config(
@@ -323,7 +313,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         });
         m_simNotifier.startPeriodic(kSimLoopPeriod);
     }
-
+    
     public Supplier<Pose2d> getPoseSupplier() {
         // Return a supplier that fetches the robot's current pose
         return this::getPose;

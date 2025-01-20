@@ -11,7 +11,9 @@ import org.json.simple.parser.ParseException;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.FileVersionException;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -120,7 +122,12 @@ public class RobotContainer
   public Command getAutonomousCommand() 
   {
     Command selectedCommand = autoChooser.getSelected();
-    System.out.println("Selected Auto: " + selectedCommand.getName());
+    if (selectedCommand != null) {
+        System.out.println("Scheduling Autonomous Command: " + selectedCommand.getName());
+        selectedCommand.schedule();
+    } else {
+        System.out.println("No Autonomous Command Selected");
+    }
     return selectedCommand;
   }
 }

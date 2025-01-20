@@ -20,15 +20,19 @@ import frc.robot.subsystems.Elevator;
 public class MidBlueToReef extends SequentialCommandGroup {
 
   public MidBlueToReef(CommandSwerveDrivetrain drivetrain, Elevator elevator  ) throws FileVersionException, IOException, ParseException 
-  {
-    //paths used
-    PathPlannerPath reefPath = PathPlannerPath.fromPathFile("MidBlueToReef");
+    {
 
-    System.out.println("Loaded path: " + reefPath);
-    addCommands
-    (
-        AutoBuilder.followPath(reefPath)
-    );
-  }
+      // Paths used
+      PathPlannerPath reefPath = PathPlannerPath.fromPathFile("MidBlueToReef");
+      
+      // Create command sequence
+      addCommands(
+          AutoBuilder.followPath(reefPath)
+        );
+
+      System.out.println("MidBlueToReef Command Initialized");
+      
+    }
+      
 }
 
