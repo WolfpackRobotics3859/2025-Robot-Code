@@ -25,7 +25,7 @@ public class ElevatorUp extends Command
   @Override
   public void initialize() 
   {
-    //intentionally empty
+    m_Elevator.elevatorRequest(Global.MODE.VOLTAGE, ElevatorConstants.ELEVATOR_UP_VOLTAGE);
   }
 
   /**Applies voltage for elevator to go up
@@ -34,7 +34,7 @@ public class ElevatorUp extends Command
   @Override
   public void execute() 
   {
-    m_Elevator.elevatorRequest(Global.MODE.VOLTAGE, ElevatorConstants.ELEVATOR_UP_VOLTAGE);
+    //intentionally empty
   }
 
   /**Once command ends shuts off motor voltage
