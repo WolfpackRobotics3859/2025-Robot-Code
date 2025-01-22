@@ -13,40 +13,45 @@ import frc.robot.subsystems.Elevator;
 public class ElevatorLevelTwo extends Command 
 {
    private final Elevator m_Elevator;
-  /** Creates a new ElevatorLevelTwo. */
+  /** 
+   * Creates a new ElevatorLevelTwo. 
+   */
   public ElevatorLevelTwo(Elevator p_Elevator) 
   {
     this.m_Elevator = p_Elevator;
-    // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(this.m_Elevator);
   }
 
-  /**Sets elevator to Level 2
+  /**
+   * Called when the command is initially scheduled.
    */
-  // Called when the command is initially scheduled.
   @Override
   public void initialize() 
   {
-    m_Elevator.elevatorRequest(Global.MODE.POSITION, ElevatorConstants.ELEVATOR_LEVEL_TWO);
+    m_Elevator.elevatorRequest(Global.MODE.POSITION, ElevatorConstants.ELEVATOR_LEVEL_TWO);// Sets elevator to Level 2
   }
 
-  // Called every time the scheduler runs while the command is scheduled.
+  /**
+   * Called every time the scheduler runs while the command is scheduled.
+   */
   @Override
   public void execute() 
   {
-    //intentionally empty
+    // Intentionally empty
   }
 
-  /**Once command ends shuts off motor voltage
+  /**
+   * Called once the command ends or is interrupted.
    */
-  // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) 
   {
-    m_Elevator.elevatorRequest(Global.MODE.VOLTAGE, 0);
+    m_Elevator.elevatorRequest(Global.MODE.VOLTAGE, 0);// Once command ends shuts off motor voltage
   }
 
-  // Returns true when the command should end.
+  /**
+   * Returns true when the command should end.
+   */
   @Override
   public boolean isFinished() 
   {
