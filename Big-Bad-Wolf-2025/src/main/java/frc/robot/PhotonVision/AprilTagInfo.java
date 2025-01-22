@@ -14,11 +14,10 @@ import edu.wpi.first.apriltag.AprilTagFields;
  */
 public class AprilTagInfo 
 {
-    AllianceColor color = AllianceColor.NONE;
-    Area area = Area.NONE;
-    int id = -1;
-    PhotonTrackedTarget target;
-
+    private AllianceColor color = AllianceColor.NONE;
+    private Area area = Area.NONE;
+    private int id = -1;
+    private PhotonTrackedTarget target;
     
     /** Initializes using an ID to figure out the color/area of the AprilTag.  Also initializes
      * a PhotonTrackedTarget object to use the position of the tag on the camera.
@@ -97,6 +96,10 @@ public class AprilTagInfo
         this.id = newId;
         setArea();
         setColor();
+
+        if (this.id < 1 || this.id > 22 ) {
+            System.out.println("AprilTag of ID " + this.id + " is nonexistent");
+        }
     }
 
     /** 
@@ -133,6 +136,11 @@ public class AprilTagInfo
             case 15:
             case 16:
             this.color = AllianceColor.RED;
+            break;
+
+            // NONE
+            default:
+            this.color = AllianceColor.NONE;
             break;
         }
     }
@@ -176,6 +184,15 @@ public class AprilTagInfo
         this.target = newTarget;
     }
 
+    /** Sees if the AprilTag ID is existent.
+     * 
+     * @return if the AprilTag ID is within 1 and the max ID number
+     */
+    public final boolean isValid() 
+    {
+        return (this.id > 0 && this.id < 23);
+    }
+
     /** 
      * An enumeration corresponding to a side of the field.
      */
@@ -200,7 +217,7 @@ public class AprilTagInfo
     
     public static final AprilTagFieldLayout TAG_LAYOUT;
     
-    // Gets the most recent april tag field
+    // Gets the most recent AprilTag field
     static {
         try {
             TAG_LAYOUT = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
