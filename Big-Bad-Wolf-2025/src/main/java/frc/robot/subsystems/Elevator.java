@@ -20,24 +20,23 @@ public class Elevator extends SubsystemBase
   private final TalonFX m_ElevatorMotor1;
   private final TalonFX m_ElevatorMotor2;
 
-  /**Constructor which runs anything in it upon initialization
-   * Follower: Sets motor 2 to follow whatever motor 1 does
-   *  @param ELEVATOR_MOTOR_1 (lead motor)
-   *  @param false (does not go in opposite direction of lead motor)
-   * does not have any current parameters
+  /**
+   * Constructor which runs anything in it upon initialization and creates a new object.
    */
   public Elevator()
   {
     m_ElevatorMotor1 = new TalonFX(Hardware.ELEVATOR_MOTOR_1);
     m_ElevatorMotor2 = new TalonFX(Hardware.ELEVATOR_MOTOR_2);
 
-    Follower followRequest = new Follower(Hardware.ELEVATOR_MOTOR_1, false);
-    m_ElevatorMotor2.setControl(followRequest);
+    Follower followRequest = new Follower(Hardware.ELEVATOR_MOTOR_1, false); 
+    m_ElevatorMotor2.setControl(followRequest);// Sets motor 2 to follow whatever motor 1 does
   }
 
-  /**based on the control mode and value input into the parameters will call a method through a command
-   * @param controlMode
-   * @param value
+  /**
+   * Moves elevator based on what control mode and value is chosen.
+   * 
+   * @param controlMode Which type of mode to use for motor.
+   * @param value value fed as an argument into chosen method
    */
   public void elevatorRequest(Global.MODE controlMode, double value)
   {
@@ -58,7 +57,9 @@ public class Elevator extends SubsystemBase
     }
   }
 
-  /** Sets voltage for elevator motor
+  /** 
+   * Sets voltage for elevator motor
+   * 
    * @param voltage amount of volts
    */
   private void setElevatorVoltage(double voltage)
@@ -67,7 +68,8 @@ public class Elevator extends SubsystemBase
     m_ElevatorMotor1.setControl(voltageRequest);
   }
 
-  /** Sets elevator motor to work at a percentage of the max power it can.
+  /** 
+   * Sets elevator motor to work at a percentage of the max power it can.
    * @param percentage percentage of max power motor works at
    */
   private void setElevatorPercentage(double percentage)
@@ -76,7 +78,8 @@ public class Elevator extends SubsystemBase
     m_ElevatorMotor1.setControl(dutyCycleRequest);
   }
 
-  /** Sets elevator position
+  /** 
+   * Sets elevator position
    * @param position as an angle or value depending on motor purpose
    */
   private void setElevatorPosition(double position)
@@ -85,14 +88,16 @@ public class Elevator extends SubsystemBase
     m_ElevatorMotor1.setControl(positionRequest);
   }
 
-  /**Stops movement and discourages any further movement
-   * 
+  /**
+   * Stops movement and discourages any further movement from external forces
    */
   private void brakeElevator()
   {
     StaticBrake brakeRequest = new StaticBrake();
     m_ElevatorMotor1.setControl(brakeRequest);
   }
+
+  
 
   @Override
   public void periodic()
