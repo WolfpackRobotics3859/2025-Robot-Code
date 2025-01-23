@@ -15,10 +15,6 @@ public class ClimbConstants
     // Insert wrist feed forward and default position values when determined.
     public static final double CLIMB_DEFAULT_WRIST_POSITION = 0;
     public static final double CLIMB_WRIST_FEED_FORWARD = 0;
-
-    // (REMOVE_BEFORE_COMP) Insert coral funnel constants when determined.
-    public static final double CORAL_FUNNEL_SEPARATE_POSITION = 0;
-    public static final double CORAL_FUNNEL_CLOSED_POSITION = 0;
     
     // Insert wrist gain values when determined.
     public static final Slot0Configs CLIMB_WRIST_MAIN_GAINS = new Slot0Configs()
