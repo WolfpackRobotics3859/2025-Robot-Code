@@ -17,13 +17,24 @@ public class ClimbConstants
     public static final double CLIMB_WRIST_FEED_FORWARD = 0;
     
     // Insert wrist gain values when determined.
-    public static final Slot0Configs CLIMB_WRIST_GAINS = new Slot0Configs()
+    public static final Slot0Configs CLIMB_MAIN_WRIST_GAINS = new Slot0Configs()
+    .withKP(0).withKI(0).withKD(0).withGravityType(GravityTypeValue.Arm_Cosine);
+
+    // Insert wrist gain values when determined.
+    public static final Slot0Configs CLIMB_FOLLOWER_WRIST_GAINS = new Slot0Configs()
     .withKP(0).withKI(0).withKD(0).withGravityType(GravityTypeValue.Arm_Cosine);
 
     // Insert Motion Magic configuration values when determined.
-    public static final MotionMagicConfigs CLIMB_WRIST_MOTOR_MOTION_MAGIC_CONFIGURATION = new MotionMagicConfigs()
+    public static final MotionMagicConfigs CLIMB_MAIN_WRIST_MOTOR_MOTION_MAGIC_CONFIGURATION = new MotionMagicConfigs()
         .withMotionMagicCruiseVelocity(0).withMotionMagicAcceleration(0);
 
-    public static final TalonFXConfiguration CLIMB_WRIST_CONFIGURATION = new TalonFXConfiguration()
-        .withMotionMagic(CLIMB_WRIST_MOTOR_MOTION_MAGIC_CONFIGURATION).withSlot0(CLIMB_WRIST_GAINS);
+    // Insert Motion Magic configuration values when determined.
+    public static final MotionMagicConfigs CLIMB_FOLLOWER_WRIST_MOTOR_MOTION_MAGIC_CONFIGURATION = new MotionMagicConfigs()
+        .withMotionMagicCruiseVelocity(0).withMotionMagicAcceleration(0);
+
+    public static final TalonFXConfiguration CLIMB_MAIN_WRIST_CONFIGURATION = new TalonFXConfiguration()
+        .withMotionMagic(CLIMB_MAIN_WRIST_MOTOR_MOTION_MAGIC_CONFIGURATION).withSlot0(CLIMB_MAIN_WRIST_GAINS);
+
+    public static final TalonFXConfiguration CLIMB_FOLLOWER_WRIST_CONFIGURATION = new TalonFXConfiguration()
+        .withMotionMagic(CLIMB_FOLLOWER_WRIST_MOTOR_MOTION_MAGIC_CONFIGURATION).withSlot0(CLIMB_FOLLOWER_WRIST_GAINS);
 }

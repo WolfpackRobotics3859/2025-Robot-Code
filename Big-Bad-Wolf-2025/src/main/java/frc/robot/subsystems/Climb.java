@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
@@ -14,14 +15,20 @@ import frc.robot.constants.Hardware;
 // Creates a new Climb subsystem.
 public class Climb extends SubsystemBase
 {
-  private final TalonFX m_ClimbWristMotor = new TalonFX(Hardware.CLIMB_MOTOR_ID);
+  private final TalonFX m_ClimbWristMotorMain = new TalonFX(Hardware.CLIMB_MAIN_WRIST_MOTOR_ID);
+  private final TalonFX m_ClimbWristMotorFollower = new TalonFX(Hardware.CLIMB_FOLLOWER_WRIST_MOTOR_ID);
   
   /**
    * Climb subsystem constructor.
    */
   public Climb() 
   {
-    m_ClimbWristMotor.getConfigurator().apply(ClimbConstants.CLIMB_WRIST_CONFIGURATION);
+    m_ClimbWristMotorMain.getConfigurator().apply(ClimbConstants.CLIMB_MAIN_WRIST_CONFIGURATION);
+    m_ClimbWristMotorFollower.getConfigurator().apply(ClimbConstants.CLIMB_FOLLOWER_WRIST_CONFIGURATION);
+
+    // Sets the main climb wrist motor to follow the secondary climb wrist motor.
+    Follower climbFollowRequest = new Follower(Hardware.CLIMB_MAIN_WRIST_MOTOR_ID, false); 
+    m_ClimbWristMotorFollower.setControl(climbFollowRequest);
   }
 
   /**
@@ -31,7 +38,7 @@ public class Climb extends SubsystemBase
   public void setClimbWristPosition(double climbPosition)
   {
     MotionMagicVoltage climbPositionRequest = new MotionMagicVoltage(climbPosition);
-    m_ClimbWristMotor.setControl(climbPositionRequest);
+    m_ClimbWristMotorMain.setControl(climbPositionRequest);
   }
 
   @Override
