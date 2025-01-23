@@ -27,6 +27,7 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.utilities.SubsystemManager;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.AlgaeIntake;
+import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.CoralPlacer;
 import frc.robot.commands.autos.MidBlueToReef;
 import frc.robot.commands.autos.RedTopToReef;
@@ -84,6 +85,7 @@ public class RobotContainer
     m_Manager.addSubsystem(new CoralPlacer());
 
     SmartDashboard.putData("Auto Selector", autoChooser);
+    m_Manager.addSubsystem(new Climb());
   }
 
   private void configureBindings() 
