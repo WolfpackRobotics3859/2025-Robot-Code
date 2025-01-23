@@ -23,6 +23,6 @@ public class Hardware
     public static final int CORAL_PLACER_MOTOR = 7;
 
     //CLIMB
-    public static final int CLIMB_MAIN_WRIST_MOTOR_ID = 8;
-    public static final int CLIMB_FOLLOWER_WRIST_MOTOR_ID = 9;
+    public static final int CLIMB_WRIST_MOTOR_MAIN_ID = 8;
+    public static final int CLIMB_WRIST_MOTOR_FOLLOWER_ID = 9;
 }

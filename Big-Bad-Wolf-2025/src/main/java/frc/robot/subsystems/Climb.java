@@ -15,19 +15,19 @@ import frc.robot.constants.Hardware;
 // Creates a new Climb subsystem.
 public class Climb extends SubsystemBase
 {
-  private final TalonFX m_ClimbWristMotorMain = new TalonFX(Hardware.CLIMB_MAIN_WRIST_MOTOR_ID);
-  private final TalonFX m_ClimbWristMotorFollower = new TalonFX(Hardware.CLIMB_FOLLOWER_WRIST_MOTOR_ID);
+  private final TalonFX m_ClimbWristMotorMain = new TalonFX(Hardware.CLIMB_WRIST_MOTOR_MAIN_ID);
+  private final TalonFX m_ClimbWristMotorFollower = new TalonFX(Hardware.CLIMB_WRIST_MOTOR_FOLLOWER_ID);
   
   /**
    * Climb subsystem constructor.
    */
   public Climb() 
   {
-    m_ClimbWristMotorMain.getConfigurator().apply(ClimbConstants.CLIMB_MAIN_WRIST_CONFIGURATION);
-    m_ClimbWristMotorFollower.getConfigurator().apply(ClimbConstants.CLIMB_FOLLOWER_WRIST_CONFIGURATION);
+    m_ClimbWristMotorMain.getConfigurator().apply(ClimbConstants.CLIMB_WRIST_MAIN_CONFIGURATION);
+    m_ClimbWristMotorFollower.getConfigurator().apply(ClimbConstants.CLIMB_WRIST_FOLLOWER_CONFIGURATION);
 
     // Sets the main climb wrist motor to follow the secondary climb wrist motor.
-    Follower climbFollowRequest = new Follower(Hardware.CLIMB_MAIN_WRIST_MOTOR_ID, false); 
+    Follower climbFollowRequest = new Follower(Hardware.CLIMB_WRIST_MOTOR_MAIN_ID, false); 
     m_ClimbWristMotorFollower.setControl(climbFollowRequest);
   }
 
