@@ -16,6 +16,7 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.utilities.SubsystemManager;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.AlgaeIntake;
+import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.CoralPlacer;
 
 /**
@@ -62,6 +63,7 @@ public class RobotContainer
     m_Manager.addSubsystem(new Elevator());
     m_Manager.addSubsystem(new AlgaeIntake());
     m_Manager.addSubsystem(new CoralPlacer());
+    m_Manager.addSubsystem(new Climb());
   }
 
   private void configureBindings() 
