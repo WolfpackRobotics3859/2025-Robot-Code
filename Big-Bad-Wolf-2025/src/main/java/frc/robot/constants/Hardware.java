@@ -21,4 +21,7 @@ public class Hardware
 
     //CORAL PLACER
     public static final int CORAL_PLACER_MOTOR = 7;
+
+    //CLIMB
+    public static final int CLIMB_MOTOR_ID = 8;
 }
