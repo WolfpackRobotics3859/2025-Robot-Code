@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.AlgaeCleanerConstants;
 import frc.robot.subsystems.AlgaeCleaner;
 
-// Creates a new Algae Cleaner Expel command.
+// Creates a new Algae Cleaner Shooting command.
 public class AlgaeCleanerShootingCommand extends Command 
 {
   private final AlgaeCleaner m_AlgaeCleaner;
