@@ -5,7 +5,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
@@ -16,14 +15,12 @@ import frc.robot.constants.Hardware;
 public class CoralPlacer extends SubsystemBase
 {
   private final TalonFX m_CoralPlacerMotor;
-  private final TalonFX m_CoralFunnelMotor;
   /**
    * Coral Placer subsystem.
   */
   public CoralPlacer()
   {
     m_CoralPlacerMotor = new TalonFX(Hardware.CORAL_PLACER_MOTOR);
-    m_CoralFunnelMotor = new TalonFX(Hardware.CORAL_FUNNEL_MOTOR_ID);
   }
   
   /**
@@ -68,16 +65,6 @@ public class CoralPlacer extends SubsystemBase
   {
     DutyCycleOut dutyCycleRequest = new DutyCycleOut(percentage);
     m_CoralPlacerMotor.setControl(dutyCycleRequest);
-  }
-
-  /**
-   * Sets the wrist position for the funnel wrist motor.
-   * @param funnelPosition Position to set the funnel wrist to.
-   */
-  public void setFunnelWristPosition(double funnelPosition)
-  {
-    MotionMagicVoltage positionRequest = new MotionMagicVoltage(funnelPosition);
-    m_CoralFunnelMotor.setControl(positionRequest);
   }
 
   @Override
