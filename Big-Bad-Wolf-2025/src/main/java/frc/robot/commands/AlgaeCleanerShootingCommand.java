@@ -9,7 +9,7 @@ import frc.robot.constants.AlgaeCleanerConstants;
 import frc.robot.subsystems.AlgaeCleaner;
 
 // Creates a new Algae Cleaner Expel command.
-public class AlgaeCleanerExpelCommand extends Command 
+public class AlgaeCleanerShootingCommand extends Command 
 {
   private final AlgaeCleaner m_AlgaeCleaner;
 
@@ -17,7 +17,7 @@ public class AlgaeCleanerExpelCommand extends Command
    * Algae Cleaner command constructor.
    * @param algaeCleaner Algae Cleaner subsystem.
    */
-  public AlgaeCleanerExpelCommand(AlgaeCleaner algaeCleaner) 
+  public AlgaeCleanerShootingCommand(AlgaeCleaner algaeCleaner) 
   {
     this.m_AlgaeCleaner = algaeCleaner;
     addRequirements(m_AlgaeCleaner);
@@ -27,8 +27,8 @@ public class AlgaeCleanerExpelCommand extends Command
   @Override
   public void initialize() 
   {
-    m_AlgaeCleaner.setCleanerWristPosition(AlgaeCleanerConstants.ALGAE_CLEANER_WRIST_EXPEL_POSITION);
-    m_AlgaeCleaner.setCleanerRollerVoltage(AlgaeCleanerConstants.ALGAE_CLEANER_ROLLER_EXPEL_VOLTAGE);  
+    m_AlgaeCleaner.setCleanerWristPosition(AlgaeCleanerConstants.ALGAE_CLEANER_WRIST_SHOOTING_POSITION);
+    m_AlgaeCleaner.setCleanerRollerVoltage(AlgaeCleanerConstants.ALGAE_CLEANER_ROLLER_SHOOTING_VOLTAGE);  
   }
 
   // Called every time the scheduler runs while the command is scheduled.
