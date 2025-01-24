@@ -8,8 +8,9 @@ package frc.robot.constants;
 public class Hardware
 {
     //ELEVATOR
-    public static final int ELEVATOR_MOTOR_1_ID = 1;
-    public static final int ELEVATOR_MOTOR_2_ID = 2;
+    public static final int ELEVATOR_MOTOR_MAIN_ID = 1;
+    public static final int ELEVATOR_MOTOR_FOLLOWER_ID = 2;
+    public static final int HALL_EFFECT_DIO_PORT_ID = 10;
 
     //ALGAE INTAKE
     public static final int ALGAE_INTAKE_ROLLER_MOTOR_ID = 3;
