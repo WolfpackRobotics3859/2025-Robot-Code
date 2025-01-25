@@ -12,8 +12,9 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 // Initializing constants for Climb.
 public class ClimbConstants 
 {
-    // Insert wrist feed forward and default position values when determined.
+    // Insert wrist feed forward and position values when determined.
     public static final double CLIMB_DEFAULT_WRIST_POSITION = 0;
+    public static final double CLIMB_WRIST_POSITION = 0;
     public static final double CLIMB_WRIST_FEED_FORWARD = 0;
 
     // (REMOVE_BEFORE_COMP) Insert coral funnel constants when determined.

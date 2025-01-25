@@ -8,16 +8,16 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.ClimbConstants;
 import frc.robot.subsystems.Climb;
 
-// Creates a new Funnel Open command.
-public class FunnelOpenCommand extends Command 
+// Creates a new Climb command.
+public class ClimbCommand extends Command 
 {
   private final Climb m_Climb;
 
   /**
-   * Funnel Open command constructor.
+   * Climb command constructor.
    * @param climb Climb subsystem.
    */
-  public FunnelOpenCommand(Climb climb) 
+  public ClimbCommand(Climb climb) 
   {
     this.m_Climb = climb;
     addRequirements(m_Climb);
@@ -27,7 +27,7 @@ public class FunnelOpenCommand extends Command
   @Override
   public void initialize() 
   {
-    m_Climb.setFunnelWristPosition(ClimbConstants.CORAL_FUNNEL_SEPARATE_POSITION);
+    m_Climb.setClimbWristPosition(ClimbConstants.CLIMB_WRIST_POSITION);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
