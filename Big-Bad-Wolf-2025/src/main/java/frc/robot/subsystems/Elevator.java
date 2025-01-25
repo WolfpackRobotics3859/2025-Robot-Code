@@ -11,25 +11,53 @@ import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Global;
 import frc.robot.constants.Hardware;
 
 public class Elevator extends SubsystemBase
 {
-  private final TalonFX m_ElevatorMotor1;
-  private final TalonFX m_ElevatorMotor2;
+  private final TalonFX m_ElevatorMotorMain;
+  private final TalonFX m_ElevatorMotorFollower;
+
+  public final DigitalInput m_HallEffectSensor;// Curcuit has 0 volts if magnet is nearby, or else it has 5 volts
 
   /**
    * Constructor which runs anything in it upon initialization and creates a new object.
    */
   public Elevator()
   {
-    m_ElevatorMotor1 = new TalonFX(Hardware.ELEVATOR_MOTOR_1_ID);
-    m_ElevatorMotor2 = new TalonFX(Hardware.ELEVATOR_MOTOR_2_ID);
+    m_ElevatorMotorMain = new TalonFX(Hardware.ELEVATOR_MOTOR_MAIN_ID);
+    m_ElevatorMotorFollower = new TalonFX(Hardware.ELEVATOR_MOTOR_FOLLOWER_ID);
 
-    Follower followRequest = new Follower(Hardware.ELEVATOR_MOTOR_1_ID, false); 
-    m_ElevatorMotor2.setControl(followRequest);// Sets motor 2 to follow whatever motor 1 does
+    Follower followRequest = new Follower(Hardware.ELEVATOR_MOTOR_MAIN_ID, false); 
+    m_ElevatorMotorFollower.setControl(followRequest);// Sets follower motor to follow whatever main motor does
+
+    m_HallEffectSensor = new DigitalInput(Hardware.HALL_EFFECT_DIO_PORT_ID);
+  }
+
+  /**
+   * Uses Hall Effect Sensor to detect and return true when the elevator reaches the bottom.
+   * Magnet is attached to bottom of elevator where Hall Effect sensor can open(turn off) curcuit when it detects it.
+   * 
+   * @return True if magnet on bottom of elevator reaches Hall Effect sensor. 
+   */
+  public boolean elevatorAtZeroPosition()
+  {
+    return this.m_HallEffectSensor.get();// .get() checks if curcuit is on or off (true if off)
+  }
+
+  /**
+   * Used to zero encoder values so it knows its position.
+   */
+  public void zeroElevator()
+  {
+    if (elevatorAtZeroPosition())
+    {
+      // If elevator is at zero position, set encoder value to 0
+      m_ElevatorMotorMain.setPosition(0);
+    }
   }
 
   /**
@@ -65,7 +93,7 @@ public class Elevator extends SubsystemBase
   private void setElevatorVoltage(double voltage)
   {
     VoltageOut voltageRequest = new VoltageOut(voltage);
-    m_ElevatorMotor1.setControl(voltageRequest);
+    m_ElevatorMotorMain.setControl(voltageRequest);
   }
 
   /** 
@@ -75,7 +103,7 @@ public class Elevator extends SubsystemBase
   private void setElevatorPercentage(double percentage)
   {
     DutyCycleOut dutyCycleRequest = new DutyCycleOut(percentage);
-    m_ElevatorMotor1.setControl(dutyCycleRequest);
+    m_ElevatorMotorMain.setControl(dutyCycleRequest);
   }
 
   /** 
@@ -85,7 +113,7 @@ public class Elevator extends SubsystemBase
   private void setElevatorPosition(double position)
   {
     MotionMagicVoltage positionRequest = new MotionMagicVoltage(position);
-    m_ElevatorMotor1.setControl(positionRequest);
+    m_ElevatorMotorMain.setControl(positionRequest);
   }
 
   /**
@@ -94,14 +122,15 @@ public class Elevator extends SubsystemBase
   private void brakeElevator()
   {
     StaticBrake brakeRequest = new StaticBrake();
-    m_ElevatorMotor1.setControl(brakeRequest);
+    m_ElevatorMotorMain.setControl(brakeRequest);
   }
 
-  
-
+  /**
+   * This method will be called once per scheduler run
+   */
   @Override
   public void periodic()
   {
-    // This method will be called once per scheduler run
+    zeroElevator();// Zeros elevator whenever elevator is at the zero position
   }
 }

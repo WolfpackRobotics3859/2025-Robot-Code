@@ -4,7 +4,9 @@
 
 package frc.robot.constants;
 
-/** Add your docs here. */
+/** 
+ * Where all constants related to elevator are declared.
+ */
 public class ElevatorConstants 
 {
 //All values are filler values and units until further testing

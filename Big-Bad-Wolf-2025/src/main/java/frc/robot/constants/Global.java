@@ -7,8 +7,8 @@ package frc.robot.constants;
 /** Add your docs here. */
 public class Global
 {
-    /**Different modes motors can call in commands
-     * 
+    /**
+     * Different modes motors can call in commands
      */
     public static enum MODE
     {

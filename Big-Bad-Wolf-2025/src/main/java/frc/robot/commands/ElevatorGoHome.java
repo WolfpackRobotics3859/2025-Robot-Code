@@ -17,7 +17,8 @@ public class ElevatorGoHome extends Command
 {
   private final Elevator m_Elevator;
   /** 
-   * Creates a new ElevatorGoHome. 
+   * Creates a new ElevatorGoHome.
+   * @param p_Elevator subsystem created in robotcontainer 
    */
   public ElevatorGoHome(Elevator p_Elevator)
   {
