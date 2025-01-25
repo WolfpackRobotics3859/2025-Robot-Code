@@ -25,10 +25,10 @@ public class Elevator extends SubsystemBase
    */
   public Elevator()
   {
-    m_ElevatorMotor1 = new TalonFX(Hardware.ELEVATOR_MOTOR_1);
-    m_ElevatorMotor2 = new TalonFX(Hardware.ELEVATOR_MOTOR_2);
+    m_ElevatorMotor1 = new TalonFX(Hardware.ELEVATOR_MOTOR_1_ID);
+    m_ElevatorMotor2 = new TalonFX(Hardware.ELEVATOR_MOTOR_2_ID);
 
-    Follower followRequest = new Follower(Hardware.ELEVATOR_MOTOR_1, false); 
+    Follower followRequest = new Follower(Hardware.ELEVATOR_MOTOR_1_ID, false); 
     m_ElevatorMotor2.setControl(followRequest);// Sets motor 2 to follow whatever motor 1 does
   }
 

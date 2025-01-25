@@ -9,7 +9,9 @@ import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.Global;
 import frc.robot.subsystems.Elevator;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
+/** 
+ * You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands 
+ */
 public class ElevatorLevelFour extends Command 
 {
    private final Elevator m_Elevator;
