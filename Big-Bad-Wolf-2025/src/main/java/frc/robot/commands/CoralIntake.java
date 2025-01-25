@@ -19,6 +19,8 @@ public class CoralIntake extends Command
 
   /** 
    * Creates a new CoralIntake. 
+   * 
+   * @param p_CoralPlacer subsystem created in robotcontainer
    */
   public CoralIntake(CoralPlacer p_CoralPlacer) 
   {

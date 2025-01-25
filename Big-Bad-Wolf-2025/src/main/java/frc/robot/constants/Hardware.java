@@ -8,8 +8,8 @@ package frc.robot.constants;
 public class Hardware
 {
     //ELEVATOR
-    public static final int ELEVATOR_MOTOR_1 = 1;
-    public static final int ELEVATOR_MOTOR_2 = 2;
+    public static final int ELEVATOR_MOTOR_1_ID = 1;
+    public static final int ELEVATOR_MOTOR_2_ID = 2;
 
     //ALGAE INTAKE
     public static final int ALGAE_INTAKE_ROLLER_MOTOR_ID = 3;
@@ -20,10 +20,10 @@ public class Hardware
     public static final int ALGAE_CLEANER_SHOOTER_MOTOR_ID = 6;
 
     //CORAL PLACER
-    public static final int CORAL_PLACER_ROLLER_MOTOR = 7;
-    public static final int CORAL_PLACER_WRIST_MOTOR = 11;
-    public static final int CORAL_PLACER_FRONT_LASER = 8;
-    public static final int CORAL_PLACER_BACK_LASER = 9;
+    public static final int CORAL_PLACER_ROLLER_MOTOR_ID = 7;
+    public static final int CORAL_PLACER_WRIST_MOTOR_ID = 11;
+    public static final int CORAL_PLACER_FRONT_LASER_ID = 8;
+    public static final int CORAL_PLACER_BACK_LASER_ID = 9;
 
     //CLIMB
     public static final int CLIMB_WRIST_MOTOR_MAIN_ID = 8;

@@ -19,6 +19,8 @@ public class CoralPurge extends Command
   private final CoralPlacer m_CoralPlacer;
   /**
    * Creates a new CoralOutake. 
+   * 
+   * @param p_CoralPlacer subsystem created in robotcontainer
    */
   public CoralPurge(CoralPlacer p_CoralPlacer) 
   {

@@ -32,11 +32,11 @@ public class CoralPlacer extends SubsystemBase
    */
   public CoralPlacer()
   {
-    m_CoralPlacerRollerMotor = new TalonFX(Hardware.CORAL_PLACER_ROLLER_MOTOR);
-    m_CoralPlacerWristMotor = new TalonFX(Hardware.CORAL_PLACER_WRIST_MOTOR);
+    m_CoralPlacerRollerMotor = new TalonFX(Hardware.CORAL_PLACER_ROLLER_MOTOR_ID);
+    m_CoralPlacerWristMotor = new TalonFX(Hardware.CORAL_PLACER_WRIST_MOTOR_ID);
 
-    m_FrontLaser = new TimeOfFlight(Hardware.CORAL_PLACER_FRONT_LASER);
-    m_BackLaser = new TimeOfFlight(Hardware.CORAL_PLACER_BACK_LASER);
+    m_FrontLaser = new TimeOfFlight(Hardware.CORAL_PLACER_FRONT_LASER_ID);
+    m_BackLaser = new TimeOfFlight(Hardware.CORAL_PLACER_BACK_LASER_ID);
     
     intakeTimer = new Timer();
   }
