@@ -14,10 +14,14 @@ public class AlgaeIntakeConstants
 {
     // Insert wrist feed forward and default position values when determined.
     public static final double ALGAE_INTAKE_WRIST_FEED_FORWARD = 0;
-    public static final double ALGAE_INTKAE_WRIST_DEFAULT_POSITION = 0;
-    public static final double ALGAE_INTAKE_WRIST_DOWN_POSITION = 0;
-    public static final double ALGAE_INTAKE_ROLLER_VOLTAGE = 0;
+
+    public static final double ALGAE_INTAKE_WRIST_DEFAULT_POSITION = 0;
+    public static final double ALGAE_INTAKE_WRIST_GROUND_POSITION = 0;
+    public static final double ALGAE_INTAKE_WRIST_PROCESSING_POSITION = 0;
+
     public static final double ALGAE_INTAKE_ROLLER_DEFAULT_VOLTAGE = 0;
+    public static final double ALGAE_INTAKE_ROLLER_VOLTAGE = 0;
+    public static final double ALGAE_INTAKE_ROLLER_PROCESSING_VOLTAGE = 0;
 
     // Insert roller gain values when determined.
     public static final Slot0Configs ALGAE_INTAKE_ROLLER_GAINS = new Slot0Configs()
