@@ -91,6 +91,7 @@ public class RobotContainer
     m_Manager.addSubsystem(TunerConstants.createDrivetrain());
     m_Manager.addSubsystem(new Elevator());
     m_Manager.addSubsystem(new AlgaeIntake());
+    m_Manager.addSubsystem(new AlgaeCleaner());
     m_Manager.addSubsystem(new CoralPlacer());
 
     SmartDashboard.putData("Auto Selector", autoChooser);
