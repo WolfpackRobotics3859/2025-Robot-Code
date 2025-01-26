@@ -85,6 +85,10 @@ public class RobotContainer
 
       m_DriverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
       m_DriverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+
+      AlgaeIntake algaeIntake = m_Manager.getSubsystemOfType(AlgaeIntake.class).get();
+
+      m_DriverController.rightTrigger().whileTrue(new AlgaeIntakeGroundCommand(algaeIntake)); //algae intake
   }
 
   /*
