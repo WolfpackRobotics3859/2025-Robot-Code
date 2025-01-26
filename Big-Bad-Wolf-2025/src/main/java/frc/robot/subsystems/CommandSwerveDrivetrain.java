@@ -69,20 +69,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     //current pose getter
     public Pose2d getPose()
     {
-        return currentPose;
+        return this.getState().Pose;
     } 
     
-    //Chassis Speed setup
-    private ChassisSpeeds currentChassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
 
     //Getter method for ChassisSpeeds
     public ChassisSpeeds getChassisSpeeds() {
-        return currentChassisSpeeds;
-    }
-
-    //update ChassisSpeeds
-    public void updateChassisSpeeds(ChassisSpeeds newSpeeds) {
-        currentChassisSpeeds = newSpeeds;
+        return this.getState().Speeds;
     }
     
      //module state getter
@@ -337,9 +330,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return this::getChassisSpeeds;
     }
 
-    private void configurePathPlanner()
-  {
-     final BiConsumer<ChassisSpeeds, DriveFeedforwards> chassisConsumer = (chassisSpeeds, driveFeedforwards) -> {
+    final BiConsumer<ChassisSpeeds, DriveFeedforwards> chassisConsumer = (chassisSpeeds, driveFeedforwards) -> {
         SwerveDriveKinematics kinematics = getKinematics();
         SwerveModuleState[] moduleStates = kinematics.toSwerveModuleStates(chassisSpeeds);
     
@@ -348,20 +339,26 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         for (int i = 0; i < moduleStates.length; i++) {
             setSwerveModuleState(i, moduleStates[i], driveFeedforwards);
         }
-    };    
+    };  
+
+    private void configurePathPlanner()
+    {
+      
     
-    RobotConfig robotConfig = new RobotConfig(
-        TunerConstants.MaxSpeed,
-        TunerConstants.MaxAngularRate,
-        new ModuleConfig(
-            m_lastSimTime, 
-            kSimLoopPeriod, 
-            m_lastSimTime, 
-            DCMotor.getFalcon500Foc(kNumConfigAttempts), 
-            m_drivetrainId, 
-            kNumConfigAttempts),        
-        0
-        );
+    //RobotConfig robotConfig = new RobotConfig(
+    //     TunerConstants.MaxSpeed,
+    //     TunerConstants.MaxAngularRate,
+    //     // TODO: add proper numbers for these (ASK JACK)
+    //     new ModuleConfig(
+    //         null, // TODO: put wheel radius here
+    //         null, // TODO: put max drive velocity here
+    //         0, // TODO: put coefficient of friction here for wheels and carpet
+    //         DCMotor.getKrakenX60(1).withReduction(), // TODO: put gear reduction for drive motor here 
+    //         null, //TODO: put drive current limit (probably around 60-80 amps)
+    //         1 // this is fine leave this
+    //         ),
+    //     this.getModuleLocations()
+    //     );
 
     AutoBuilder.configure(
         this::getPose,
@@ -369,8 +366,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         this::getChassisSpeeds, 
         chassisConsumer, 
         new PPHolonomicDriveController(
-            new PIDConstants(kSimLoopPeriod, m_drivetrainId, kNumConfigAttempts), 
-            new PIDConstants(kSimLoopPeriod, m_drivetrainId, kNumConfigAttempts)
+            new PIDConstants(5, 0, 0), 
+            new PIDConstants(5, 0, 0)
             ), 
         robotConfig,
         () -> DriverStation.getAlliance().orElse(Alliance.Blue)==Alliance.Red, 
