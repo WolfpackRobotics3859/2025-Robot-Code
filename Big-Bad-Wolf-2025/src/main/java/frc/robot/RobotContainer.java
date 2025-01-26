@@ -34,9 +34,7 @@ public class RobotContainer
 {
   // Store subsystems in a public manager so other objects can easily cache them.
   public static final SubsystemManager m_Manager = new SubsystemManager();
-  public static final CoralPlacer m_CoralPlacer = new CoralPlacer();
-  public static final Elevator m_Elevator = new Elevator();
-
+  
   private final CommandXboxController m_DriverController = new CommandXboxController(0);
   private final CommandXboxController m_CoDriverController = new CommandXboxController(1);
   

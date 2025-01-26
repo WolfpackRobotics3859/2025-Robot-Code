@@ -5,7 +5,7 @@
 package frc.robot.commands.groups;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.CoralPurge;
 import frc.robot.subsystems.CoralPlacer;
 
@@ -14,7 +14,7 @@ import frc.robot.subsystems.CoralPlacer;
  * information, see:
  * https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
  */
-public class PlaceCoralOnReef extends ParallelCommandGroup 
+public class PlaceCoralOnReef extends SequentialCommandGroup 
 {
   CoralPlacer m_CoralPlacer;
   /** 
