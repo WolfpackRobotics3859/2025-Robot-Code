@@ -4,24 +4,31 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.Global;
 import frc.robot.constants.Hardware;
+import frc.robot.subsystems.elevator.ElevatorRequest;
 
 public class Elevator extends SubsystemBase
 {
+  // Hardware
   private final TalonFX m_ElevatorMotorMain;
   private final TalonFX m_ElevatorMotorFollower;
-
-  public final DigitalInput m_HallEffectSensor;// Curcuit has 0 volts if magnet is nearby, or else it has 5 volts
+  private final DigitalInput m_HallEffectSensor;
+  
+  private ElevatorRequest m_CurrentRequest;
+  private boolean hasZeroed = false;
 
   /**
    * Constructor which runs anything in it upon initialization and creates a new object.
@@ -31,98 +38,85 @@ public class Elevator extends SubsystemBase
     m_ElevatorMotorMain = new TalonFX(Hardware.ELEVATOR_MOTOR_MAIN_ID);
     m_ElevatorMotorFollower = new TalonFX(Hardware.ELEVATOR_MOTOR_FOLLOWER_ID);
 
+    m_ElevatorMotorMain.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
+    m_ElevatorMotorFollower.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
+
     Follower followRequest = new Follower(Hardware.ELEVATOR_MOTOR_MAIN_ID, false); 
     m_ElevatorMotorFollower.setControl(followRequest);// Sets follower motor to follow whatever main motor does
 
     m_HallEffectSensor = new DigitalInput(Hardware.HALL_EFFECT_DIO_PORT_ID);
   }
 
-  /**
-   * Uses Hall Effect Sensor to detect and return true when the elevator reaches the bottom.
-   * Magnet is attached to bottom of elevator where Hall Effect sensor can open(turn off) curcuit when it detects it.
-   * 
-   * @return True if magnet on bottom of elevator reaches Hall Effect sensor. 
-   */
-  public boolean elevatorAtZeroPosition()
+  public void ApplyRequest(ElevatorRequest request)
   {
-    return this.m_HallEffectSensor.get();// .get() checks if curcuit is on or off (true if off)
-  }
+    ControlRequest motorRequest = null;
 
-  /**
-   * Used to zero encoder values so it knows its position.
-   */
-  public void zeroElevator()
-  {
-    if (elevatorAtZeroPosition())
+    switch(request.GetType())
     {
-      // If elevator is at zero position, set encoder value to 0
-      m_ElevatorMotorMain.setPosition(0);
-    }
-  }
+      case NOOP:
+        if(this.m_CurrentRequest == null)
+        {
+          this.ApplyRequest(new ElevatorRequest().PercentOutput(0)); // If there is no previous request then create a neutral one. Otherwise, maintain previous request.
+          return;
+        }
+      break;
 
-  /**
-   * Moves elevator based on what control mode and value is chosen.
-   * 
-   * @param controlMode Which type of mode to use for motor.
-   * @param value value fed as an argument into chosen method
-   */
-  public void elevatorRequest(Global.MODE controlMode, double value)
-  {
-    switch(controlMode)
-    {
-      case VOLTAGE:
-        setElevatorVoltage(value);
-        break;
-      case PERCENT:
-        setElevatorPercentage(value);
-        break;
-      case POSITION:
-        setElevatorPosition(value);
-        break;
       case BRAKE:
-        brakeElevator();
-        break;
+      {
+        motorRequest = new StaticBrake();
+      }
+      break;
+
+      case VOLTAGE:
+      {
+        motorRequest = new VoltageOut(request.GetValue());
+      }
+      break;
+
+      case PERCENT:
+      {
+        motorRequest = new DutyCycleOut(request.GetValue());
+      }
+      break;
+
+      case POSITION:
+      {
+        motorRequest = new MotionMagicVoltage(request.GetValue());
+      }
+      break;
+    }
+
+    if(motorRequest == null)
+    {
+      System.out.println("ERROR: Attempted to assign a null control request to the elevator motors.");
+    }
+    else
+    {
+      SmartDashboard.putString("[Elevator] Current Request Type", request.GetType().name());
+      SmartDashboard.putNumber("[Elevator] Goal Value", request.GetValue());
+      this.m_ElevatorMotorMain.setControl(motorRequest);
     }
   }
 
-  /** 
-   * Sets voltage for elevator motor
-   * 
-   * @param voltage amount of volts
-   */
-  private void setElevatorVoltage(double voltage)
+  public double getElevatorPosition()
   {
-    VoltageOut voltageRequest = new VoltageOut(voltage);
-    m_ElevatorMotorMain.setControl(voltageRequest);
+    return this.m_ElevatorMotorMain.getPosition().getValueAsDouble();
   }
 
-  /** 
-   * Sets elevator motor to work at a percentage of the max power it can.
-   * @param percentage percentage of max power motor works at
-   */
-  private void setElevatorPercentage(double percentage)
+  private void zeroElevator()
   {
-    DutyCycleOut dutyCycleRequest = new DutyCycleOut(percentage);
-    m_ElevatorMotorMain.setControl(dutyCycleRequest);
-  }
-
-  /** 
-   * Sets elevator position
-   * @param position as an angle or value depending on motor purpose
-   */
-  private void setElevatorPosition(double position)
-  {
-    MotionMagicVoltage positionRequest = new MotionMagicVoltage(position);
-    m_ElevatorMotorMain.setControl(positionRequest);
-  }
-
-  /**
-   * Stops movement and discourages any further movement from external forces
-   */
-  private void brakeElevator()
-  {
-    StaticBrake brakeRequest = new StaticBrake();
-    m_ElevatorMotorMain.setControl(brakeRequest);
+    if (!this.m_HallEffectSensor.get())
+    {
+      if(!hasZeroed)
+      {
+        m_ElevatorMotorMain.setPosition(0);
+        this.hasZeroed = true;
+      }
+    }
+    else
+    {
+      this.hasZeroed = false;
+    }
   }
 
   /**
@@ -131,6 +125,14 @@ public class Elevator extends SubsystemBase
   @Override
   public void periodic()
   {
-    zeroElevator();// Zeros elevator whenever elevator is at the zero position
+    this.zeroElevator();// Zeros elevator whenever elevator is at the zero position
+    SmartDashboard.putNumber("Elevator Position", this.getElevatorPosition());
+    SmartDashboard.putBoolean("Elevator Hall Effect Sensor", !this.m_HallEffectSensor.get());
+  }
+
+  private void InitializeSmartdashboardFields()
+  {
+    SmartDashboard.putString("[Elevator] Current Request Type", "N/A");
+    SmartDashboard.putNumber("[Elevator] Goal Value", 0);
   }
 }

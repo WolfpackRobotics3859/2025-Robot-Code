@@ -9,17 +9,17 @@ import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.Global;
 import frc.robot.subsystems.Elevator;
 
-/** 
+/**
  * You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands 
  */
-public class ElevatorUp extends Command 
+public class ElevatorBrake extends Command 
 {
   private final Elevator m_Elevator;
   /** 
-   * Creates a new ElevatorUp. 
+   * Creates a new ElevatorDown. 
    * @param p_Elevator subsystem created in robotcontainer
    */
-  public ElevatorUp(Elevator p_Elevator)
+  public ElevatorBrake(Elevator p_Elevator)
   {
     this.m_Elevator = p_Elevator;
     addRequirements(this.m_Elevator);
@@ -31,8 +31,7 @@ public class ElevatorUp extends Command
   @Override
   public void initialize() 
   {
-    m_Elevator.elevatorRequest(Global.MODE.VOLTAGE, ElevatorConstants.ELEVATOR_UP_VOLTAGE);// Applies voltage for elevator to go up
-
+    m_Elevator.elevatorRequest(Global.MODE.VOLTAGE, 0);
   }
 
   /**
@@ -41,8 +40,7 @@ public class ElevatorUp extends Command
   @Override
   public void execute() 
   {
-
-    // Intentionally empty
+    // intentionally empty
   }
 
   /**
@@ -51,7 +49,7 @@ public class ElevatorUp extends Command
   @Override
   public void end(boolean interrupted) 
   {
-    m_Elevator.elevatorRequest(Global.MODE.VOLTAGE, 0);// Once command ends shuts off motor voltage
+    // Intentionally Empty
   }
 
   /**

@@ -15,6 +15,6 @@ public class ElevatorConstants
     public static final double ELEVATOR_LEVEL_THREE = 20;
     public static final double ELEVATOR_LEVEL_FOUR = 30;
 
-    public static final double ELEVATOR_UP_VOLTAGE = 4;
-    public static final double ELEVATOR_DOWN_VOLTAGE = -4;
+    public static final double ELEVATOR_UP_VOLTAGE = 3;
+    public static final double ELEVATOR_DOWN_VOLTAGE = -3;
 }

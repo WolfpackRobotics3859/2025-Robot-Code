@@ -10,10 +10,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.commands.AlgaeIntakeGroundCommand;
-import frc.robot.commands.AlgaeIntakeProcessingCommand;
-import frc.robot.commands.ElevatorLevelTwo;
-import frc.robot.commands.groups.PlaceCoralOnReef;
+import frc.robot.commands.ElevatorBrake;
+import frc.robot.commands.ElevatorDown;
+import frc.robot.commands.ElevatorUp;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Elevator;
@@ -48,6 +47,10 @@ public class RobotContainer
   public Command reverseDynamicCommand; 
   public Command forwardQuasistaticCommand;
   public Command reverseQuasistaticCommand;
+
+  public Command elevatorUpCommand;
+  public Command elevatorDownCommand;
+  public Command elevatorBrakeCommand;
   
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() 
@@ -64,29 +67,37 @@ public class RobotContainer
 
   private void initializeSubsystems()
   {
-    m_Manager.addSubsystem(TunerConstants.createDrivetrain());
+ //   m_Manager.addSubsystem(TunerConstants.createDrivetrain());
     m_Manager.addSubsystem(new Elevator());
-    m_Manager.addSubsystem(new AlgaeIntake());
+/*     m_Manager.addSubsystem(new AlgaeIntake());
     m_Manager.addSubsystem(new AlgaeCleaner());
     m_Manager.addSubsystem(new CoralPlacer());
-    m_Manager.addSubsystem(new Climb());
+    m_Manager.addSubsystem(new Climb()); */
   }
 
   private void configureBindings() 
   {
-    CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
+   // CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
 
-    drivetrain.setDefaultCommand
+/*     drivetrain.setDefaultCommand
     (
         m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get().applyRequest(() ->
             drive.withVelocityX(-m_DriverController.getLeftY() * TunerConstants.MaxSpeed)
                  .withVelocityY(-m_DriverController.getLeftX() * TunerConstants.MaxSpeed)
                  .withRotationalRate(-m_DriverController.getRightX() * TunerConstants.MaxAngularRate)
         )
-    );
+    ); */
 
-      m_DriverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
-      m_DriverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+    Elevator elevator = m_Manager.getSubsystemOfType(Elevator.class).get();
+
+    elevatorBrakeCommand = new ElevatorBrake(elevator);
+    elevatorUpCommand = new ElevatorUp(elevator);
+    elevatorDownCommand = new ElevatorDown(elevator);
+
+    elevator.setDefaultCommand(elevatorBrakeCommand);
+
+    //  m_DriverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
+    //  m_DriverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
   }
 
   /*
@@ -94,16 +105,20 @@ public class RobotContainer
    */
   private void configureCharacterizationBindings()
   {
-    CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
-    forwardDynamicCommand = drivetrain.sysIdDynamic(Direction.kForward);
-    reverseDynamicCommand = drivetrain.sysIdDynamic(Direction.kReverse);
-    forwardQuasistaticCommand = drivetrain.sysIdQuasistatic(Direction.kForward);
-    reverseQuasistaticCommand = drivetrain.sysIdQuasistatic(Direction.kReverse);
+  //  CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
+  //  forwardDynamicCommand = drivetrain.sysIdDynamic(Direction.kForward);
+  //  reverseDynamicCommand = drivetrain.sysIdDynamic(Direction.kReverse);
+  //  forwardQuasistaticCommand = drivetrain.sysIdQuasistatic(Direction.kForward);
+   // reverseQuasistaticCommand = drivetrain.sysIdQuasistatic(Direction.kReverse);
 
-    SmartDashboard.putData("Forward Dynamic", this.forwardDynamicCommand);
-    SmartDashboard.putData("Reverse Dynamic", this.reverseDynamicCommand);
-    SmartDashboard.putData("Forward Quasistatic", this.forwardQuasistaticCommand);
-    SmartDashboard.putData("Reverse Quasistatic", this.reverseQuasistaticCommand);
+  //  SmartDashboard.putData("Forward Dynamic", this.forwardDynamicCommand);
+  //  SmartDashboard.putData("Reverse Dynamic", this.reverseDynamicCommand);
+  //  SmartDashboard.putData("Forward Quasistatic", this.forwardQuasistaticCommand);
+  //  SmartDashboard.putData("Reverse Quasistatic", this.reverseQuasistaticCommand);
+
+    SmartDashboard.putData("Elevator Up", this.elevatorUpCommand);
+    SmartDashboard.putData("Elevator Down", this.elevatorDownCommand);
+    SmartDashboard.putData("Elevator Brake", this.elevatorBrakeCommand);
   }
 
   public Command getAutonomousCommand() 
