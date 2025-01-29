@@ -29,7 +29,7 @@ public class RotateToAngle extends Command
         );
 
         rotationRequest.HeadingController.setTolerance(0.1);
-        rotationRequest.HeadingController.enableContinuousInput(Math.PI, -Math.PI);
+        rotationRequest.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
     }
 
     public void execute() {
