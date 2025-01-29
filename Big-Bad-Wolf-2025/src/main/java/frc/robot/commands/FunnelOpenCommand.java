@@ -46,8 +46,15 @@ public class FunnelOpenCommand extends Command
 
   // Returns true when the command should end.
   @Override
-  public boolean isFinished() 
+  public boolean isFinished()
   {
-    return false;
+    if(m_Climb.getFunnelWristPosition() == ClimbConstants.CORAL_FUNNEL_SEPARATE_POSITION)
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
   }
 }
