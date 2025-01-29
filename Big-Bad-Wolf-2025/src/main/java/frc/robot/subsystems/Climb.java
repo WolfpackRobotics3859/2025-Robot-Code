@@ -19,7 +19,7 @@ public class Climb extends SubsystemBase
   private final TalonFX m_ClimbWristMotorFollower = new TalonFX(Hardware.CLIMB_WRIST_MOTOR_FOLLOWER_ID);
 
   private final TalonFX m_CoralFunnelMotor;
-  
+
   /**
    * Climb subsystem constructor.
    */
@@ -53,6 +53,11 @@ public class Climb extends SubsystemBase
   {
     MotionMagicVoltage positionRequest = new MotionMagicVoltage(funnelPosition);
     m_CoralFunnelMotor.setControl(positionRequest);
+  }
+
+  public final double getFunnelWristPosition()
+  {
+    return m_CoralFunnelMotor.getPosition().getValueAsDouble();
   }
 
   @Override
