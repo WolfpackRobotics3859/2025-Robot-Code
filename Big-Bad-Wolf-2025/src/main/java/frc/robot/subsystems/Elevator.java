@@ -4,6 +4,9 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Volts;
+
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.DutyCycleOut;
@@ -17,6 +20,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.constants.Hardware;
 import frc.robot.subsystems.elevator.ElevatorRequest;
 
@@ -25,26 +29,29 @@ public class Elevator extends SubsystemBase
   // Hardware
   private final TalonFX m_ElevatorMotorMain;
   private final TalonFX m_ElevatorMotorFollower;
-  private final DigitalInput m_HallEffectSensor;
   
   private ElevatorRequest m_CurrentRequest;
   private boolean hasZeroed = false;
+  private SysIdRoutine m_SysIdRoutine;
 
   /**
    * Constructor which runs anything in it upon initialization and creates a new object.
    */
   public Elevator()
   {
-    m_ElevatorMotorMain = new TalonFX(Hardware.ELEVATOR_MOTOR_MAIN_ID);
-    m_ElevatorMotorFollower = new TalonFX(Hardware.ELEVATOR_MOTOR_FOLLOWER_ID);
+    m_ElevatorMotorMain = new TalonFX(Hardware.ELEVATOR_MOTOR_LEFT_ID);
+    m_ElevatorMotorFollower = new TalonFX(Hardware.ELEVATOR_MOTOR_RIGHT_ID);
 
     m_ElevatorMotorMain.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
     m_ElevatorMotorFollower.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
 
-    Follower followRequest = new Follower(Hardware.ELEVATOR_MOTOR_MAIN_ID, false); 
+    Follower followRequest = new Follower(Hardware.ELEVATOR_MOTOR_LEFT_ID, false); 
     m_ElevatorMotorFollower.setControl(followRequest);// Sets follower motor to follow whatever main motor does
+  }
 
-    m_HallEffectSensor = new DigitalInput(Hardware.HALL_EFFECT_DIO_PORT_ID);
+  public double getElevatorPosition()
+  {
+    return this.m_ElevatorMotorMain.getPosition().getValueAsDouble();
   }
 
   public void ApplyRequest(ElevatorRequest request)
@@ -98,25 +105,21 @@ public class Elevator extends SubsystemBase
     }
   }
 
-  public double getElevatorPosition()
+  public void BuildSysIdRoutine()
   {
-    return this.m_ElevatorMotorMain.getPosition().getValueAsDouble();
-  }
-
-  private void zeroElevator()
-  {
-    if (!this.m_HallEffectSensor.get())
-    {
-      if(!hasZeroed)
-      {
-        m_ElevatorMotorMain.setPosition(0);
-        this.hasZeroed = true;
-      }
-    }
-    else
-    {
-      this.hasZeroed = false;
-    }
+    this.m_SysIdRoutine = new SysIdRoutine(
+      new SysIdRoutine.Config(
+         null,         // Use default ramp rate (1 V/s)
+         Volts.of(4), // Reduce dynamic step voltage to 4 to prevent brownout
+         null,          // Use default timeout (10 s)
+         (state) -> SignalLogger.writeString("state", state.toString()) // Log state with Phoenix SignalLogger class
+      ),
+      new SysIdRoutine.Mechanism(
+         (volts) -> m_ElevatorMotorMain.setControl(new VoltageOut(volts.in(Volts))),
+         null,
+         this
+      )
+   );
   }
 
   /**
@@ -125,9 +128,7 @@ public class Elevator extends SubsystemBase
   @Override
   public void periodic()
   {
-    this.zeroElevator();// Zeros elevator whenever elevator is at the zero position
     SmartDashboard.putNumber("Elevator Position", this.getElevatorPosition());
-    SmartDashboard.putBoolean("Elevator Hall Effect Sensor", !this.m_HallEffectSensor.get());
   }
 
   private void InitializeSmartdashboardFields()
