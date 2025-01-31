@@ -25,6 +25,19 @@ public class ElevatorRequest
         return this;
     }
 
+    public ElevatorRequest Position(double position)
+    {
+        this.requestType = ElevatorRequestType.POSITION;
+        this.requestValue = position;
+        return this;
+    }
+
+    public ElevatorRequest Brake()
+    {
+        this.requestType = ElevatorRequestType.BRAKE;
+        return this;
+    }
+
     public ElevatorRequestType GetType()
     {
         return this.requestType;

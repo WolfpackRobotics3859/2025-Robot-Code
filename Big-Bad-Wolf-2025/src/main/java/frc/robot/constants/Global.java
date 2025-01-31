@@ -4,11 +4,14 @@
 
 package frc.robot.constants;
 
-/** Add your docs here. */
+/**
+ * Cobe-base configuration.
+ */
 public class Global
 {
     /**
      * Different modes motors can call in commands
+     * **** SOON TO BE REMOVED
      */
     public static enum MODE
     {
@@ -17,4 +20,13 @@ public class Global
         POSITION,
         BRAKE
     }
+
+    public static enum BUILD_TYPE
+    {
+        COMPETITION,
+        DRIVETRAIN_DEBUG,
+        ELEVATOR_DEBUG
+    }
+
+    public static BUILD_TYPE ACTIVE_BUILD = BUILD_TYPE.ELEVATOR_DEBUG;
 }

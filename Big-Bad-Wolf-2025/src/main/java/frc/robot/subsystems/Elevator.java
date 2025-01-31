@@ -7,7 +7,6 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.SignalLogger;
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
@@ -15,12 +14,12 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.InvertedValue;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.Hardware;
 import frc.robot.subsystems.elevator.ElevatorRequest;
 
@@ -31,7 +30,6 @@ public class Elevator extends SubsystemBase
   private final TalonFX m_ElevatorMotorFollower;
   
   private ElevatorRequest m_CurrentRequest;
-  private boolean hasZeroed = false;
   private SysIdRoutine m_SysIdRoutine;
 
   /**
@@ -42,16 +40,38 @@ public class Elevator extends SubsystemBase
     m_ElevatorMotorMain = new TalonFX(Hardware.ELEVATOR_MOTOR_LEFT_ID);
     m_ElevatorMotorFollower = new TalonFX(Hardware.ELEVATOR_MOTOR_RIGHT_ID);
 
-    m_ElevatorMotorMain.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
-    m_ElevatorMotorFollower.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
+    m_ElevatorMotorMain.getConfigurator().apply(ElevatorConstants.LEFT_MOTOR_CONFIG);
+    m_ElevatorMotorFollower.getConfigurator().apply(ElevatorConstants.RIGHT_MOTOR_CONFIG);
 
     Follower followRequest = new Follower(Hardware.ELEVATOR_MOTOR_LEFT_ID, false); 
-    m_ElevatorMotorFollower.setControl(followRequest);// Sets follower motor to follow whatever main motor does
+    m_ElevatorMotorFollower.setControl(followRequest);
+
+    this.initializeSmartdashboardFields();
+  }
+
+  public Command goToPosition(double position)
+  {
+    return this.runOnce(() -> this.ApplyRequest(new ElevatorRequest().Position(position)));
+  }
+
+  public Command applyElevatorVoltage(double voltage)
+  {
+    return this.runOnce(() -> this.ApplyRequest(new ElevatorRequest().VoltageOut(voltage)));
+  }
+
+  public Command brakeElevator()
+  {
+    return this.runOnce(() -> this.ApplyRequest(new ElevatorRequest().Brake()));
   }
 
   public double getElevatorPosition()
   {
     return this.m_ElevatorMotorMain.getPosition().getValueAsDouble();
+  }
+
+  public SysIdRoutine getSysIdRoutine()
+  {
+    return this.m_SysIdRoutine;
   }
 
   public void ApplyRequest(ElevatorRequest request)
@@ -105,7 +125,7 @@ public class Elevator extends SubsystemBase
     }
   }
 
-  public void BuildSysIdRoutine()
+  public SysIdRoutine BuildSysIdRoutine()
   {
     this.m_SysIdRoutine = new SysIdRoutine(
       new SysIdRoutine.Config(
@@ -120,6 +140,7 @@ public class Elevator extends SubsystemBase
          this
       )
    );
+   return this.m_SysIdRoutine;
   }
 
   /**
@@ -131,7 +152,7 @@ public class Elevator extends SubsystemBase
     SmartDashboard.putNumber("Elevator Position", this.getElevatorPosition());
   }
 
-  private void InitializeSmartdashboardFields()
+  private void initializeSmartdashboardFields()
   {
     SmartDashboard.putString("[Elevator] Current Request Type", "N/A");
     SmartDashboard.putNumber("[Elevator] Goal Value", 0);
