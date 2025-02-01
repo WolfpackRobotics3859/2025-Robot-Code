@@ -2,33 +2,32 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package frc.robot.commands.Funnel;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.constants.AlgaeCleanerConstants;
-import frc.robot.subsystems.AlgaeCleaner;
+import frc.robot.constants.ClimbConstants;
+import frc.robot.subsystems.Climb;
 
-// Creates a new Algae Cleaner Stow command.
-public class AlgaeCleanerStowCommand extends Command 
+// Creates a new Funnel Closed command.
+public class FunnelClosedCommand extends Command 
 {
-  private final AlgaeCleaner m_AlgaeCleaner;
+  private final Climb m_Climb;
 
   /**
-   * Algae Cleaner command constructor.
-   * @param algaeCleaner Algae Cleaner subsystem.
+   * Funnel Closed command constructor.
+   * @param coralPlacer Coral Placer subsystem.
    */
-  public AlgaeCleanerStowCommand(AlgaeCleaner algaeCleaner) 
+  public FunnelClosedCommand(Climb climb) 
   {
-    this.m_AlgaeCleaner = algaeCleaner;
-    addRequirements(m_AlgaeCleaner);
+    this.m_Climb = climb;
+    addRequirements(m_Climb);  
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() 
   {
-    m_AlgaeCleaner.setCleanerWristPosition(AlgaeCleanerConstants.ALGAE_CLEANER_WRIST_DEFAULT_POSITION);
-    m_AlgaeCleaner.setCleanerRollerVoltage(AlgaeCleanerConstants.ALGAE_CLEANER_ROLLER_DEFAULT_VOLTAGE);  
+    m_Climb.setFunnelWristPosition(ClimbConstants.CORAL_FUNNEL_CLOSED_POSITION);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

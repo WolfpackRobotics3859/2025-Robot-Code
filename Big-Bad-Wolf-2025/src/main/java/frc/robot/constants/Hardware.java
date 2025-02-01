@@ -27,7 +27,7 @@ public class Hardware
     public static final int CORAL_PLACER_BACK_LASER_ID = 9;
 
     //CLIMB
-    public static final int CLIMB_WRIST_MOTOR_MAIN_ID = 8;
-    public static final int CLIMB_WRIST_MOTOR_FOLLOWER_ID = 9;
-    public static final int CORAL_FUNNEL_MOTOR_ID = 8;
+    public static final int CLIMB_WRIST_MOTOR_MAIN_ID = 12;
+    public static final int CLIMB_WRIST_MOTOR_FOLLOWER_ID = 13;
+    public static final int CORAL_FUNNEL_MOTOR_ID = 14;
 }

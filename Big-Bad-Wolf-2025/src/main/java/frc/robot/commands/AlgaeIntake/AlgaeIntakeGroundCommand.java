@@ -2,32 +2,29 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package frc.robot.commands.AlgaeIntake;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.constants.ClimbConstants;
-import frc.robot.subsystems.Climb;
+import frc.robot.constants.AlgaeIntakeConstants;
+import frc.robot.subsystems.AlgaeIntake;
 
-// Creates a new Funnel Open command.
-public class FunnelOpenCommand extends Command 
+// Creates a new Algae Ground Intake command.
+public class AlgaeIntakeGroundCommand extends Command 
 {
-  private final Climb m_Climb;
+  private final AlgaeIntake m_AlgaeIntake;
 
-  /**
-   * Funnel Open command constructor.
-   * @param coralPlacer Coral Placer subsystem.
-   */
-  public FunnelOpenCommand(Climb climb) 
+  public AlgaeIntakeGroundCommand(AlgaeIntake algaeIntake) 
   {
-    this.m_Climb = climb;
-    addRequirements(m_Climb);
+    this.m_AlgaeIntake = algaeIntake;
+    addRequirements(m_AlgaeIntake);  
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() 
   {
-    m_Climb.setFunnelWristPosition(ClimbConstants.CORAL_FUNNEL_SEPARATE_POSITION);
+    m_AlgaeIntake.setWristPosition(AlgaeIntakeConstants.ALGAE_INTAKE_WRIST_GROUND_POSITION);
+    m_AlgaeIntake.setRollerVoltage(AlgaeIntakeConstants.ALGAE_INTAKE_ROLLER_VOLTAGE);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

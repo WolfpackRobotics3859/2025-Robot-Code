@@ -2,24 +2,24 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package frc.robot.commands.Elevator;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.Global;
 import frc.robot.subsystems.Elevator;
 
-/** 
+/**
  * You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands 
  */
-public class ElevatorLevelTwo extends Command 
+public class ElevatorLevelThree extends Command 
 {
    private final Elevator m_Elevator;
   /** 
-   * Creates a new ElevatorLevelTwo. 
-   * @param p_Elevator subsystem created in robotcontainer
+   * Creates a new ElevatorLevelThree.
+   * @param p_Elevator subsystem created in robotcontainer 
    */
-  public ElevatorLevelTwo(Elevator p_Elevator) 
+  public ElevatorLevelThree(Elevator p_Elevator) 
   {
     this.m_Elevator = p_Elevator;
     addRequirements(this.m_Elevator);
@@ -31,7 +31,7 @@ public class ElevatorLevelTwo extends Command
   @Override
   public void initialize() 
   {
-    m_Elevator.elevatorRequest(Global.MODE.POSITION, ElevatorConstants.ELEVATOR_LEVEL_TWO);// Sets elevator to Level 2
+    m_Elevator.elevatorRequest(Global.MODE.POSITION, ElevatorConstants.ELEVATOR_LEVEL_THREE);// Sets elevator to Level 3
   }
 
   /**
