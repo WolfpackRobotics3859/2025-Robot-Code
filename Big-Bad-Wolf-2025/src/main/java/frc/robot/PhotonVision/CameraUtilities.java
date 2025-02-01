@@ -90,8 +90,8 @@ public class CameraUtilities
 
       // Use Pigeon2 sensor to get the robot's current yaw
       // let Pigeon2's yaw in degrees = yawReading
-      // -(yawReading % 360) = current yaw in degrees, from 0 to 360
-      double robotYawDegrees = -(m_drivetrain.getPigeon2().getRotation2d().getDegrees()%360);
+      // (yawReading % 360) = current yaw in degrees, from 0 to 360
+      double robotYawDegrees = Math.floorMod((int)m_drivetrain.getPigeon2().getRotation2d().getDegrees(),360);
 
       // Where the robot should face depending on the AprilTag's yaw
       double desiredYawDegrees = robotYawDegrees + tagYawDegrees;
