@@ -15,7 +15,7 @@ public class FunnelOpenCommand extends Command
 
   /**
    * Funnel Open command constructor.
-   * @param coralPlacer Coral Placer subsystem.
+   * @param climb Climb subsystem.
    */
   public FunnelOpenCommand(Climb climb) 
   {
@@ -46,8 +46,15 @@ public class FunnelOpenCommand extends Command
 
   // Returns true when the command should end.
   @Override
-  public boolean isFinished() 
+  public boolean isFinished()
   {
-    return false;
+    if(m_Climb.getFunnelWristPosition() <= ClimbConstants.CORAL_FUNNEL_SEPARATE_POSITION_UPPER_BOUND && m_Climb.getFunnelWristPosition() >= ClimbConstants.CORAL_FUNNEL_SEPARATE_POSITION_LOWER_BOUND)
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
   }
 }
