@@ -48,7 +48,7 @@ public class FunnelOpenCommand extends Command
   @Override
   public boolean isFinished()
   {
-    if(m_Climb.getFunnelWristPosition() == ClimbConstants.CORAL_FUNNEL_SEPARATE_POSITION)
+    if(m_Climb.getFunnelWristPosition() <= ClimbConstants.CORAL_FUNNEL_SEPARATE_POSITION_UPPER_BOUND && m_Climb.getFunnelWristPosition() >= ClimbConstants.CORAL_FUNNEL_SEPARATE_POSITION_LOWER_BOUND)
     {
       return true;
     }

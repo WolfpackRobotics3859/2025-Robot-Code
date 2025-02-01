@@ -19,6 +19,9 @@ public class ClimbConstants
 
     // (REMOVE_BEFORE_COMP) Insert coral funnel constants when determined.
     public static final double CORAL_FUNNEL_SEPARATE_POSITION = 0;
+    // (REMOVE BEFORE COMP) Upper and Lower bound constants will have a 10-20 difference from default separate position.
+    public static final double CORAL_FUNNEL_SEPARATE_POSITION_UPPER_BOUND = 0;
+    public static final double CORAL_FUNNEL_SEPARATE_POSITION_LOWER_BOUND = 0;
     public static final double CORAL_FUNNEL_CLOSED_POSITION = 0;
     
     // Insert wrist gain values when determined.
