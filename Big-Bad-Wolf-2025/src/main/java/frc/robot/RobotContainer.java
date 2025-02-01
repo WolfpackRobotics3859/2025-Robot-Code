@@ -10,10 +10,19 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.commands.AlgaeIntakeGroundCommand;
-import frc.robot.commands.AlgaeIntakeProcessingCommand;
-import frc.robot.commands.ElevatorLevelTwo;
+import frc.robot.commands.AlgaeIntake.AlgaeIntakeGroundCommand;
+import frc.robot.commands.AlgaeIntake.AlgaeIntakeProcessingCommand;
+import frc.robot.commands.AlgaeIntake.AlgaeIntakeStowCommand;
+import frc.robot.commands.CommandGroups.AlgaeCleanerBottomLevel;
+import frc.robot.commands.CommandGroups.AlgaeCleanerIntakeToStow;
+import frc.robot.commands.CommandGroups.AlgaeCleanerTopLevel;
 import frc.robot.commands.groups.PlaceCoralOnReef;
+import frc.robot.commands.Elevator.ElevatorDown;
+import frc.robot.commands.Elevator.ElevatorGoHome;
+import frc.robot.commands.Elevator.ElevatorLevelTwo;
+import frc.robot.commands.Elevator.ElevatorUp;
+import frc.robot.commands.Elevator.ElevatorLevelThree;
+import frc.robot.commands.Elevator.ElevatorLevelFour;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Elevator;
@@ -42,7 +51,7 @@ public class RobotContainer
           .withDeadband(TunerConstants.MaxSpeed * 0.1).withRotationalDeadband(TunerConstants.MaxAngularRate * 0.1) // Add a 10% deadband
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
-  private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+  // private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
   public Command forwardDynamicCommand;
   public Command reverseDynamicCommand; 
@@ -75,6 +84,12 @@ public class RobotContainer
   private void configureBindings() 
   {
     CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
+    AlgaeIntake algaeIntake = m_Manager.getSubsystemOfType(AlgaeIntake.class).get();
+    AlgaeCleaner algaeCleaner = m_Manager.getSubsystemOfType(AlgaeCleaner.class).get();
+    Elevator elevator = m_Manager.getSubsystemOfType(Elevator.class).get();
+    CoralPlacer coralPlacer = m_Manager.getSubsystemOfType(CoralPlacer.class).get();
+    Climb climb = m_Manager.getSubsystemOfType(Climb.class).get();
+
 
     drivetrain.setDefaultCommand
     (
@@ -85,8 +100,22 @@ public class RobotContainer
         )
     );
 
-      m_DriverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
+      // Main driver controller button bindings
       m_DriverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+      m_DriverController.rightTrigger().whileTrue(new AlgaeIntakeGroundCommand(algaeIntake)).onChange(new AlgaeIntakeStowCommand(algaeIntake));
+      m_DriverController.a().whileTrue(new AlgaeIntakeProcessingCommand(algaeIntake)).onChange(new AlgaeIntakeStowCommand(algaeIntake));
+      // m_DriverController.leftTrigger().whileTrue(new ClimbCommandGroup(climb));
+
+      m_DriverController.povUp().whileTrue(new AlgaeCleanerTopLevel(elevator, algaeCleaner)).onChange(new AlgaeCleanerIntakeToStow(elevator, algaeCleaner));
+      m_DriverController.povDown().whileTrue(new AlgaeCleanerBottomLevel(elevator, algaeCleaner)).onChange(new AlgaeCleanerIntakeToStow(elevator, algaeCleaner));
+
+      // Secondary driver controller button bindings
+      m_CoDriverController.a().whileTrue(new PlaceCoralOnReef(coralPlacer, new ElevatorLevelTwo(elevator))).onChange(new ElevatorGoHome(elevator));
+      m_CoDriverController.x().whileTrue(new PlaceCoralOnReef(coralPlacer, new ElevatorLevelThree(elevator))).onChange(new ElevatorGoHome(elevator));
+      m_CoDriverController.y().whileTrue(new PlaceCoralOnReef(coralPlacer, new ElevatorLevelFour(elevator))).onChange(new ElevatorGoHome(elevator));
+
+      m_CoDriverController.povUp().whileTrue(new ElevatorUp(elevator));
+      m_CoDriverController.povDown().whileTrue(new ElevatorDown(elevator));
   }
 
   /*

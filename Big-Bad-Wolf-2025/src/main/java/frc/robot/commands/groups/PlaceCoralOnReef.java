@@ -6,7 +6,7 @@ package frc.robot.commands.groups;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.CoralPurge;
+import frc.robot.commands.Coral.CoralPurge;
 import frc.robot.subsystems.CoralPlacer;
 
 /**

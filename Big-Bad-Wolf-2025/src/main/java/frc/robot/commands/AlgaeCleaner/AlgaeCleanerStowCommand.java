@@ -2,29 +2,33 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package frc.robot.commands.AlgaeCleaner;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.constants.AlgaeIntakeConstants;
-import frc.robot.subsystems.AlgaeIntake;
+import frc.robot.constants.AlgaeCleanerConstants;
+import frc.robot.subsystems.AlgaeCleaner;
 
-// Creates a new Algae Ground Intake command.
-public class AlgaeIntakeGroundCommand extends Command 
+// Creates a new Algae Cleaner Stow command.
+public class AlgaeCleanerStowCommand extends Command 
 {
-  private final AlgaeIntake m_AlgaeIntake;
+  private final AlgaeCleaner m_AlgaeCleaner;
 
-  public AlgaeIntakeGroundCommand(AlgaeIntake algaeIntake) 
+  /**
+   * Algae Cleaner command constructor.
+   * @param algaeCleaner Algae Cleaner subsystem.
+   */
+  public AlgaeCleanerStowCommand(AlgaeCleaner algaeCleaner) 
   {
-    this.m_AlgaeIntake = algaeIntake;
-    addRequirements(m_AlgaeIntake);  
+    this.m_AlgaeCleaner = algaeCleaner;
+    addRequirements(m_AlgaeCleaner);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() 
   {
-    m_AlgaeIntake.setWristPosition(AlgaeIntakeConstants.ALGAE_INTAKE_WRIST_GROUND_POSITION);
-    m_AlgaeIntake.setRollerVoltage(AlgaeIntakeConstants.ALGAE_INTAKE_ROLLER_VOLTAGE);
+    m_AlgaeCleaner.setCleanerWristPosition(AlgaeCleanerConstants.ALGAE_CLEANER_WRIST_DEFAULT_POSITION);
+    m_AlgaeCleaner.setCleanerRollerVoltage(AlgaeCleanerConstants.ALGAE_CLEANER_ROLLER_DEFAULT_VOLTAGE);  
   }
 
   // Called every time the scheduler runs while the command is scheduled.
