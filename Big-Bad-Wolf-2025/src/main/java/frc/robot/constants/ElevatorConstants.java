@@ -16,6 +16,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
+import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
 /** 
  * Where all constants related to elevator are declared.
@@ -43,12 +44,12 @@ public class ElevatorConstants
                                                                                              .withContinuousWrap(false);
 
     public static final CurrentLimitsConfigs LEFT_MOTOR_CURRENT_LIMIT_CONFIG = new CurrentLimitsConfigs()
-                                                                                    .withStatorCurrentLimit(null)
-                                                                                    .withStatorCurrentLimitEnable(false)
-                                                                                    .withSupplyCurrentLimit(null)
+                                                                                    .withStatorCurrentLimit(80)
+                                                                                    .withStatorCurrentLimitEnable(true)
+                                                                                    .withSupplyCurrentLimit(40)
                                                                                     .withSupplyCurrentLimitEnable(false)
-                                                                                    .withSupplyCurrentLowerLimit(null)
-                                                                                    .withSupplyCurrentLowerTime(null);
+                                                                                    .withSupplyCurrentLowerLimit(30)
+                                                                                    .withSupplyCurrentLowerTime(1);
 
     public static final Slot0Configs LEFT_MOTOR_SLOT_0_CONFIG = new Slot0Configs()
                                                                     .withGravityType(GravityTypeValue.Elevator_Static)
@@ -59,14 +60,14 @@ public class ElevatorConstants
                                                                     .withKP(0)
                                                                     .withKS(0)
                                                                     .withKV(0)
-                                                                    .withStaticFeedforwardSign(null);
+                                                                    .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
 
     public static final MotionMagicConfigs LEFT_MOTOR_MOTION_MAGIC_CONFIG = new MotionMagicConfigs()
-                                                                                .withMotionMagicAcceleration(null)
-                                                                                .withMotionMagicCruiseVelocity(null)
-                                                                                .withMotionMagicExpo_kA(null)
-                                                                                .withMotionMagicExpo_kV(null)
-                                                                                .withMotionMagicJerk(null);
+                                                                                .withMotionMagicAcceleration(1)
+                                                                                .withMotionMagicCruiseVelocity(1)
+                                                                                .withMotionMagicExpo_kA(0.1)
+                                                                                .withMotionMagicExpo_kV(0.12)
+                                                                                .withMotionMagicJerk(0);
     
     public static final HardwareLimitSwitchConfigs LEFT_MOTOR_HARDWARE_LIMIT_SWITCH_CONFIG = new HardwareLimitSwitchConfigs()
                                                                                                  .withReverseLimitSource(ReverseLimitSourceValue.RemoteCANdiS1)
@@ -92,12 +93,12 @@ public class ElevatorConstants
                                                                           .withPeakReverseDutyCycle(-1);
 
     public static final CurrentLimitsConfigs RIGHT_MOTOR_CURRENT_LIMIT_CONFIG = new CurrentLimitsConfigs()
-                                                                                    .withStatorCurrentLimit(null)
-                                                                                    .withStatorCurrentLimitEnable(false)
-                                                                                    .withSupplyCurrentLimit(null)
+                                                                                    .withStatorCurrentLimit(80)
+                                                                                    .withStatorCurrentLimitEnable(true)
+                                                                                    .withSupplyCurrentLimit(40)
                                                                                     .withSupplyCurrentLimitEnable(false)
-                                                                                    .withSupplyCurrentLowerLimit(null)
-                                                                                    .withSupplyCurrentLowerTime(null);
+                                                                                    .withSupplyCurrentLowerLimit(40)
+                                                                                    .withSupplyCurrentLowerTime(1);
     
     public static final HardwareLimitSwitchConfigs RIGHT_MOTOR_HARDWARE_LIMIT_SWITCH_CONFIG = new HardwareLimitSwitchConfigs()
                                                                                                  .withReverseLimitSource(ReverseLimitSourceValue.RemoteCANdiS1)

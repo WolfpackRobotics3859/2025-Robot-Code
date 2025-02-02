@@ -4,8 +4,8 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
-
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.DutyCycleOut;
@@ -14,7 +14,6 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -56,7 +55,7 @@ public class Elevator extends SubsystemBase
 
   public Command applyElevatorVoltage(double voltage)
   {
-    return this.runOnce(() -> this.ApplyRequest(new ElevatorRequest().VoltageOut(voltage)));
+    return this.startEnd(() -> this.ApplyRequest(new ElevatorRequest().VoltageOut(voltage)), () -> this.ApplyRequest(new ElevatorRequest().Brake()));
   }
 
   public Command brakeElevator()
@@ -125,12 +124,13 @@ public class Elevator extends SubsystemBase
     }
   }
 
+  // To-do: Move sysId settings to the constants file
   public SysIdRoutine BuildSysIdRoutine()
   {
     this.m_SysIdRoutine = new SysIdRoutine(
       new SysIdRoutine.Config(
-         null,         // Use default ramp rate (1 V/s)
-         Volts.of(4), // Reduce dynamic step voltage to 4 to prevent brownout
+         Volts.of(0.5).per(Seconds),         // Use default ramp rate (1 V/s)
+         Volts.of(0.5), // Reduce dynamic step voltage to 4 to prevent brownout
          null,          // Use default timeout (10 s)
          (state) -> SignalLogger.writeString("state", state.toString()) // Log state with Phoenix SignalLogger class
       ),
@@ -149,7 +149,7 @@ public class Elevator extends SubsystemBase
   @Override
   public void periodic()
   {
-    SmartDashboard.putNumber("Elevator Position", this.getElevatorPosition());
+  //  SmartDashboard.putNumber("Elevator Position", this.getElevatorPosition());
   }
 
   private void initializeSmartdashboardFields()
