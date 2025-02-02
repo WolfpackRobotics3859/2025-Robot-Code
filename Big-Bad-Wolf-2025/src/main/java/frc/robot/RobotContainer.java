@@ -6,14 +6,14 @@ package frc.robot;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+
+import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.commands.AlgaeIntakeGroundCommand;
-import frc.robot.commands.AlgaeIntakeProcessingCommand;
-import frc.robot.commands.ElevatorLevelTwo;
-import frc.robot.commands.groups.PlaceCoralOnReef;
+import frc.robot.constants.Global;
+import frc.robot.constants.Global.BUILD_TYPE;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Elevator;
@@ -43,18 +43,11 @@ public class RobotContainer
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-
-  public Command forwardDynamicCommand;
-  public Command reverseDynamicCommand; 
-  public Command forwardQuasistaticCommand;
-  public Command reverseQuasistaticCommand;
   
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() 
   {
-    this.initializeSubsystems();
-    this.configureBindings();
-    this.configureCharacterizationBindings(); // REMOVE FROM COMPETITION BUILD (REMOVE_BEFORE_COMP)
+    this.configurationChooser(Global.ACTIVE_BUILD);
   }
 
   public static SubsystemManager getSubsystemManager()
@@ -62,19 +55,51 @@ public class RobotContainer
     return m_Manager;
   }
 
-  private void initializeSubsystems()
+  private void configurationChooser(BUILD_TYPE type)
   {
-    m_Manager.addSubsystem(TunerConstants.createDrivetrain());
-    m_Manager.addSubsystem(new Elevator());
-    m_Manager.addSubsystem(new AlgaeIntake());
-    m_Manager.addSubsystem(new AlgaeCleaner());
-    m_Manager.addSubsystem(new CoralPlacer());
-    m_Manager.addSubsystem(new Climb());
+    switch(type)
+    {
+      case COMPETITION:
+        m_Manager.addSubsystem(TunerConstants.createDrivetrain());
+        m_Manager.addSubsystem(new Elevator());
+        m_Manager.addSubsystem(new AlgaeIntake());
+        m_Manager.addSubsystem(new AlgaeCleaner());
+        m_Manager.addSubsystem(new CoralPlacer());
+        m_Manager.addSubsystem(new Climb());
+        this.configureCompetitionBindings();
+      break;
+
+      case DRIVETRAIN_DEBUG:
+        m_Manager.addSubsystem(TunerConstants.createDrivetrain());
+        this.configureDrivetrainDebugBindings();
+      break;
+
+      case _DEBUG:
+        m_Manager.addSubsystem(new Elevator());
+        this.configureDebugBindings();
+      break;
+
+      default:
+        System.out.println("Did you mean to configure nothing? :( Sad Robot Face");
+      break;
+    }
+    SmartDashboard.putString("Active Build", type.name());
   }
 
-  private void configureBindings() 
+  private void configureCompetitionBindings()
+  {
+    // Emptry for now
+  }
+
+ private void configureDrivetrainDebugBindings()
   {
     CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
+    SmartDashboard.putData((Sendable) drivetrain);
+
+    m_DriverController.a().whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+    m_DriverController.b().whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+    m_DriverController.y().whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+    m_DriverController.x().whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
     drivetrain.setDefaultCommand
     (
@@ -84,26 +109,16 @@ public class RobotContainer
                  .withRotationalRate(-m_DriverController.getRightX() * TunerConstants.MaxAngularRate)
         )
     );
-
-      m_DriverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
-      m_DriverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+    m_DriverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
+    m_DriverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
   }
 
   /*
    * Configures the bindings for characterization subroutines. Shouldn't be bound in a competition environment.
    */
-  private void configureCharacterizationBindings()
+  private void configureDebugBindings()
   {
-    CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
-    forwardDynamicCommand = drivetrain.sysIdDynamic(Direction.kForward);
-    reverseDynamicCommand = drivetrain.sysIdDynamic(Direction.kReverse);
-    forwardQuasistaticCommand = drivetrain.sysIdQuasistatic(Direction.kForward);
-    reverseQuasistaticCommand = drivetrain.sysIdQuasistatic(Direction.kReverse);
-
-    SmartDashboard.putData("Forward Dynamic", this.forwardDynamicCommand);
-    SmartDashboard.putData("Reverse Dynamic", this.reverseDynamicCommand);
-    SmartDashboard.putData("Forward Quasistatic", this.forwardQuasistaticCommand);
-    SmartDashboard.putData("Reverse Quasistatic", this.reverseQuasistaticCommand);
+  
   }
 
   public Command getAutonomousCommand() 
