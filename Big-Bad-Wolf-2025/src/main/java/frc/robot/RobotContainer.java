@@ -74,9 +74,9 @@ public class RobotContainer
         this.configureDrivetrainDebugBindings();
       break;
 
-      case _DEBUG:
+      case PLACER_DEBUG:
         m_Manager.addSubsystem(new Elevator());
-        this.configureDebugBindings();
+        this.configurePlacerDebugBindings();
       break;
 
       default:
@@ -116,7 +116,7 @@ public class RobotContainer
   /*
    * Configures the bindings for characterization subroutines. Shouldn't be bound in a competition environment.
    */
-  private void configureDebugBindings()
+  private void configurePlacerDebugBindings()
   {
   
   }

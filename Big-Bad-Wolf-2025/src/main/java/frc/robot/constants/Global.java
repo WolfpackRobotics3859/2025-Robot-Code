@@ -25,8 +25,8 @@ public class Global
     {
         COMPETITION,
         DRIVETRAIN_DEBUG,
-        _DEBUG
+        PLACER_DEBUG
     }
 
-    public static BUILD_TYPE ACTIVE_BUILD = BUILD_TYPE._DEBUG;
+    public static BUILD_TYPE ACTIVE_BUILD = BUILD_TYPE.PLACER_DEBUG;
 }
