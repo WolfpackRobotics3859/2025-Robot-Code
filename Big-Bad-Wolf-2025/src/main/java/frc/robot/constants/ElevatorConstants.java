@@ -28,8 +28,8 @@ public class ElevatorConstants
     public static final double ELEVATOR_LEVEL_THREE = 20;
     public static final double ELEVATOR_LEVEL_FOUR = 30;
 
-    public static final double ELEVATOR_UP_VOLTAGE = 3;
-    public static final double ELEVATOR_DOWN_VOLTAGE = -3;
+    public static final double ELEVATOR_UP_VOLTAGE = 1.5;
+    public static final double ELEVATOR_DOWN_VOLTAGE = -1.5;
 
     // TalonFX Configs
 
@@ -75,7 +75,7 @@ public class ElevatorConstants
                                                                                                  .withReverseLimitAutosetPositionValue(0)
                                                                                                  .withReverseLimitAutosetPositionEnable(true)
                                                                                                  .withReverseLimitEnable(true)
-                                                                                                 .withForwardLimitRemoteSensorID(Hardware.CANDI_0);
+                                                                                                 .withReverseLimitRemoteSensorID(Hardware.CANDI_0);
 
     public static final TalonFXConfiguration LEFT_MOTOR_CONFIG = new TalonFXConfiguration()
                                                                      .withMotorOutput(LEFT_MOTOR_OUTPUT_CONFIG)
@@ -104,7 +104,7 @@ public class ElevatorConstants
                                                                                                  .withReverseLimitSource(ReverseLimitSourceValue.RemoteCANdiS1)
                                                                                                  .withReverseLimitType(ReverseLimitTypeValue.NormallyClosed)
                                                                                                  .withReverseLimitEnable(true)
-                                                                                                 .withForwardLimitRemoteSensorID(Hardware.CANDI_0);
+                                                                                                 .withReverseLimitRemoteSensorID(Hardware.CANDI_0);
 
     public static final TalonFXConfiguration RIGHT_MOTOR_CONFIG = new TalonFXConfiguration()
                                                                      .withMotorOutput(RIGHT_MOTOR_OUTPUT_CONFIG)

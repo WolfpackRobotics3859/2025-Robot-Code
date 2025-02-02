@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
@@ -86,6 +87,7 @@ public class RobotContainer
       break;
     }
     SmartDashboard.putString("Active Build", type.name());
+    System.out.println("[Wolfpack] Current build is: " + type.name());
   }
 
   private void configureCompetitionBindings()
@@ -135,6 +137,7 @@ public class RobotContainer
     m_DriverController.b().whileTrue(sysIdRoutine.dynamic(Direction.kReverse));
     m_DriverController.y().whileTrue(sysIdRoutine.quasistatic(Direction.kForward));
     m_DriverController.x().whileTrue(sysIdRoutine.quasistatic(Direction.kReverse));
+    System.out.println("[Wolfpack] Elevator Debug bindings successfully configured.");
   }
 
   public Command getAutonomousCommand() 

@@ -13,6 +13,7 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.CANdi;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -27,6 +28,7 @@ public class Elevator extends SubsystemBase
   // Hardware
   private final TalonFX m_ElevatorMotorMain;
   private final TalonFX m_ElevatorMotorFollower;
+  private final CANdi m_CANdi;
   
   private ElevatorRequest m_CurrentRequest;
   private SysIdRoutine m_SysIdRoutine;
@@ -38,6 +40,7 @@ public class Elevator extends SubsystemBase
   {
     m_ElevatorMotorMain = new TalonFX(Hardware.ELEVATOR_MOTOR_LEFT_ID);
     m_ElevatorMotorFollower = new TalonFX(Hardware.ELEVATOR_MOTOR_RIGHT_ID);
+    m_CANdi = new CANdi(Hardware.CANDI_0, "rio");
 
     m_ElevatorMotorMain.getConfigurator().apply(ElevatorConstants.LEFT_MOTOR_CONFIG);
     m_ElevatorMotorFollower.getConfigurator().apply(ElevatorConstants.RIGHT_MOTOR_CONFIG);
@@ -149,7 +152,7 @@ public class Elevator extends SubsystemBase
   @Override
   public void periodic()
   {
-  //  SmartDashboard.putNumber("Elevator Position", this.getElevatorPosition());
+    SmartDashboard.putNumber("Elevator Position", this.getElevatorPosition());
   }
 
   private void initializeSmartdashboardFields()

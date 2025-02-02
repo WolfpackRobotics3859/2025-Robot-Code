@@ -10,7 +10,7 @@ public class Hardware
     //ELEVATOR
     public static final int ELEVATOR_MOTOR_LEFT_ID = 1;
     public static final int ELEVATOR_MOTOR_RIGHT_ID = 2;
-    public static final int CANDI_0 = 44;
+    public static final int CANDI_0 = 0;
 
     //ALGAE INTAKE
     public static final int ALGAE_INTAKE_ROLLER_MOTOR_ID = 3;

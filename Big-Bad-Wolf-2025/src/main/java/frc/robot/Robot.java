@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.SignalLogger;
+
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -17,6 +19,8 @@ public class Robot extends TimedRobot
   public Robot() 
   {
     m_robotContainer = new RobotContainer();
+    // Set the logger to log to the first flashdrive plugged in
+    SignalLogger.setPath("/media/sda1/");
   }
 
   @Override
@@ -26,13 +30,22 @@ public class Robot extends TimedRobot
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() 
+  {
+    // Explicitly stop logging
+    // If the user does not call stop(), then it's possible to lose the last few seconds of data
+    SignalLogger.stop();
+  }
 
   @Override
   public void disabledPeriodic() {}
 
   @Override
-  public void disabledExit() {}
+  public void disabledExit() 
+  {
+    // Explicitly start the logger
+    SignalLogger.start();
+  }
 
   @Override
   public void autonomousInit() {
