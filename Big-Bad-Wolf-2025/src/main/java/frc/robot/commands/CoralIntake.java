@@ -34,10 +34,7 @@ public class CoralIntake extends Command
   @Override
   public void initialize() 
   {
-    m_CoralPlacer.CoralPlacerRequest(
-      CoralPlacerConstants.MOTOR.PLACER_WRIST, 
-      Global.MODE.POSITION, 
-      CoralPlacerConstants.CORAL_PLACER_WRIST_INTAKE_POSITION);// Set wrist to coral intaking position
+    m_CoralPlacer.goToPosition(CoralPlacerConstants.CORAL_PLACER_WRIST_INTAKE_POSITION, m_CoralPlacer.m_CoralPlacerWristMotor);
   }
 
   /**
@@ -46,7 +43,8 @@ public class CoralIntake extends Command
   @Override
   public void execute()
   {
-    m_CoralPlacer.IntakeCoral();// Stop Coral when it reaches correct point
+    m_CoralPlacer.applyPlacerVoltage(CoralPlacerConstants.CORAL_PLACER_INTAKE_VOLTAGE, m_CoralPlacer.m_CoralPlacerRollerMotor);
+    //m_CoralPlacer.IntakeCoral();// Stop Coral when it reaches correct point
   }
 
   /**

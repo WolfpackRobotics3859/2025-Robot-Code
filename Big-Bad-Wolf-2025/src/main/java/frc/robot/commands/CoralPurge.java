@@ -34,11 +34,8 @@ public class CoralPurge extends Command
   @Override
   public void initialize() 
   {
-    m_CoralPlacer.CoralPlacerRequest(MOTOR.PLACER_WRIST, MODE.POSITION, CoralPlacerConstants.CORAL_PLACER_WRIST_PLACE_POSITION);
-    m_CoralPlacer.CoralPlacerRequest(
-      CoralPlacerConstants.MOTOR.PLACER_ROLLER, 
-      Global.MODE.VOLTAGE, 
-      CoralPlacerConstants.CORAL_PLACER_PURGE_VOLTAGE);// Applies positive voltage to purge coral
+    m_CoralPlacer.goToPosition(CoralPlacerConstants.CORAL_PLACER_WRIST_INTAKE_POSITION, m_CoralPlacer.m_CoralPlacerWristMotor);
+    m_CoralPlacer.applyPlacerVoltage(CoralPlacerConstants.CORAL_PLACER_PURGE_VOLTAGE, m_CoralPlacer.m_CoralPlacerRollerMotor); // Applies positive voltage to purge coral
   }
 
   /** 
@@ -56,7 +53,7 @@ public class CoralPurge extends Command
   @Override
   public void end(boolean interrupted) 
   {
-    m_CoralPlacer.CoralPlacerRequest(CoralPlacerConstants.MOTOR.PLACER_ROLLER, Global.MODE.VOLTAGE, 0);// Stops voltage
+    m_CoralPlacer.applyPlacerVoltage(0, m_CoralPlacer.m_CoralPlacerRollerMotor);// Stops voltage
   }
 
   /**

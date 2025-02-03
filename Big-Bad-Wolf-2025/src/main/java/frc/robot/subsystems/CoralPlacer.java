@@ -28,8 +28,8 @@ import frc.robot.subsystems.placer.PlacerRequest;
 
 public class CoralPlacer extends SubsystemBase
 {
-  private final TalonFX m_CoralPlacerRollerMotor;
-  private final TalonFX m_CoralPlacerWristMotor;
+  public final TalonFX m_CoralPlacerRollerMotor;
+  public final TalonFX m_CoralPlacerWristMotor;
 
   // public final TimeOfFlight m_FrontLaser;
   // public final TimeOfFlight m_BackLaser;
@@ -37,7 +37,7 @@ public class CoralPlacer extends SubsystemBase
   // public final Timer intakeTimer;
 
   private PlacerRequest m_CurrenRequest;
-  // private SysIdRoutine m_SysIdRoutine;
+  private SysIdRoutine m_SysIdRoutine;
 
   /**
    * Creates new CoralPlacer subsystem; initializes motors and sensors
@@ -47,10 +47,10 @@ public class CoralPlacer extends SubsystemBase
     m_CoralPlacerRollerMotor = new TalonFX(Hardware.CORAL_PLACER_ROLLER_MOTOR_ID);
     m_CoralPlacerWristMotor = new TalonFX(Hardware.CORAL_PLACER_WRIST_MOTOR_ID);
 
-  //   m_FrontLaser = new TimeOfFlight(Hardware.CORAL_PLACER_FRONT_LASER_ID);
-  //   m_BackLaser = new TimeOfFlight(Hardware.CORAL_PLACER_BACK_LASER_ID);
+    // m_FrontLaser = new TimeOfFlight(Hardware.CORAL_PLACER_FRONT_LASER_ID);
+    // m_BackLaser = new TimeOfFlight(Hardware.CORAL_PLACER_BACK_LASER_ID);
     
-  //   intakeTimer = new Timer();
+    //intakeTimer = new Timer();
   }
 
   // /** 
@@ -85,12 +85,12 @@ public class CoralPlacer extends SubsystemBase
   //     if (backLaserDetect())
   //     {
   //       // If front laser and back laser detect then there's two corals in intake: purge coral
-  //       CoralPlacerRequest(CoralPlacerConstants.MOTOR.PLACER_ROLLER, Global.MODE.VOLTAGE, CoralPlacerConstants.CORAL_PLACER_PURGE_VOLTAGE);
+  //       applyPlacerVoltage(CoralPlacerConstants.CORAL_PLACER_PURGE_VOLTAGE, m_CoralPlacerRollerMotor);
   //     }
   //     else
   //     {
   //       // If front laser detects but back doesn't: brake to hold coral
-  //       CoralPlacerRequest(CoralPlacerConstants.MOTOR.PLACER_ROLLER, Global.MODE.BRAKE, 0);
+  //       brakePlacer(m_CoralPlacerRollerMotor);
   //     }
   //   }
   //   else if (backLaserDetect())
@@ -101,7 +101,8 @@ public class CoralPlacer extends SubsystemBase
   //     if (intakeTimer.get() >= CoralPlacerConstants.INTAKE_TIME_THRESHOLD && intakeTimer.get() < CoralPlacerConstants.UNJAM_TIME_THRESHOLD)
   //     {
   //       // If back laser detect and timer is greater than or equal to INTAKE_TIME_THRESHOLD and less than UNJAM_TIME_THRESHOLD: unjam
-  //       CoralPlacerRequest(CoralPlacerConstants.MOTOR.PLACER_ROLLER, Global.MODE.VOLTAGE, CoralPlacerConstants.CORAL_PLACER_UNJAM_VOLTAGE);
+  //       applyPlacerVoltage(CoralPlacerConstants.CORAL_PLACER_UNJAM_VOLTAGE, m_CoralPlacerRollerMotor);
+
   //     }
   //     else if (intakeTimer.get() >= CoralPlacerConstants.UNJAM_TIME_THRESHOLD)
   //     {
@@ -112,7 +113,7 @@ public class CoralPlacer extends SubsystemBase
   //     else
   //     {
   //       // If back laser detect and timer less than INTAKE_TIME_THRESHOLD: intake
-  //       CoralPlacerRequest(CoralPlacerConstants.MOTOR.PLACER_ROLLER, Global.MODE.VOLTAGE, CoralPlacerConstants.CORAL_PLACER_INTAKE_VOLTAGE); 
+  //       applyPlacerVoltage(CoralPlacerConstants.CORAL_PLACER_INTAKE_VOLTAGE, m_CoralPlacerRollerMotor)
   //     }
   //   }
   //   else
@@ -120,18 +121,18 @@ public class CoralPlacer extends SubsystemBase
   //     if (intakeTimer.get() >= CoralPlacerConstants.INTAKE_TIME_THRESHOLD)
   //     {
   //       // If neither lasers detect and timer is over threshold for intaking: stop intake, stop and reset timer
-  //       CoralPlacerRequest(CoralPlacerConstants.MOTOR.PLACER_ROLLER, Global.MODE.VOLTAGE, 0);
+  //       applyPlacerVoltage(0, m_CoralPlacerRollerMotor);
   //       intakeTimer.reset();
   //     }
   //     else
   //     {
   //       // If neither lasers detect but timer isn't over threshold for intaking: intake
-  //       CoralPlacerRequest(CoralPlacerConstants.MOTOR.PLACER_ROLLER, Global.MODE.VOLTAGE, CoralPlacerConstants.CORAL_PLACER_INTAKE_VOLTAGE);
+  //       applyPlacerVoltage(CoralPlacerConstants.CORAL_PLACER_INTAKE_VOLTAGE, m_CoralPlacerRollerMotor);
   //     }
   //   }
   // }
 
-  public Command goToPosition(TalonFX motor, double position)
+  public Command goToPosition(double position, TalonFX motor)
   {
     if(motor == m_CoralPlacerRollerMotor)
     {
@@ -144,12 +145,12 @@ public class CoralPlacer extends SubsystemBase
     }
   }
 
-  public Command applyPlacerVoltage(TalonFX motor, double voltage)
+  public Command applyPlacerVoltage(double voltage, TalonFX motor)
   {
     return this.runOnce(() -> this.ApplyRequest(new PlacerRequest().VoltageOut(voltage), motor));
   }
 
-  public Command applyDutyCycle(TalonFX motor, double percent)
+  public Command applyDutyCycle(double percent, TalonFX motor)
   {
     return this.runOnce(() -> this.ApplyRequest(new PlacerRequest().PercentOutput(percent), motor));
   }
@@ -212,12 +213,12 @@ public class CoralPlacer extends SubsystemBase
 
     if(motorRequest == null)
     {
-      System.out.println("ERROR: Attempted to assign a null control request to the elevator motors.");
+      System.out.println("ERROR: Attempted to assign a null control request to the placer motors.");
     }
     else
     {
-      SmartDashboard.putString("[Elevator] Current Request Type", request.GetType().name());
-      SmartDashboard.putNumber("[Elevator] Goal Value", request.GetValue());
+      SmartDashboard.putString("[Placer] Current Request Type", request.GetType().name());
+      SmartDashboard.putNumber("[Placer] Goal Value", request.GetValue());
       motor.setControl(motorRequest);
     }
   }
