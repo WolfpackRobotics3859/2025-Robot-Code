@@ -138,7 +138,7 @@ public class CameraUtilities
     {
       // Prints out the error of the camera and increments the camera's exception count
       System.out.println("ERROR! \tSource: " + camera.getCameraName() + "\tException: " + e);
-      camera.setCameraExceptionCount(exceptionCount + 1);
+      camera.setCameraExceptionCount(exceptionCount ++);
     }
   }
 
