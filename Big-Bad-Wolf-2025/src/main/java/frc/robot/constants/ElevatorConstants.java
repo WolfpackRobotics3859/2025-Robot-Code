@@ -28,7 +28,7 @@ public class ElevatorConstants
     public static final double ELEVATOR_LEVEL_THREE = 20;
     public static final double ELEVATOR_LEVEL_FOUR = 30;
 
-    public static final double ELEVATOR_UP_VOLTAGE = 1.5;
+    public static final double ELEVATOR_UP_VOLTAGE = 3;
     public static final double ELEVATOR_DOWN_VOLTAGE = -1.5;
 
     // TalonFX Configs
@@ -71,7 +71,7 @@ public class ElevatorConstants
     
     public static final HardwareLimitSwitchConfigs LEFT_MOTOR_HARDWARE_LIMIT_SWITCH_CONFIG = new HardwareLimitSwitchConfigs()
                                                                                                  .withReverseLimitSource(ReverseLimitSourceValue.RemoteCANdiS1)
-                                                                                                 .withReverseLimitType(ReverseLimitTypeValue.NormallyClosed)
+                                                                                                 .withReverseLimitType(ReverseLimitTypeValue.NormallyOpen)
                                                                                                  .withReverseLimitAutosetPositionValue(0)
                                                                                                  .withReverseLimitAutosetPositionEnable(true)
                                                                                                  .withReverseLimitEnable(true)
@@ -102,7 +102,7 @@ public class ElevatorConstants
     
     public static final HardwareLimitSwitchConfigs RIGHT_MOTOR_HARDWARE_LIMIT_SWITCH_CONFIG = new HardwareLimitSwitchConfigs()
                                                                                                  .withReverseLimitSource(ReverseLimitSourceValue.RemoteCANdiS1)
-                                                                                                 .withReverseLimitType(ReverseLimitTypeValue.NormallyClosed)
+                                                                                                 .withReverseLimitType(ReverseLimitTypeValue.NormallyOpen)
                                                                                                  .withReverseLimitEnable(true)
                                                                                                  .withReverseLimitRemoteSensorID(Hardware.CANDI_0);
 

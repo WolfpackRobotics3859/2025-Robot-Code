@@ -40,7 +40,7 @@ public class Elevator extends SubsystemBase
   {
     m_ElevatorMotorMain = new TalonFX(Hardware.ELEVATOR_MOTOR_LEFT_ID);
     m_ElevatorMotorFollower = new TalonFX(Hardware.ELEVATOR_MOTOR_RIGHT_ID);
-    m_CANdi = new CANdi(Hardware.CANDI_0, "rio");
+    m_CANdi = new CANdi(Hardware.CANDI_0);
 
     m_ElevatorMotorMain.getConfigurator().apply(ElevatorConstants.LEFT_MOTOR_CONFIG);
     m_ElevatorMotorFollower.getConfigurator().apply(ElevatorConstants.RIGHT_MOTOR_CONFIG);

@@ -4,11 +4,9 @@
 
 package frc.robot;
 
-import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
-import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -19,13 +17,12 @@ import frc.robot.constants.Global.BUILD_TYPE;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Shooter;
 import frc.robot.utilities.SubsystemManager;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.subsystems.AlgaeCleaner;
-import frc.robot.subsystems.AlgaeIntake;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Climb;
-import frc.robot.subsystems.CoralPlacer;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -65,9 +62,7 @@ public class RobotContainer
       case COMPETITION:
         m_Manager.addSubsystem(TunerConstants.createDrivetrain());
         m_Manager.addSubsystem(new Elevator());
-        m_Manager.addSubsystem(new AlgaeIntake());
-        m_Manager.addSubsystem(new AlgaeCleaner());
-        m_Manager.addSubsystem(new CoralPlacer());
+        m_Manager.addSubsystem(new Intake());
         m_Manager.addSubsystem(new Climb());
         this.configureCompetitionBindings();
       break;
@@ -80,6 +75,16 @@ public class RobotContainer
       case ELEVATOR_DEBUG:
         m_Manager.addSubsystem(new Elevator());
         this.configureElevatorDebugBindings();
+      break;
+
+      case SHOOTER_DEBUG:
+        m_Manager.addSubsystem(new Shooter());
+        this.configureShooterDebugBindings();
+      break;
+
+      case INTAKE_DEBUG:
+        m_Manager.addSubsystem(new Intake());
+        this.configureIntakeDebugBindings();
       break;
 
       default:
@@ -98,7 +103,6 @@ public class RobotContainer
   private void configureDrivetrainDebugBindings()
   {
     CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
-    SmartDashboard.putData((Sendable) drivetrain);
 
     m_DriverController.a().whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
     m_DriverController.b().whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
@@ -138,6 +142,34 @@ public class RobotContainer
     m_DriverController.y().whileTrue(sysIdRoutine.quasistatic(Direction.kForward));
     m_DriverController.x().whileTrue(sysIdRoutine.quasistatic(Direction.kReverse));
     System.out.println("[Wolfpack] Elevator Debug bindings successfully configured.");
+  }
+
+  private void configureShooterDebugBindings()
+  {
+    Shooter shooter = m_Manager.getSubsystemOfType(Shooter.class).get();
+
+    m_DriverController.rightBumper().whileTrue(shooter.applyWristVoltage(1)); // FORWARD
+    m_DriverController.leftBumper().whileTrue(shooter.applyWristVoltage(-1)); // REVERSE
+
+    m_DriverController.a().whileTrue(shooter.applyShooterVoltage(3)); // SHOOT OUT
+    m_DriverController.b().whileTrue(shooter.applyShooterVoltage(-3)); // INTAKE IN
+    System.out.println("[Wolfpack] Shooter Debug bindings successfully configured.");
+  }
+
+  private void configureIntakeDebugBindings()
+  {
+    Intake intake = m_Manager.getSubsystemOfType(Intake.class).get();
+
+    m_DriverController.rightBumper().whileTrue(intake.applyWristVoltage(1)); // FORWARD
+    m_DriverController.leftBumper().whileTrue(intake.applyWristVoltage(-1)); // REVERSE
+
+    m_DriverController.a().whileTrue(intake.applyShooterVoltage(3)); // SHOOT OUT
+    m_DriverController.b().whileTrue(intake.applyShooterVoltage(-3)); // INTAKE IN
+
+    m_DriverController.y().onTrue(intake.goToIntakePosition());
+    m_DriverController.x().onTrue(intake.goToStowPosition());
+
+    m_DriverController.povUp().onTrue(intake.goToPositionThenRoll(7.43, 3));
   }
 
   public Command getAutonomousCommand() 

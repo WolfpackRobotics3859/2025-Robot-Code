@@ -25,8 +25,10 @@ public class Global
     {
         COMPETITION,
         DRIVETRAIN_DEBUG,
-        ELEVATOR_DEBUG
+        ELEVATOR_DEBUG,
+        SHOOTER_DEBUG,
+        INTAKE_DEBUG
     }
 
-    public static BUILD_TYPE ACTIVE_BUILD = BUILD_TYPE.ELEVATOR_DEBUG;
+    public static BUILD_TYPE ACTIVE_BUILD = BUILD_TYPE.DRIVETRAIN_DEBUG;
 }
