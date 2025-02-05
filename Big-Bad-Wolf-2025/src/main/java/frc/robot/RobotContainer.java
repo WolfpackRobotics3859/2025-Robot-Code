@@ -18,15 +18,9 @@ import frc.robot.constants.CoralPlacerConstants;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.Global;
 import frc.robot.constants.Global.BUILD_TYPE;
-import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.Elevator;
 import frc.robot.utilities.SubsystemManager;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.subsystems.AlgaeCleaner;
-import frc.robot.subsystems.AlgaeIntake;
-import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.CoralPlacer;
 
 /**
@@ -38,101 +32,99 @@ import frc.robot.subsystems.CoralPlacer;
 public class RobotContainer 
 {
   // Store subsystems in a public manager so other objects can easily cache them.
-  public static final SubsystemManager m_Manager = new SubsystemManager();
+  public static final CoralPlacer m_CoralPlacer = new CoralPlacer();
   
   private final CommandXboxController m_DriverController = new CommandXboxController(0);
   private final CommandXboxController m_CoDriverController = new CommandXboxController(1);
   
-  private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-          .withDeadband(TunerConstants.MaxSpeed * 0.1).withRotationalDeadband(TunerConstants.MaxAngularRate * 0.1) // Add a 10% deadband
-          .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+  // private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+  //         .withDeadband(TunerConstants.MaxSpeed * 0.1).withRotationalDeadband(TunerConstants.MaxAngularRate * 0.1) // Add a 10% deadband
+  //         .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
-  private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+  // private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() 
   {
-    this.configurationChooser(Global.ACTIVE_BUILD);
+    // this.configurationChooser(Global.ACTIVE_BUILD);
+    configurePlacerDebugBindings();
   }
 
-  public static SubsystemManager getSubsystemManager()
-  {
-    return m_Manager;
-  }
+  // public static SubsystemManager getSubsystemManager()
+  // {
+  //   return m_Manager;
+  // }
 
-  private void configurationChooser(BUILD_TYPE type)
-  {
-    switch(type)
-    {
-      case COMPETITION:
-        m_Manager.addSubsystem(TunerConstants.createDrivetrain());
-        m_Manager.addSubsystem(new Elevator());
-        m_Manager.addSubsystem(new AlgaeIntake());
-        m_Manager.addSubsystem(new AlgaeCleaner());
-        m_Manager.addSubsystem(new CoralPlacer());
-        m_Manager.addSubsystem(new Climb());
-        this.configureCompetitionBindings();
-      break;
+  // private void configurationChooser(BUILD_TYPE type)
+  // {
+  //   switch(type)
+  //   {
+  //     case COMPETITION:
+  //       m_Manager.addSubsystem(TunerConstants.createDrivetrain());
+  //       m_Manager.addSubsystem(new Elevator());
+  //       m_Manager.addSubsystem(new AlgaeIntake());
+  //       m_Manager.addSubsystem(new AlgaeCleaner());
+  //       m_Manager.addSubsystem(new CoralPlacer());
+  //       m_Manager.addSubsystem(new Climb());
+  //       this.configureCompetitionBindings();
+  //     break;
 
-      case DRIVETRAIN_DEBUG:
-        m_Manager.addSubsystem(TunerConstants.createDrivetrain());
-        this.configureDrivetrainDebugBindings();
-      break;
+  //     case DRIVETRAIN_DEBUG:
+  //       m_Manager.addSubsystem(TunerConstants.createDrivetrain());
+  //       this.configureDrivetrainDebugBindings();
+  //     break;
 
-      case PLACER_DEBUG:
-        m_Manager.addSubsystem(new Elevator());
-        this.configurePlacerDebugBindings();
-      break;
+  //     case PLACER_DEBUG:
+  //       m_Manager.addSubsystem(new Elevator());
+  //       this.configurePlacerDebugBindings();
+  //     break;
 
-      default:
-        System.out.println("Did you mean to configure nothing? :( Sad Robot Face");
-      break;
-    }
-    SmartDashboard.putString("Active Build", type.name());
-  }
+  //     default:
+  //       System.out.println("Did you mean to configure nothing? :( Sad Robot Face");
+  //     break;
+  //   }
+  //   SmartDashboard.putString("Active Build", type.name());
+  // }
 
-  private void configureCompetitionBindings()
-  {
-    // Emptry for now
-  }
+  // private void configureCompetitionBindings()
+  // {
+  //   // Emptry for now
+  // }
 
- private void configureDrivetrainDebugBindings()
-  {
-    CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
-    SmartDashboard.putData((Sendable) drivetrain);
+//  private void configureDrivetrainDebugBindings()
+//   {
+//     CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
+//     SmartDashboard.putData((Sendable) drivetrain);
 
-    m_DriverController.a().whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-    m_DriverController.b().whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-    m_DriverController.y().whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-    m_DriverController.x().whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+//     m_DriverController.a().whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+//     m_DriverController.b().whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+//     m_DriverController.y().whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+//     m_DriverController.x().whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-    drivetrain.setDefaultCommand
-    (
-        m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get().applyRequest(() ->
-            drive.withVelocityX(-m_DriverController.getLeftY() * TunerConstants.MaxSpeed)
-                 .withVelocityY(-m_DriverController.getLeftX() * TunerConstants.MaxSpeed)
-                 .withRotationalRate(-m_DriverController.getRightX() * TunerConstants.MaxAngularRate)
-        )
-    );
-    m_DriverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
-    m_DriverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-  }
+//     drivetrain.setDefaultCommand
+//     (
+//         m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get().applyRequest(() ->
+//             drive.withVelocityX(-m_DriverController.getLeftY() * TunerConstants.MaxSpeed)
+//                  .withVelocityY(-m_DriverController.getLeftX() * TunerConstants.MaxSpeed)
+//                  .withRotationalRate(-m_DriverController.getRightX() * TunerConstants.MaxAngularRate)
+//         )
+//     );
+//     m_DriverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
+//     m_DriverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+  // }
 
   /*
    * Configures the bindings for characterization subroutines. Shouldn't be bound in a competition environment.
    */
   private void configurePlacerDebugBindings()
   {
-    CoralPlacer m_CoralPlacer = m_Manager.getSubsystemOfType(CoralPlacer.class).get();
-    SmartDashboard.putData(m_CoralPlacer);
-
     m_DriverController.rightBumper().whileTrue(new CoralPurge(m_CoralPlacer));
     m_DriverController.leftBumper().whileTrue(new CoralIntake(m_CoralPlacer));
 
-    m_DriverController.povDown().onTrue(m_CoralPlacer.goToPosition(-2, m_CoralPlacer.m_CoralPlacerRollerMotor));
-    m_DriverController.povRight().onTrue(m_CoralPlacer.goToPosition(4, m_CoralPlacer.m_CoralPlacerWristMotor));
-    m_DriverController.povUp().onTrue(m_CoralPlacer.goToPosition(2, m_CoralPlacer.m_CoralPlacerRollerMotor));
-    m_DriverController.povLeft().onTrue(m_CoralPlacer.goToPosition(-4, m_CoralPlacer.m_CoralPlacerWristMotor));
+    m_DriverController.povDown().whileTrue(m_CoralPlacer.applyPlacerVoltage(-1, m_CoralPlacer.m_CoralPlacerRollerMotor));
+    m_DriverController.rightTrigger().whileTrue(m_CoralPlacer.applyPlacerVoltage(1, m_CoralPlacer.m_CoralPlacerWristMotor));
+    m_DriverController.povUp().whileTrue(m_CoralPlacer.applyPlacerVoltage(1, m_CoralPlacer.m_CoralPlacerRollerMotor));
+    m_DriverController.leftTrigger().whileTrue(m_CoralPlacer.applyPlacerVoltage(-1, m_CoralPlacer.m_CoralPlacerWristMotor));
 
     
   }
