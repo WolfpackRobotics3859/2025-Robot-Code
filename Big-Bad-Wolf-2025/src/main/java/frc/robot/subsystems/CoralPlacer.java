@@ -132,97 +132,16 @@ public class CoralPlacer extends SubsystemBase
   //   }
   // }
 
-  public Command goToPosition(double position, TalonFX motor)
+  public Command applyWristVoltage(double voltage)
   {
-    if(motor == m_CoralPlacerRollerMotor)
-    {
-      System.out.println("ERROR: Tried to apply output type POSITION to rollers");
-      return null;
-    }
-    else
-    {
-      return this.runOnce(() -> this.ApplyRequest(new PlacerRequest().Position(position), motor));
-    }
+    return this.startEnd(() -> m_CoralPlacerWristMotor.setControl(new VoltageOut(voltage)), () -> m_CoralPlacerWristMotor.setControl(new StaticBrake()));
   }
 
-  public Command applyPlacerVoltage(double voltage, TalonFX motor)
+  public Command applyShooterVoltage(double voltage)
   {
-    return this.runOnce(() -> this.ApplyRequest(new PlacerRequest().VoltageOut(voltage), motor));
+    return this.startEnd(() -> m_CoralPlacerRollerMotor.setControl(new VoltageOut(voltage)), () -> m_CoralPlacerRollerMotor.setControl(new VoltageOut(0)));
   }
 
-  public Command applyDutyCycle(double percent, TalonFX motor)
-  {
-    return this.runOnce(() -> this.ApplyRequest(new PlacerRequest().PercentOutput(percent), motor));
-  }
-
-  public Command brakePlacer(TalonFX motor)
-  {
-    return this.runOnce(() -> this.ApplyRequest(new PlacerRequest().Brake(), motor));
-  }
-  
-  public double getWristPosition()
-  {
-    return this.m_CoralPlacerWristMotor.getPosition().getValueAsDouble();
-  }
-
-  // public SysIdRoutine 
-
-  /** 
-   * Method for controlling any motor in the coral placer subsystem.
-   * 
-   * @param request contains the output type and magnitude
-   */
-  public void ApplyRequest(PlacerRequest request, TalonFX motor)
-  {
-    ControlRequest motorRequest = null;
-    this.m_CurrenRequest = request;
-
-    switch(request.GetType())
-    {
-      case NOOP:
-        if(this.m_CurrenRequest == null)
-        {
-          this.ApplyRequest((new PlacerRequest().PercentOutput(0)), motor); // If there is no previous request then create a neutral one. Otherwise, maintain previous request.
-          return;
-        }
-        break;
-
-      case BRAKE:
-      {
-        motorRequest = new StaticBrake();
-      }
-
-      case VOLTAGE:
-      {
-        motorRequest = new VoltageOut(this.m_CurrenRequest.GetValue());
-      }
-
-      case PERCENT:
-      {
-        motorRequest = new DutyCycleOut(this.m_CurrenRequest.GetValue());
-      }
-      
-      case POSITION:
-      {
-        motorRequest = new MotionMagicVoltage(this.m_CurrenRequest.GetValue());
-      }
-
-      default:
-        break;
-    }
-
-    if(motorRequest == null)
-    {
-      System.out.println("ERROR: Attempted to assign a null control request to the placer motors.");
-    }
-    else
-    {
-      SmartDashboard.putString("[Placer] Current Request Type", request.GetType().name());
-      SmartDashboard.putNumber("[Placer] Goal Value", request.GetValue());
-      motor.setControl(motorRequest);
-    }
-  }
-  
   public SysIdRoutine buildSysIdRoutine(TalonFX motor)
   {
     this.m_SysIdRoutine = new SysIdRoutine(

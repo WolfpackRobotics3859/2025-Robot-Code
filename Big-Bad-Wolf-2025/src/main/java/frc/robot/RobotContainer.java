@@ -16,8 +16,8 @@ import frc.robot.commands.AlgaeIntakeWristUp;
 import frc.robot.commands.ClimbCommand;
 import frc.robot.commands.AlgaeIntakeGroundCommand;
 import frc.robot.commands.AlgaeIntakeProcessingCommand;
-import frc.robot.commands.CoralIntake;
-import frc.robot.commands.CoralPurge;
+// import frc.robot.commands.CoralIntake;
+// import frc.robot.commands.CoralPurge;
 import frc.robot.constants.CoralPlacerConstants;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.Global;
@@ -65,7 +65,7 @@ public class RobotContainer
 
     // configureClimbDebugBindings();
 
-    // configurePlacerDebugBindings();
+    configurePlacerDebugBindings();
 
 
   }
@@ -141,10 +141,10 @@ public class RobotContainer
     // m_DriverController.rightBumper().whileTrue(new CoralPurge(m_CoralPlacer));
     // m_DriverController.leftBumper().whileTrue(new CoralIntake(m_CoralPlacer));
 
-    m_DriverController.rightBumper().whileTrue(m_CoralPlacer.applyPlacerVoltage(-1, m_CoralPlacer.m_CoralPlacerRollerMotor));
-    m_DriverController.leftTrigger().whileTrue(m_CoralPlacer.applyPlacerVoltage(1, m_CoralPlacer.m_CoralPlacerWristMotor));
-    m_DriverController.rightTrigger().whileTrue(m_CoralPlacer.applyPlacerVoltage(1, m_CoralPlacer.m_CoralPlacerRollerMotor));
-    m_DriverController.leftBumper().whileTrue(m_CoralPlacer.applyPlacerVoltage(-1, m_CoralPlacer.m_CoralPlacerWristMotor));
+    m_DriverController.leftTrigger().whileTrue(m_CoralPlacer.applyWristVoltage(-1));//up
+    m_DriverController.rightTrigger().whileTrue(m_CoralPlacer.applyWristVoltage(1));//down
+    m_DriverController.leftBumper().whileTrue(m_CoralPlacer.applyShooterVoltage(-2));//outake
+    m_DriverController.rightBumper().whileTrue(m_CoralPlacer.applyShooterVoltage(2));//intake
   }
 
   private void configureAlgaeIntakeDebugBindings()

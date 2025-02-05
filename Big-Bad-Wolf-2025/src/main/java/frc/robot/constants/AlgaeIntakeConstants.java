@@ -15,7 +15,7 @@ public class AlgaeIntakeConstants
     // Insert wrist feed forward and default position values when determined.
     public static final double ALGAE_INTAKE_WRIST_FEED_FORWARD = 0;
 
-    public static final double ALGAE_INTAKE_WRIST_VOLTAGE = 4;
+    public static final double ALGAE_INTAKE_WRIST_VOLTAGE = 1;
     public static final double ALGAE_INTAKE_WRIST_GROUND_POSITION = 7;
     public static final double ALGAE_INTAKE_WRIST_PROCESSING_POSITION = 0;
 

@@ -56,7 +56,7 @@ public class AlgaeIntake extends SubsystemBase
    */
   public void setWristVoltage(double voltage)
   {
-    MotionMagicVoltage voltageRequest = new MotionMagicVoltage(voltage);
+    VoltageOut voltageRequest = new VoltageOut(voltage);
     m_AlgaeIntakeWristMotor.setControl(voltageRequest);
   }
 

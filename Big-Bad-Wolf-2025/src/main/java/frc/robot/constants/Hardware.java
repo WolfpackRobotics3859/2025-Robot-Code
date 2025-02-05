@@ -17,12 +17,12 @@ public class Hardware
     public static final int ALGAE_INTAKE_WRIST_MOTOR_ID = 4;
 
     //ALGAE CLEANER
-    public static final int ALGAE_CLEANER_WRIST_MOTOR_ID = 5;
-    public static final int ALGAE_CLEANER_SHOOTER_MOTOR_ID = 6;
+    // public static final int ALGAE_CLEANER_WRIST_MOTOR_ID = 5;
+    // public static final int ALGAE_CLEANER_SHOOTER_MOTOR_ID = 6;
 
     //CORAL PLACER
-    public static final int CORAL_PLACER_ROLLER_MOTOR_ID = 7;
-    public static final int CORAL_PLACER_WRIST_MOTOR_ID = 11;
+    public static final int CORAL_PLACER_ROLLER_MOTOR_ID = 6;
+    public static final int CORAL_PLACER_WRIST_MOTOR_ID = 5;
     public static final int CORAL_PLACER_FRONT_LASER_ID = 8;
     public static final int CORAL_PLACER_BACK_LASER_ID = 9;
 
