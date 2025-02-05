@@ -171,7 +171,7 @@ public class RobotContainer
     m_DriverController.a().whileTrue(new ClimbCommand(m_Climb, 1));
     m_DriverController.x().whileTrue(new ClimbCommand(m_Climb, 2));
     m_DriverController.y().whileTrue(new ClimbCommand(m_Climb, 3));
-    m_DriverController.b().whileTrue(new ClimbCommand(m_Climb, 4));
+    m_DriverController.b().whileTrue(new ClimbCommand(m_Climb, 0));
   }
 
   
