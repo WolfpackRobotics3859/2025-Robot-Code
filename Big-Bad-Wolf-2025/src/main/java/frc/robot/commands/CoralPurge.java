@@ -7,7 +7,6 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.CoralPlacerConstants;
 import frc.robot.constants.Global;
-import frc.robot.constants.CoralPlacerConstants.MOTOR;
 import frc.robot.constants.Global.MODE;
 import frc.robot.subsystems.CoralPlacer;
 
@@ -34,7 +33,7 @@ public class CoralPurge extends Command
   @Override
   public void initialize() 
   {
-    m_CoralPlacer.goToPosition(CoralPlacerConstants.CORAL_PLACER_WRIST_INTAKE_POSITION, m_CoralPlacer.m_CoralPlacerWristMotor);
+    // m_CoralPlacer.goToPosition(CoralPlacerConstants.CORAL_PLACER_WRIST_INTAKE_POSITION, m_CoralPlacer.m_CoralPlacerWristMotor);
     m_CoralPlacer.applyPlacerVoltage(CoralPlacerConstants.CORAL_PLACER_PURGE_VOLTAGE, m_CoralPlacer.m_CoralPlacerRollerMotor); // Applies positive voltage to purge coral
   }
 

@@ -7,22 +7,21 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.CoralPlacerConstants;
 import frc.robot.constants.Global;
+import frc.robot.constants.Global.MODE;
 import frc.robot.subsystems.CoralPlacer;
 
 /**
- * DEFAULT COMMAND
- * You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands
+ * You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands 
  */
-public class CoralIntake extends Command 
+public class CoralWristDown extends Command 
 {
   private final CoralPlacer m_CoralPlacer;
-
-  /** 
-   * Creates a new CoralIntake. 
+  /**
+   * Creates a new CoralOutake. 
    * 
    * @param p_CoralPlacer subsystem created in robotcontainer
    */
-  public CoralIntake(CoralPlacer p_CoralPlacer) 
+  public CoralWristDown(CoralPlacer p_CoralPlacer) 
   {
     this.m_CoralPlacer = p_CoralPlacer;
     addRequirements(this.m_CoralPlacer);
@@ -35,25 +34,27 @@ public class CoralIntake extends Command
   public void initialize() 
   {
     // m_CoralPlacer.goToPosition(CoralPlacerConstants.CORAL_PLACER_WRIST_INTAKE_POSITION, m_CoralPlacer.m_CoralPlacerWristMotor);
+    m_CoralPlacer.applyPlacerVoltage(CoralPlacerConstants.CORAL_PLACER_PURGE_VOLTAGE * -1, m_CoralPlacer.m_CoralPlacerWristMotor); // Applies positive voltage to purge coral
   }
 
-  /**
+  /** 
    * Called every time the scheduler runs while the command is scheduled.
    */
   @Override
-  public void execute()
+  public void execute() 
   {
-    m_CoralPlacer.applyPlacerVoltage(4, m_CoralPlacer.m_CoralPlacerRollerMotor);
-    //m_CoralPlacer.IntakeCoral();// Stop Coral when it reaches correct point
+    // Intentionally empty
   }
 
-  /**
+  /** 
    * Called once the command ends or is interrupted.
    */
   @Override
   public void end(boolean interrupted) 
   {
-    m_CoralPlacer.applyPlacerVoltage(0, m_CoralPlacer.m_CoralPlacerRollerMotor);
+    // m_CoralPlacer.applyPlacerVoltage(0, m_CoralPlacer.m_CoralPlacerRollerMotor);// Stops voltage
+    m_CoralPlacer.applyPlacerVoltage(0, m_CoralPlacer.m_CoralPlacerWristMotor);// Stops voltage
+
   }
 
   /**

@@ -14,7 +14,11 @@ public class ClimbConstants
 {
     // Insert wrist feed forward and default position values when determined.
     public static final double CLIMB_DEFAULT_WRIST_POSITION = 0;
-    public static final double CLIMB_WRIST_FEED_FORWARD = 0;
+    public static final double CLIMB_VOLTAGE_ZERO = 0;
+    public static final double CLIMB_VOLTAGE_ONE = 1;
+    public static final double CLIMB_VOLTAGE_TWO = 2;
+    public static final double CLIMB_VOLTAGE_THREE = 3;
+
 
     // (REMOVE_BEFORE_COMP) Insert coral funnel constants when determined.
     public static final double CORAL_FUNNEL_SEPARATE_POSITION = 0;

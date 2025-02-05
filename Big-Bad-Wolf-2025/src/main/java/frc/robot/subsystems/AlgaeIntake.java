@@ -15,8 +15,8 @@ import frc.robot.constants.Hardware;
 // Creates a new Algae Intake subsystem.
 public class AlgaeIntake extends SubsystemBase 
 {
-  private final TalonFX m_AlgaeIntakeRollerMotor = new TalonFX(Hardware.ALGAE_INTAKE_ROLLER_MOTOR_ID);
-  private final TalonFX m_AlgaeIntakeWristMotor = new TalonFX(Hardware.ALGAE_INTAKE_WRIST_MOTOR_ID);
+  public final TalonFX m_AlgaeIntakeRollerMotor = new TalonFX(Hardware.ALGAE_INTAKE_ROLLER_MOTOR_ID);
+  public final TalonFX m_AlgaeIntakeWristMotor = new TalonFX(Hardware.ALGAE_INTAKE_WRIST_MOTOR_ID);
 
   /**
    * Algae Intake subsystem constructor.
@@ -48,6 +48,18 @@ public class AlgaeIntake extends SubsystemBase
     MotionMagicVoltage setPosition = new MotionMagicVoltage(position);
     m_AlgaeIntakeWristMotor.setControl(setPosition);
   }
+
+   /**
+   * Sets the wrist position for the Algae Intake wrist motor.
+   * 
+   * @param position Assigns wrist position to the motors (where intake arm is located in space).
+   */
+  public void setWristVoltage(double voltage)
+  {
+    MotionMagicVoltage voltageRequest = new MotionMagicVoltage(voltage);
+    m_AlgaeIntakeWristMotor.setControl(voltageRequest);
+  }
+
 
   @Override
   public void periodic() 

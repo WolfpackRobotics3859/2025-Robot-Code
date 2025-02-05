@@ -27,7 +27,6 @@ public class AlgaeIntakeProcessingCommand extends Command
   @Override
   public void initialize() 
   {
-    m_AlgaeIntake.setWristPosition(AlgaeIntakeConstants.ALGAE_INTAKE_WRIST_PROCESSING_POSITION);
     m_AlgaeIntake.setRollerVoltage(AlgaeIntakeConstants.ALGAE_INTAKE_ROLLER_PROCESSING_VOLTAGE);
   }
 

@@ -223,24 +223,23 @@ public class CoralPlacer extends SubsystemBase
     }
   }
   
-  // public SysIdRoutine buildSysIdRoutine(TalonFX motor)
-  // {
-  //   VoltageUnit stepVoltage;
-  //   this.m_SysIdRoutine = new SysIdRoutine(
-  //     new SysIdRoutine.Config(
-  //       null,         // Use default ramp rate (1 V/s)
-  //       stepVoltage = (motor = m_CoralPlacerRollerMotor) != null ? Volts.of(4): Volts.of(2), // Reduce dynamic step voltage to 4 to prevent brownout
-  //       null,          // Use default timeout (10 s)
-  //       (state) -> SignalLogger.writeString("state", state.toString()) // Log state with Phoenix SignalLogger class
-  //     ),
-  //     new SysIdRoutine.Mechanism(
-  //       (volts) -> motor.setControl(new VoltageOut(volts.in(Volts))),
-  //       null,
-  //       this
-  //     )
-  //   );
-  //   return this.m_SysIdRoutine;
-  // }
+  public SysIdRoutine buildSysIdRoutine(TalonFX motor)
+  {
+    this.m_SysIdRoutine = new SysIdRoutine(
+      new SysIdRoutine.Config(
+        null,         // Use default ramp rate (1 V/s)
+        Volts.of(2), // Reduce dynamic step voltage to 4 to prevent brownout
+        null,          // Use default timeout (10 s)
+        (state) -> SignalLogger.writeString("state", state.toString()) // Log state with Phoenix SignalLogger class
+      ),
+      new SysIdRoutine.Mechanism(
+        (volts) -> motor.setControl(new VoltageOut(volts.in(Volts))),
+        null,
+        this
+      )
+    );
+    return this.m_SysIdRoutine;
+  }
 
 
   /**
