@@ -24,13 +24,14 @@ public class AlgaeIntakeGroundCommand extends Command
   public void initialize() 
   {
     m_AlgaeIntake.setWristPosition(AlgaeIntakeConstants.ALGAE_INTAKE_WRIST_GROUND_POSITION);
+    m_AlgaeIntake.setRollerVoltage(AlgaeIntakeConstants.ALGAE_INTAKE_ROLLER_VOLTAGE);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() 
   {
-    m_AlgaeIntake.setRollerVoltage(AlgaeIntakeConstants.ALGAE_INTAKE_ROLLER_VOLTAGE);
+    
   }
 
   // Called once the command ends or is interrupted.
@@ -38,7 +39,7 @@ public class AlgaeIntakeGroundCommand extends Command
   public void end(boolean interrupted) 
   {
     m_AlgaeIntake.setRollerVoltage(0);
-    m_AlgaeIntake.setWristVoltage(0);
+    m_AlgaeIntake.setWristPosition(0);
   }
 
   // Returns true when the command should end.

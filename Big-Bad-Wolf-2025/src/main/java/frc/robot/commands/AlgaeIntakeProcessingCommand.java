@@ -27,21 +27,23 @@ public class AlgaeIntakeProcessingCommand extends Command
   @Override
   public void initialize() 
   {
-    m_AlgaeIntake.setRollerVoltage(AlgaeIntakeConstants.ALGAE_INTAKE_ROLLER_PROCESSING_VOLTAGE);
+    m_AlgaeIntake.setWristPosition(3);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() 
   {
-    // Intentionally Empty.
+    m_AlgaeIntake.setRollerVoltage(AlgaeIntakeConstants.ALGAE_INTAKE_ROLLER_PROCESSING_VOLTAGE);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted)
   {
-    // Intentionally Empty.
+    m_AlgaeIntake.setRollerVoltage(0);
+    m_AlgaeIntake.setWristVoltage(0);
+
   }
 
   // Returns true when the command should end.

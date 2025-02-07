@@ -16,6 +16,7 @@ import frc.robot.commands.AlgaeIntakeWristUp;
 import frc.robot.commands.ClimbCommand;
 import frc.robot.commands.AlgaeIntakeGroundCommand;
 import frc.robot.commands.AlgaeIntakeProcessingCommand;
+import frc.robot.constants.AlgaeIntakeConstants;
 // import frc.robot.commands.CoralIntake;
 // import frc.robot.commands.CoralPurge;
 import frc.robot.constants.CoralPlacerConstants;
@@ -61,9 +62,9 @@ public class RobotContainer
     // m_Manager.addSubsystem(TunerConstants.createDrivetrain());
     // this.configureDrivetrainDebugBindings();
 
-    // configureAlgaeIntakeDebugBindings();
+    configureAlgaeIntakeDebugBindings();
 
-    // configureClimbDebugBindings();
+    configureClimbDebugBindings();
 
     configurePlacerDebugBindings();
 
@@ -103,11 +104,32 @@ public class RobotContainer
   //   SmartDashboard.putString("Active Build", type.name());
   // }
 
-  private void configureCompetitionBindings()
-  {
-    // Emptry for now
-  }
+private void configureCompetitionBindings()
+{
+  CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
+  // Elevator elevator =m_Manager.getSubsystemOfType(Elevator.class).get();
+  // Intake intake = m_Manager.getSubsystemOfType(Intake.class).get();
+//Main Driver Controller
+  //drivetrain
+  drivetrain.setDefaultCommand
+  (
+      m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get().applyRequest(() ->
+          drive.withVelocityX(-m_DriverController.getLeftY() * TunerConstants.MaxSpeed)
+                .withVelocityY(-m_DriverController.getLeftX() * TunerConstants.MaxSpeed)
+                .withRotationalRate(-m_DriverController.getRightX() * TunerConstants.MaxAngularRate)
+      )
+  );
+  m_DriverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
+  m_DriverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric())); //resets drive pose
+  //elevator
+  // m_DriverController.povUp().whileTrue(elevator.applyElevatorVoltage(ElevatorConstants.ELEVATOR_UP_VOLTAGE));
+  // m_DriverController.povDown().whileTrue(elevator.applyElevatorVoltage(ElevatorConstants.ELEVATOR_DOWN_VOLTAGE));
+  // //intake
+  // m_DriverController.rightTrigger().whileTrue(intake.goToPositionThenRoll(AlgaeIntakeConstants.ALGAE_INTAKE_WRIST_GROUND_POSITION, -3));
+  // //process algae
+  // m_DriverController.a().whileTrue(intake.goToPositionThenRoll(6, 3));
 
+}
  private void configureDrivetrainDebugBindings()
   {
     CommandSwerveDrivetrain m_Drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
@@ -141,10 +163,11 @@ public class RobotContainer
     // m_DriverController.rightBumper().whileTrue(new CoralPurge(m_CoralPlacer));
     // m_DriverController.leftBumper().whileTrue(new CoralIntake(m_CoralPlacer));
 
-    m_DriverController.leftTrigger().whileTrue(m_CoralPlacer.applyWristVoltage(-1));//up
-    m_DriverController.rightTrigger().whileTrue(m_CoralPlacer.applyWristVoltage(1));//down
-    m_DriverController.leftBumper().whileTrue(m_CoralPlacer.applyShooterVoltage(-2));//outake
-    m_DriverController.rightBumper().whileTrue(m_CoralPlacer.applyShooterVoltage(2));//intake
+    m_DriverController.leftTrigger().whileTrue(m_CoralPlacer.applyWristVoltage(-1, 0.015));//up
+    m_DriverController.povDown().whileTrue(m_CoralPlacer.applyWristVoltage(-1, 0.015));//down
+    m_DriverController.rightTrigger().whileTrue(m_CoralPlacer.applyWristVoltage(1, 0));//down
+    m_DriverController.y().whileTrue(m_CoralPlacer.applyShooterVoltage(-2));//outake
+    m_DriverController.b().whileTrue(m_CoralPlacer.applyShooterVoltage(2));//intake
   }
 
   private void configureAlgaeIntakeDebugBindings()
@@ -155,9 +178,9 @@ public class RobotContainer
     // m_DriverController.rightBumper().whileTrue(new CoralPurge(m_CoralPlacer));
     // m_DriverController.leftBumper().whileTrue(new CoralIntake(m_CoralPlacer));
 
-    m_DriverController.rightBumper().whileTrue(new AlgaeIntakeGroundCommand(m_AlgaeIntake));
-    m_DriverController.leftTrigger().whileTrue(new AlgaeIntakeWristUp(m_AlgaeIntake));
-    m_DriverController.rightTrigger().whileTrue(new AlgaeIntakeProcessingCommand(m_AlgaeIntake));
+    m_DriverController.a().whileTrue(new AlgaeIntakeGroundCommand(m_AlgaeIntake));
+    // m_DriverController.leftBumper().whileTrue(new AlgaeIntakeWristUp(m_AlgaeIntake));
+    m_DriverController.x().whileTrue(new AlgaeIntakeProcessingCommand(m_AlgaeIntake));
   }
 
   private void configureClimbDebugBindings()
@@ -168,10 +191,10 @@ public class RobotContainer
     // m_DriverController.rightBumper().whileTrue(new CoralPurge(m_CoralPlacer));
     // m_DriverController.leftBumper().whileTrue(new CoralIntake(m_CoralPlacer));
 
-    m_DriverController.a().whileTrue(new ClimbCommand(m_Climb, 1));
-    m_DriverController.x().whileTrue(new ClimbCommand(m_Climb, 2));
-    m_DriverController.y().whileTrue(new ClimbCommand(m_Climb, 3));
-    m_DriverController.b().whileTrue(new ClimbCommand(m_Climb, 0));
+    m_DriverController.rightBumper().whileTrue(new ClimbCommand(m_Climb, 1));
+    m_DriverController.leftBumper().whileTrue(new ClimbCommand(m_Climb, -1));
+    // m_DriverController.y().whileTrue(new ClimbCommand(m_Climb, 3));
+    // m_DriverController.b().whileTrue(new ClimbCommand(m_Climb, 0));
   }
 
   

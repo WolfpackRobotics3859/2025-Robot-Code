@@ -37,7 +37,7 @@ public class ClimbCommand extends Command
   @Override
   public void end(boolean interrupted) 
   {
-    // m_Climb.setClimbWristVoltage(ClimbConstants.CLIMB_VOLTAGE_ZERO);
+    m_Climb.setClimbWristVoltage(ClimbConstants.CLIMB_VOLTAGE_ZERO);
   }
 
   // Returns true when the command should end.

@@ -7,24 +7,13 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.SignalLogger;
-import com.ctre.phoenix6.controls.ControlRequest;
-import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.playingwithfusion.TimeOfFlight;
-
-import edu.wpi.first.units.VoltageUnit;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.constants.CoralPlacerConstants;
-import frc.robot.constants.Global;
 import frc.robot.constants.Hardware;
-import frc.robot.subsystems.placer.PlacerRequest;
 
 public class CoralPlacer extends SubsystemBase
 {
@@ -36,7 +25,6 @@ public class CoralPlacer extends SubsystemBase
 
   // public final Timer intakeTimer;
 
-  private PlacerRequest m_CurrenRequest;
   private SysIdRoutine m_SysIdRoutine;
 
   /**
@@ -132,9 +120,14 @@ public class CoralPlacer extends SubsystemBase
   //   }
   // }
 
-  public Command applyWristVoltage(double voltage)
+  public Command applyWristVoltage(double voltage, double voltage2)
   {
-    return this.startEnd(() -> m_CoralPlacerWristMotor.setControl(new VoltageOut(voltage)), () -> m_CoralPlacerWristMotor.setControl(new StaticBrake()));
+    return this.startEnd(() -> m_CoralPlacerWristMotor.setControl(new VoltageOut(voltage)), () -> m_CoralPlacerWristMotor.setControl(new VoltageOut(voltage2)));
+  }
+
+  public Command applyWristBrake()
+  {
+    return this.runOnce(() -> m_CoralPlacerWristMotor.setControl(new StaticBrake()));
   }
 
   public Command applyShooterVoltage(double voltage)

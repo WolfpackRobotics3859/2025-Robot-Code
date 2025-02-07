@@ -23,8 +23,8 @@ public class AlgaeIntake extends SubsystemBase
    */
   public AlgaeIntake() 
   {
-    m_AlgaeIntakeRollerMotor.getConfigurator().apply(AlgaeIntakeConstants.ALGAE_INTAKE_ROLLER_GAINS);
-    m_AlgaeIntakeWristMotor.getConfigurator().apply(AlgaeIntakeConstants.ALGAE_INTAKE_WRIST_CONFIGURATION);
+    m_AlgaeIntakeRollerMotor.getConfigurator().apply(AlgaeIntakeConstants.INTAKE_ROLLER_GAINS);
+    m_AlgaeIntakeWristMotor.getConfigurator().apply(AlgaeIntakeConstants.INTAKE_WRIST_CONFIGURATION);
   }
 
   /**

@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -47,7 +48,7 @@ public class Climb extends SubsystemBase
 
   public void setClimbWristVoltage(double voltage)
   {
-    MotionMagicVoltage voltageRequest = new MotionMagicVoltage(voltage);
+    VoltageOut voltageRequest = new VoltageOut(voltage);
     m_ClimbWristMotorMain.setControl(voltageRequest);
   }
 
