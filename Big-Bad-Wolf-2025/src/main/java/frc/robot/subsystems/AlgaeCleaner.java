@@ -15,8 +15,8 @@ import frc.robot.constants.Hardware;
 // Algae Cleaner subsystem.
 public class AlgaeCleaner extends SubsystemBase 
 {
-  private final TalonFX m_AlgaeCleanerShooterMotor = new TalonFX(Hardware.ALGAE_CLEANER_SHOOTER_MOTOR_ID);
-  private final TalonFX m_AlgaeCleanerWristMotor = new TalonFX(Hardware.ALGAE_CLEANER_WRIST_MOTOR_ID);
+  private final TalonFX m_AlgaeCleanerShooterMotor = new TalonFX(0);
+  private final TalonFX m_AlgaeCleanerWristMotor = new TalonFX(0);
 
   /**
    *  Algae Cleaner subsystem constructor.

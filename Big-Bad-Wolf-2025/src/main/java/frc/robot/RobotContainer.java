@@ -5,13 +5,14 @@
 package frc.robot;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.constants.ClawConstants;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.Global;
 import frc.robot.constants.Global.BUILD_TYPE;
@@ -23,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.AlgaeCleaner;
 import frc.robot.subsystems.AlgaeIntake;
+import frc.robot.subsystems.Claw;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.CoralPlacer;
 
@@ -81,6 +83,10 @@ public class RobotContainer
         this.configureElevatorDebugBindings();
       break;
 
+      case CLAW_DEBUG:
+        m_Manager.addSubsystem(new Claw());
+        this.configureClawDebugBindings();
+
       default:
         System.out.println("Did you mean to configure nothing? :( Sad Robot Face");
       break;
@@ -96,7 +102,7 @@ public class RobotContainer
   private void configureDrivetrainDebugBindings()
   {
     CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
-    SmartDashboard.putData((Sendable) drivetrain);
+    // SmartDashboard.putData((Sendable) drivetrain);
 
     m_DriverController.a().whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
     m_DriverController.b().whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
@@ -111,7 +117,7 @@ public class RobotContainer
                  .withRotationalRate(-m_DriverController.getRightX() * TunerConstants.MaxAngularRate)
         )
     );
-
+ 
     m_DriverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
     m_DriverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
   }
@@ -137,8 +143,15 @@ public class RobotContainer
     m_DriverController.x().whileTrue(sysIdRoutine.quasistatic(Direction.kReverse));
   }
 
+  private void configureClawDebugBindings() {
+    Claw claw = m_Manager.getSubsystemOfType(Claw.class).get();
+    SmartDashboard.putData(claw);
+    m_DriverController.rightBumper().whileTrue(claw.placeCoral());
+    m_DriverController.leftBumper().whileTrue(claw.armGoToPosition(ClawConstants.CLAW_ARM_STOW_POSITION));
+  }
+
   public Command getAutonomousCommand() 
   {
-      return Commands.print("No autonomous command configured");
+    return m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get().pathPlannerAuto;
   }
 }
