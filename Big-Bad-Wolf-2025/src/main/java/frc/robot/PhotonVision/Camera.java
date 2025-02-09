@@ -1,8 +1,13 @@
 package frc.robot.PhotonVision;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.targeting.PhotonPipelineResult;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -16,15 +21,17 @@ import edu.wpi.first.math.util.Units;
 public class Camera 
 {
     // Photon Objects
-    private PhotonCamera PhotonCamera; // The actual camera object
-    private PhotonPoseEstimator CameraPoseEstimator; // Estimates the position and orientation of the robot based on vision
+    private PhotonCamera photonCamera; // The actual camera object
+    private PhotonPoseEstimator cameraPoseEstimator; // Estimates the position and orientation of the robot based on vision
 
-    private Transform3d position_3d; // Holds the 3D coordinates of the camera relative to the robot position
+    private Transform3d position3d; // Holds the 3D coordinates of the camera relative to the robot position
     private CAMERA_PLACEMENT placement = CAMERA_PLACEMENT.NONE; // The placement of the camera on the robot
 
     private int exceptionCount = 0; // Counts the errors of the camera
     private String name; // The name of the camera on the PhotonVision UI
 
+    private List<PhotonPipelineResult> unreadPipelines;
+    private PhotonPipelineResult mostRecentPipeline;
     
     /** Constructs the camera with the appropriate name and placement on the robot.
      * 
@@ -38,12 +45,12 @@ public class Camera
         setCameraPlacement(initPlacement);
 
         setPhotonCamera(new PhotonCamera(this.name));
-        setCameraPoseEstimator(new PhotonPoseEstimator(AprilTagInfo.TAG_LAYOUT, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, this.position_3d));
+        setCameraPoseEstimator(new PhotonPoseEstimator(AprilTagInfo.TAG_LAYOUT, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, this.position3d));
         setCameraExceptionCount(0);
         
         if (this.placement == CAMERA_PLACEMENT.FRONT) 
         {
-            this.PhotonCamera.setDriverMode(true);
+            this.photonCamera.setDriverMode(true);
         }
     }
 
@@ -55,7 +62,7 @@ public class Camera
      */
     public final PhotonCamera getPhotonCamera() 
     {
-        return this.PhotonCamera;
+        return this.photonCamera;
     }
 
     /** Gets the PhotonPoseEstimator object.
@@ -64,7 +71,7 @@ public class Camera
      */
     public final PhotonPoseEstimator getCameraPoseEstimator() 
     {
-        return this.CameraPoseEstimator;
+        return this.cameraPoseEstimator;
     }
 
     /** Gets the CAMERA_PLACEMENT object which corresponds 
@@ -84,7 +91,7 @@ public class Camera
      */
     public final Transform3d getCamera3DPosition() 
     {
-        return this.position_3d;
+        return this.position3d;
     }
 
     /** Gets the number of exceptions the camera has encountered.
@@ -105,6 +112,16 @@ public class Camera
         return this.name;
     }
 
+    public List<PhotonPipelineResult> getUnreadPipelines()
+    {
+        return this.unreadPipelines;// returns all unread results from selected camera
+    }
+
+    public PhotonPipelineResult getMostRecentPipeline()
+    {
+        return this.mostRecentPipeline;// returns last index in pipeline list
+    }
+
     /*
      * SETTER METHODS
      * 
@@ -112,15 +129,14 @@ public class Camera
      * since that is handled when doing setCameraPlacement.
      * 
      */
-
     public final void setPhotonCamera(PhotonCamera newCamera) 
     {
-        this.PhotonCamera = newCamera;
+        this.photonCamera = newCamera;
     }
 
     public final void setCameraPoseEstimator(PhotonPoseEstimator newPoseEstimator) 
     {
-        this.CameraPoseEstimator = newPoseEstimator;
+        this.cameraPoseEstimator = newPoseEstimator;
     }
 
     /** Uses the camera's placement to determine its 3D position relative to the robot.
@@ -133,13 +149,13 @@ public class Camera
         switch (placement) 
         {
             case FRONT:
-                position_3d = CAMERA_3D_POSITION.FRONT; break;
+                position3d = CAMERA_3D_POSITION.FRONT; break;
             case BACK:
-                position_3d = CAMERA_3D_POSITION.BACK; break;
+                position3d = CAMERA_3D_POSITION.BACK; break;
             case LEFT:
-                position_3d = CAMERA_3D_POSITION.LEFT; break;
+                position3d = CAMERA_3D_POSITION.LEFT; break;
             case RIGHT:
-                position_3d = CAMERA_3D_POSITION.RIGHT; break;
+                position3d = CAMERA_3D_POSITION.RIGHT; break;
             case NONE:
                 System.out.println("Camera Error: Can't set the placement of a nonexistent camera.");
         }
@@ -174,14 +190,14 @@ public class Camera
 
         public static final Transform3d FRONT = new Transform3d(
             new Translation3d(
-                Units.inchesToMeters(0),
-                Units.inchesToMeters(0),
-                Units.inchesToMeters(0)
+                Units.inchesToMeters(0),// X
+                Units.inchesToMeters(0),// Y
+                Units.inchesToMeters(0)// Z
             ),
             new Rotation3d(
-                Rotation2d.fromDegrees(0).getRadians(),
-                Rotation2d.fromDegrees(0).getRadians(),
-                Rotation2d.fromDegrees(0).getRadians()
+                Rotation2d.fromDegrees(0).getRadians(),// Roll
+                Rotation2d.fromDegrees(0).getRadians(),// Pitch
+                Rotation2d.fromDegrees(0).getRadians()// Yaw
             )
         );
 
@@ -223,6 +239,24 @@ public class Camera
                 Rotation2d.fromDegrees(0).getRadians()
             )
         );
+    }
+
+    public void updateUnreadPipelines()
+    {
+        unreadPipelines = this.getPhotonCamera().getAllUnreadResults();// Grabs all unread results from selected camera
+    }
+
+    public void updateMostRecentPipeline()
+    {
+        List<PhotonPipelineResult> pipelines = this.getUnreadPipelines();
+        if (!pipelines.isEmpty())
+        {
+            mostRecentPipeline = pipelines.get(this.getUnreadPipelines().size()-1);// Gets last index in pipeline list
+        }
+        else
+        {
+            mostRecentPipeline = null;
+        }
     }
 
     /**
