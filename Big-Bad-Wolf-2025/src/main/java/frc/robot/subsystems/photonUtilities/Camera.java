@@ -1,4 +1,4 @@
-package frc.robot.PhotonVision;
+package frc.robot.subsystems.photonUtilities;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,8 +30,9 @@ public class Camera
     private int exceptionCount = 0; // Counts the errors of the camera
     private String name; // The name of the camera on the PhotonVision UI
 
-    private List<PhotonPipelineResult> unreadPipelines;
+    private List<PhotonPipelineResult> unreadPipelines; // unread pipelines from the camera
     private PhotonPipelineResult mostRecentPipeline;
+    private Transform3d robotToTarget;
     
     /** Constructs the camera with the appropriate name and placement on the robot.
      * 

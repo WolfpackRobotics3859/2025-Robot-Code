@@ -2,9 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.PhotonVision;
+package frc.robot.subsystems;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
@@ -12,37 +11,41 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.PhotonVision.AprilTagInfo.Area;
-import frc.robot.PhotonVision.Camera.CAMERA_PLACEMENT;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.constants.PhotonConstants;
+import frc.robot.subsystems.photonUtilities.AprilTagInfo;
+import frc.robot.subsystems.photonUtilities.AprilTagTask;
+import frc.robot.subsystems.photonUtilities.Camera;
+import frc.robot.subsystems.photonUtilities.AprilTagInfo.Area;
+import frc.robot.subsystems.photonUtilities.Camera.CAMERA_PLACEMENT;
 
-public class CameraUtilities extends SubsystemBase
+public class PhotonVision extends SubsystemBase
 {
 
   private static Optional<EstimatedRobotPose> optionalPose;
-  public final Camera frontCamera;
-  public final Camera backCamera;
-  public final Camera rightCamera;
-  public final Camera leftCamera;
+  private final CommandSwerveDrivetrain m_Drivetrain;
+  public final Camera m_FrontCamera;
+  public final Camera m_BackCamera;
+  public final Camera m_RightCamera;
+  public final Camera m_LeftCamera;
 
-  public CameraUtilities() 
+  public PhotonVision(CommandSwerveDrivetrain p_Drivetrain)
   {
-    frontCamera = new Camera("frontCamera", CAMERA_PLACEMENT.FRONT);
-    backCamera = new Camera("backCamera", CAMERA_PLACEMENT.BACK);
-    rightCamera = new Camera("rightCamera", CAMERA_PLACEMENT.RIGHT);
-    leftCamera = new Camera("leftCamera", CAMERA_PLACEMENT.LEFT);
+    m_FrontCamera = PhotonConstants.frontCamera;
+    m_BackCamera = PhotonConstants.backCamera;
+    m_LeftCamera = PhotonConstants.leftCamera;    
+    m_RightCamera = PhotonConstants.rightCamera;
+
+    this.m_Drivetrain = p_Drivetrain;
   }
 
   public Optional<EstimatedRobotPose> positionEstimation(Camera camera)
   {
-    // Creates an estimated position based on 
+    // Creates an estimated position off most recent pipeline using camera pose estimator
     return camera.getCameraPoseEstimator().update(camera.getMostRecentPipeline());
   }
   
-
   /** Uses a camera to update the odometry and help
    * the robot know where it is on the field
    * 
@@ -131,12 +134,14 @@ public class CameraUtilities extends SubsystemBase
         task.alignWithCage();
         break;
       case CORAL_REEF:
+        System.out.println("CORAL REEF");
         task.alignWithCoralReef();
         break;
       case CORAL_STATION:
         task.alignWithCoralStation();
         break;
       case NONE:
+        System.out.println("NO TASK");
         break;
       default:
         break;

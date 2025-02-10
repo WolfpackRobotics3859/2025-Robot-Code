@@ -1,4 +1,4 @@
-package frc.robot.PhotonVision;
+package frc.robot.subsystems.photonUtilities;
 
 import java.io.UncheckedIOException;
 
@@ -18,6 +18,7 @@ public class AprilTagInfo
     private Area area = Area.NONE;
     private int id = -1;
     private PhotonTrackedTarget target;
+    private Camera cameraWitness;
     
     /** Initializes using an ID to figure out the color/area of the AprilTag.  Also initializes
      * a PhotonTrackedTarget object to use the position of the tag on the camera.
@@ -25,10 +26,11 @@ public class AprilTagInfo
      * @param initID
      * @param initTarget
      */
-    public AprilTagInfo(int initID, PhotonTrackedTarget initTarget) 
+    public AprilTagInfo(int initID, PhotonTrackedTarget initTarget, Camera witness) 
     {
         setID(initID);
         setTarget(initTarget);
+        setCameraWitness(witness);
     }
 
     /** Initializes using an ID to figure out color/area of the AprilTag.
@@ -75,6 +77,11 @@ public class AprilTagInfo
         return this.area;
     }
 
+    public final Camera getCameraWitness()
+    {
+        return this.cameraWitness;
+    }
+
     /** Gets the PhotonTrackedTarget of the AprilTag which
      * contains information about yaw, pitch, etc. 
      * 
@@ -85,6 +92,7 @@ public class AprilTagInfo
         return this.target;
     }
 
+    
     // SETTER METHODS //
 
     /** Uses a new ID to set the new color and area of the object.
@@ -100,6 +108,11 @@ public class AprilTagInfo
         if (this.id < 1 || this.id > 22 ) {
             System.out.println("AprilTag of ID " + this.id + " is nonexistent");
         }
+    }
+
+    public final void setCameraWitness(Camera camera)
+    {
+        this.cameraWitness = camera;
     }
 
     /** 

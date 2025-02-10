@@ -2,10 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.PhotonVision;
+package frc.robot.subsystems.photonUtilities;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
+import frc.robot.commands.RotateToAngle;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 /** Add your docs here. */
@@ -33,6 +38,14 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
     public final void setCommandSwerveDrivetrain(CommandSwerveDrivetrain newDrivetrain) 
     {
       this.m_drivetrain = newDrivetrain;
+    }
+
+    public final Transform3d robotToTargetTransform3d()
+    {
+      return this.info.getTarget()
+      .getBestCameraToTarget()
+      .plus(
+        info.getCameraWitness().getCamera3DPosition());
     }
 
     public final AprilTagInfo getAprilTagInfo() 
@@ -68,15 +81,15 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
     public final void rotateToAprilTag() 
     {
       // Get the yaw of the AprilTag (degrees from the center of camera)
-      double tagYawDegrees = info.getTarget().getYaw();
+      double tagYawOffset = info.getTarget().getYaw();
 
-      // Use Pigeon2 sensor to get the robot's current yaw
-      // let Pigeon2's yaw in degrees = yawReading
-      // (yawReading % 360) = current yaw in degrees, from 0 to 360
-      double robotYawDegrees = Math.floorMod((int)m_drivetrain.getPigeon2().getRotation2d().getDegrees(), 360);
+      // Use Pigeon2 sensor to get the robot's raw yaw in degrees
+      double robotYawRaw = m_drivetrain.getPigeon2().getRotation2d().getDegrees();
+      // (yawReading % 360) = current yaw in degrees 
+      double robotYawDegrees = ((robotYawRaw % 360) + 360) % 360; // Add 360 to find positive coterminal angle then % to get rid of values over 360
 
       // Where the robot should face depending on the AprilTag's yaw
-      double desiredYawDegrees = robotYawDegrees + tagYawDegrees;
+      double desiredYawDegrees = robotYawDegrees + tagYawOffset ;
 
       // Convert the yaw to radians (since Rotation2d's constructor uses radians)
       double desiredYawRadians = Units.degreesToRadians(desiredYawDegrees);
