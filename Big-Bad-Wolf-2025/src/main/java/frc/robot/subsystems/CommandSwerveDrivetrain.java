@@ -7,7 +7,6 @@ import java.util.function.Supplier;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
-import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -15,14 +14,11 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.controllers.PPLTVController;
-import com.pathplanner.lib.controllers.PathFollowingController;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -214,13 +210,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             this::getPose2d,
             this::resetPose,
             this::getCurrentSpeed,
-            (speeds,driveFeedForward) -> driveRobotRelative(speeds),
+            (speeds,driveFeedForward) -> this.setControl(new SwerveRequest.ApplyRobotSpeeds().withSpeeds(speeds)),
             new PPHolonomicDriveController(new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
             robotConfig,
             () -> false,
             this);
         pathPlannerAuto = new PathPlannerAuto("DriveStraight");
-    }
+    }  
 
     public ChassisSpeeds getCurrentSpeed() {
         System.out.println("this.getKinematics().toChassisSpeeds(this.getState().ModuleStates): "+ this.getKinematics().toChassisSpeeds(this.getState().ModuleStates));
