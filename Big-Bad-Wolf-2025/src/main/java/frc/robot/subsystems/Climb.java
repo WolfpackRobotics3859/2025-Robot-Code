@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -45,14 +46,11 @@ public class Climb extends SubsystemBase
     m_ClimbWristMotorMain.setControl(climbPositionRequest);
   }
 
-  /**
-   * Sets the wrist position for the funnel wrist motor.
-   * @param funnelPosition Position to set the funnel wrist to.
-   */
-  public void setFunnelWristPosition(double funnelPosition)
+ 
+  public void setClimbWristVoltage(double voltage)
   {
-    MotionMagicVoltage positionRequest = new MotionMagicVoltage(funnelPosition);
-    m_CoralFunnelMotor.setControl(positionRequest);
+    VoltageOut voltageRequest = new VoltageOut(voltage);
+    m_ClimbWristMotorMain.setControl(voltageRequest);
   }
 
   @Override

@@ -4,6 +4,12 @@
 
 package frc.robot;
 
+import java.io.IOException;
+
+import org.json.simple.parser.ParseException;
+
+import com.pathplanner.lib.util.FileVersionException;
+
 import edu.wpi.first.wpilibj.RobotBase;
 
 public final class Main 
@@ -15,6 +21,13 @@ public final class Main
 
   public static void main(String... args) 
   {
-    RobotBase.startRobot(Robot::new);
+    RobotBase.startRobot(() -> {
+      try {
+          return new Robot();
+      } catch (FileVersionException | IOException | ParseException e) {
+          e.printStackTrace();
+          throw new RuntimeException("[CRITICAL ERROR] Failed to initialize Robot!", e);
+      }
+  });
   }
 }

@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -9,9 +10,18 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.PathPoint;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -21,7 +31,6 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 
 /**
@@ -30,9 +39,11 @@ import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
  */
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem 
 {
+    private RobotConfig robotConfig;
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
+
 
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
@@ -128,6 +139,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         {
             startSimThread();
         }
+        autoBuilder();
     }
 
     /**
@@ -153,6 +165,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         {
             startSimThread();
         }
+        autoBuilder();
     }
 
     /**
@@ -186,6 +199,43 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         {
             startSimThread();
         }
+        autoBuilder();
+    }
+
+    public void autoBuilder() 
+    {
+        try {
+            robotConfig = RobotConfig.fromGUISettings();
+        } catch (Exception e) {
+            System.out.print("***** ROBOT CONFIG IS NULL ******");
+        }
+        AutoBuilder.configure(
+            this::getPose2d,
+            this::resetPose,
+            this::getCurrentSpeed,
+            (speeds,driveFeedForward) -> this.setControl(new SwerveRequest.ApplyRobotSpeeds().withSpeeds(speeds)),
+            new PPHolonomicDriveController(new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
+            robotConfig,
+            () -> false,
+            this
+        );
+    }  
+
+    public ChassisSpeeds getCurrentSpeed() {
+       return this.getKinematics().toChassisSpeeds(this.getState().ModuleStates);
+    }
+
+    public Pose2d getPose2d() {
+        return this.getState().Pose;
+    }
+
+    public void resetPose2d(Pose2d newPose) {
+        this.getState().Pose = newPose;
+    }
+
+    public Command driveRobotRelative(ChassisSpeeds chassisSpeeds) {
+        SwerveRequest.ApplyRobotSpeeds request = new SwerveRequest.ApplyRobotSpeeds().withSpeeds(chassisSpeeds);        
+        return run(() -> this.setControl(request));
     }
 
     /**
@@ -263,4 +313,28 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         });
         m_simNotifier.startPeriodic(kSimLoopPeriod);
     }
+
+    public boolean atTargetPosition(Pose2d targetPose) 
+    {
+        Pose2d currentPose = getState().Pose; 
+        double distance = currentPose.getTranslation().getDistance(targetPose.getTranslation());
+        return distance < 0.05; //consider "at target" if within 5 cm
+    }
+  
+  public void driveTo(Pose2d targetPose) 
+  {
+    PathConstraints constraints = new PathConstraints(3.0, 3.0, m_lastSimTime, m_lastSimTime); //adjust speed and acceleration as needed
+
+    PathPlannerPath path = PathPlannerPath.fromPathPoints(
+        List.of(
+            new PathPoint(getState().Pose.getTranslation()), //starting pose
+            new PathPoint(targetPose.getTranslation())  //goal pose
+        ),
+        constraints, null
+    );
+
+    //follow the path above
+    AutoBuilder.followPath(path).schedule();
+    } 
 }
+
