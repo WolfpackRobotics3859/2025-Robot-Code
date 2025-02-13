@@ -6,43 +6,63 @@ package frc.robot.subsystems;
 
 
 import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
+
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.constants.Hardware;
 import frc.robot.constants.ShooterConstants;
+import frc.robot.utilities.MotorManager;
 
 public class Shooter extends SubsystemBase 
 {
   private final TalonFX m_ShooterWristMotor;
-  private final TalonFX m_ShooterShooterMotor;
+  private final TalonFX m_ShooterAlgaeMotor;
+  private final TalonFX m_ShooterCoralMotor;
 
   private SysIdRoutine m_SysIdRoutine;
 
-  /** Creates a new Shooter. */
+  private final VoltageOut m_AlgaeVoltageRequest;
+  private final VoltageOut m_CoralVoltageRequest;
+  private final MotionMagicVoltage m_WristPositionRequest;
+  private final StaticBrake m_BrakeRequest;
+
   public Shooter()
   {
-    m_ShooterWristMotor = new TalonFX(Hardware.SHOOTER_WRIST_MOTOR_ID);
-    m_ShooterShooterMotor = new TalonFX(Hardware.SHOOTER_SHOOTER_MOTOR_ID);
+    MotorManager.AddMotor("SHOOTER WRIST MOTOR", Hardware.SHOOTER_WRIST_MOTOR);
+    MotorManager.AddMotor("SHOOTER ALGAE MOTOR", Hardware.SHOOTER_ALGAE_MOTOR);
+    MotorManager.AddMotor("SHOOTER CORAL MOTOR", Hardware.SHOOTER_CORAL_MOTOR);
 
-    m_ShooterWristMotor.getConfigurator().apply(ShooterConstants.WRIST_MOTOR_CONFIG);
-    m_ShooterShooterMotor.getConfigurator().apply(ShooterConstants.SHOOTER_MOTOR_CONFIG);
+    m_ShooterWristMotor = MotorManager.GetMotor(Hardware.SHOOTER_WRIST_MOTOR);
+    m_ShooterAlgaeMotor = MotorManager.GetMotor(Hardware.SHOOTER_ALGAE_MOTOR);
+    m_ShooterCoralMotor = MotorManager.GetMotor(Hardware.SHOOTER_CORAL_MOTOR);
+
+
+    MotorManager.ApplyConfigs(ShooterConstants.WRIST_MOTOR_CONFIG, Hardware.SHOOTER_WRIST_MOTOR);
+    MotorManager.ApplyConfigs(ShooterConstants.SHOOTER_ALGAE_MOTOR_CONFIG, Hardware.SHOOTER_ALGAE_MOTOR);
+    MotorManager.ApplyConfigs(ShooterConstants.SHOOTER_CORAL_MOTOR_CONFIG, Hardware.SHOOTER_CORAL_MOTOR);
+
+    m_AlgaeVoltageRequest = new VoltageOut(0);
+    m_CoralVoltageRequest = new VoltageOut(0);
+    m_WristPositionRequest = new MotionMagicVoltage(0);
+    m_BrakeRequest = new StaticBrake();
   }
 
-  public Command applyWristVoltage(double voltage)
+  public Command StowShooter()
   {
-    return this.startEnd(() -> m_ShooterWristMotor.setControl(new VoltageOut(voltage)), () -> m_ShooterWristMotor.setControl(new StaticBrake()));
-  }
-
-  public Command applyShooterVoltage(double voltage)
-  {
-    return this.startEnd(() -> m_ShooterShooterMotor.setControl(new VoltageOut(voltage)), () -> m_ShooterShooterMotor.setControl(new VoltageOut(0)));
+    return new FunctionalCommand(() -> this.BrakeAlgae().BrakeCoral().SetWristPosition(ShooterConstants.WRIST_STOW_POSITION),
+                                 () -> {}, 
+                                 interrupted -> {},
+                                 MotorManager.InPosition(Hardware.SHOOTER_WRIST_MOTOR, 10),
+                                 this);
   }
 
   // To-do: Move sysId settings to the constants file
@@ -62,6 +82,36 @@ public class Shooter extends SubsystemBase
       )
    );
    return this.m_SysIdRoutine;
+  }
+
+  private Shooter SetWristPosition(double position)
+  {
+    MotorManager.ApplyControlRequest(m_WristPositionRequest.withPosition(position), Hardware.SHOOTER_WRIST_MOTOR);
+    return this;
+  }
+
+  private Shooter SetAlgaeVoltage(double voltage)
+  {
+    MotorManager.ApplyControlRequest(m_AlgaeVoltageRequest.withOutput(voltage), Hardware.SHOOTER_ALGAE_MOTOR);
+    return this;
+  }
+
+  private Shooter SetCoralVoltage(double voltage)
+  {
+    MotorManager.ApplyControlRequest(m_CoralVoltageRequest.withOutput(voltage), Hardware.SHOOTER_CORAL_MOTOR);
+    return this;
+  }
+
+  private Shooter BrakeAlgae()
+  {
+    MotorManager.ApplyControlRequest(m_BrakeRequest, Hardware.SHOOTER_ALGAE_MOTOR);
+    return this;
+  }
+
+  private Shooter BrakeCoral()
+  {
+    MotorManager.ApplyControlRequest(m_BrakeRequest, Hardware.SHOOTER_CORAL_MOTOR);
+    return this;
   }
 
   @Override

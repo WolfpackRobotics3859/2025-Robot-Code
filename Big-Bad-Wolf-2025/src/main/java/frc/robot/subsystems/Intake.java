@@ -33,13 +33,13 @@ public class Intake extends SubsystemBase
   public Command goToPositionThenRoll(double position, double rollerVoltage)
   {
     return new FunctionalCommand(
-      // Reset encoders on command start
+      // Begin moving the intake to a desired position.
       () -> m_IntakeWristMotor.setControl(new MotionMagicVoltage(position)),
-      // Start driving forward at the start of the command
+      // Ensure the intake rollers aren't powered while moving the intake.
       () -> m_IntakeRollerMotor.setControl(new VoltageOut(0)),
-      // Stop driving at the end of the command
+      // Spin up the intake rollers right before the command ends.
       interrupted ->  m_IntakeRollerMotor.setControl(new VoltageOut(rollerVoltage)),
-      // End the command when the robot's driven distance exceeds the desired value
+      // Ends the command once the intake is in the desired position.
       () -> this.getIntakeInPosition(0.1),
       this
   );
@@ -69,6 +69,7 @@ public class Intake extends SubsystemBase
   {
     return Math.abs(this.m_IntakeWristMotor.getClosedLoopError().getValueAsDouble()) < tolerance;
   }
+  
   /**
    * Sets the roller voltage for the  Intake roller motor.
    * 

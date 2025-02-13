@@ -71,6 +71,16 @@ public class Elevator extends SubsystemBase
     return this.m_ElevatorMotorMain.getPosition().getValueAsDouble();
   }
 
+  /**
+   * Checks the closed loop position error againt a tolerance to see if the elevator is within range.
+   * @param tolerance the largest magnitude of error allowed.
+   * @return true if the elevator's closed loop error is within the allowable magnitude, false otherwise.
+   */
+  public boolean getIsElevatorInPosition(double tolerance)
+  {
+    return Math.abs(this.m_ElevatorMotorMain.getClosedLoopError().getValueAsDouble()) < tolerance;
+  }
+
   public SysIdRoutine getSysIdRoutine()
   {
     return this.m_SysIdRoutine;
