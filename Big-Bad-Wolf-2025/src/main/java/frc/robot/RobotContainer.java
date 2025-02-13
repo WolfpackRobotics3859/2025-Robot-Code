@@ -64,6 +64,7 @@ public class RobotContainer
         m_Manager.addSubsystem(new Elevator());
         m_Manager.addSubsystem(new Intake());
         m_Manager.addSubsystem(new Climb());
+        m_Manager.addSubsystem(new Shooter());
         this.configureCompetitionBindings();
       break;
 
