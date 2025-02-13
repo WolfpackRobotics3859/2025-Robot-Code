@@ -197,7 +197,7 @@ public class MotorManager
         return true;
     }
 
-    public static boolean InPosition(int id, double tolerance)
+    public static BooleanSupplier InPosition(int id, double tolerance)
     {
         TalonFX motor = GetMotor(id);
 
