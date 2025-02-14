@@ -10,9 +10,14 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
+import com.playingwithfusion.TimeOfFlight.RangingMode;
 
 public class ShooterConstants 
 {
+    // CORAL TOF SENSOR CONSTANTS
+    public static final RangingMode CORAL_TOF_RANGING_MODE = RangingMode.Short;
+    public static final double CORAL_TOF_IN_RANGE_THRESHOLD = 0;
+
     // CORAL MOTOR VOLTAGE
     public static final double CORAL_INTAKE_VOLTAGE = 0;
     public static final double CORAL_DEPLOYMENT_VOLTAGE = 0;
@@ -33,6 +38,7 @@ public class ShooterConstants
     public static final double WRIST_ALGAE_INTAKE_POSITION = 0;
     public static final double WRIST_ALGAE_PROCESSOR_DEPLOYMENT_POSITION = 0;
     public static final double WRIST_ALGAE_SHOOTING_POSITION = 0;
+    public static final double WRIST_ALGAE_SWEEPING_POSITION = 0;
     
     // WRIST MOTOR CONFIGS
     public static final MotorOutputConfigs WRIST_MOTOR_OUTPUT_CONFIG = new MotorOutputConfigs()

@@ -10,6 +10,7 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.playingwithfusion.TimeOfFlight;
 
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -27,6 +28,8 @@ public class Shooter extends SubsystemBase
   private final TalonFX m_ShooterWristMotor;
   private final TalonFX m_ShooterAlgaeMotor;
   private final TalonFX m_ShooterCoralMotor;
+
+  private final TimeOfFlight m_TOF;
 
   private SysIdRoutine m_SysIdRoutine;
 
@@ -61,8 +64,60 @@ public class Shooter extends SubsystemBase
     return new FunctionalCommand(() -> this.BrakeAlgae().BrakeCoral().SetWristPosition(ShooterConstants.WRIST_STOW_POSITION),
                                  () -> {}, 
                                  interrupted -> {},
-                                 MotorManager.InPosition(Hardware.SHOOTER_WRIST_MOTOR, 10),
+                                 MotorManager.InPosition(Hardware.SHOOTER_WRIST_MOTOR, 0.5),
                                  this);
+  }
+
+  public Command IntakeCoral()
+  {
+    return SetCoralAndWrist(ShooterConstants.CORAL_INTAKE_VOLTAGE, ShooterConstants.WRIST_CORAL_INTAKE_POSITION);
+  }
+
+  public Command SweepAlgae()
+  {
+    return SetAlgaeAndWrist(ShooterConstants.ALGAE_SWEEPING_VOLTAGE, ShooterConstants.WRIST_ALGAE_SWEEPING_POSITION);
+  }
+
+  public Command IntakeAlgae()
+  {
+    return SetAlgaeAndWrist(ShooterConstants.ALGAE_GROUND_INTAKING_VOLTAGE, ShooterConstants.WRIST_ALGAE_INTAKE_POSITION);
+  }
+
+  public Command SetAlgaeAndWrist(double algaeVoltage, double position)
+  {
+    return new FunctionalCommand(() -> this.BrakeCoral().SetAlgaeVoltage(algaeVoltage).SetWristPosition(position),
+    () -> {}, 
+    interrupted -> {},
+    MotorManager.InPosition(Hardware.SHOOTER_WRIST_MOTOR, 0.5),
+    this);
+  }
+
+  public Command SetCoralAndWrist(double coralVoltage, double position)
+  {
+    return new FunctionalCommand(() -> this.SetCoralVoltage(coralVoltage).BrakeAlgae().SetWristPosition(position),
+    () -> {}, 
+    interrupted -> {},
+    MotorManager.InPosition(Hardware.SHOOTER_WRIST_MOTOR, 0.5),
+    this);
+  }
+
+  public Command SetShooterWristPositon(double position)
+  {
+    return new FunctionalCommand(() -> this.SetWristPosition(position),
+                                 () -> {}, 
+                                 interrupted -> {},
+                                 MotorManager.InPosition(Hardware.SHOOTER_WRIST_MOTOR, 0.5),
+                                 this);
+  }
+
+  public Command SetAlgaeVoltageInstant(double voltage)
+  {
+    return this.runOnce(() -> this.SetAlgaeVoltage(voltage));
+  }
+  
+  public Command SetCoralVoltageInstant(double voltage)
+  {
+    return this.runOnce(() -> this.SetCoralVoltage(voltage));
   }
 
   // To-do: Move sysId settings to the constants file
