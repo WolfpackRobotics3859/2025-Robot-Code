@@ -29,11 +29,11 @@ public class Shooter extends SubsystemBase
   /** Creates a new Shooter. */
   public Shooter()
   {
-    m_ShooterWristMotor = new TalonFX(Hardware.SHOOTER_WRIST_MOTOR_ID);
-    m_ShooterShooterMotor = new TalonFX(Hardware.SHOOTER_SHOOTER_MOTOR_ID);
+    m_ShooterWristMotor = new TalonFX(Hardware.SHOOTER_WRIST_MOTOR);
+    m_ShooterShooterMotor = new TalonFX(Hardware.SHOOTER_CORAL_MOTOR);
 
     m_ShooterWristMotor.getConfigurator().apply(ShooterConstants.WRIST_MOTOR_CONFIG);
-    m_ShooterShooterMotor.getConfigurator().apply(ShooterConstants.SHOOTER_MOTOR_CONFIG);
+    m_ShooterShooterMotor.getConfigurator().apply(ShooterConstants.WRIST_MOTOR_CONFIG);
   }
 
 

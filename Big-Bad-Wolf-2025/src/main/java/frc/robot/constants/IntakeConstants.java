@@ -16,13 +16,12 @@ public class IntakeConstants
     public static final double INTAKE_WRIST_FEED_FORWARD = 0;
 
     public static final double INTAKE_WRIST_DEFAULT_POSITION = 0;
-    public static final double INTAKE_WRIST_STOW_POSITION = 4;
     public static final double INTAKE_WRIST_GROUND_POSITION = 7.48;
     public static final double INTAKE_WRIST_PROCESSING_POSITION = 0;
 
     public static final double INTAKE_ROLLER_DEFAULT_VOLTAGE = 0;
-    public static final double INTAKE_ROLLER_VOLTAGE = -3;
-    public static final double INTAKE_ROLLER_PROCESSING_VOLTAGE = 3;
+    public static final double INTAKE_ROLLER_VOLTAGE = 0;
+    public static final double INTAKE_ROLLER_PROCESSING_VOLTAGE = 0;
 
     // Insert roller gain values when determined.
     public static final Slot0Configs INTAKE_ROLLER_GAINS = new Slot0Configs()

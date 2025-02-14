@@ -19,8 +19,8 @@ import frc.robot.constants.Hardware;
 // Creates a new  Intake subsystem.
 public class Intake extends SubsystemBase 
 {
-  private final TalonFX m_IntakeRollerMotor = new TalonFX(Hardware.INTAKE_ROLLER_MOTOR_ID);
-  private final TalonFX m_IntakeWristMotor = new TalonFX(Hardware.INTAKE_WRIST_MOTOR_ID);
+  private final TalonFX m_IntakeRollerMotor = new TalonFX(Hardware.INTAKE_ROLLER_MOTOR);
+  private final TalonFX m_IntakeWristMotor = new TalonFX(Hardware.INTAKE_WRIST_MOTOR);
 
   /**
    *  Intake subsystem constructor.
@@ -63,7 +63,7 @@ public class Intake extends SubsystemBase
 
   public Command goToStowPosition()
   {
-    return this.runOnce(() -> this.setWristPosition(IntakeConstants.INTAKE_WRIST_STOW_POSITION));
+    return this.runOnce(() -> this.setWristPosition(IntakeConstants.INTAKE_WRIST_DEFAULT_POSITION));
   }
 
   private boolean getIntakeInPosition(double tolerance)

@@ -166,7 +166,7 @@ public class RobotContainer
     //m_DriverController.b().whileTrue(shooter.applyShooterVoltage(2));//intake
 
    
-    //AUTOMATED SHOOTER NO LEFT/RIGHT; FOR TESTS
+    //AUTOMATED SHOOTER NO ALIGNMENT
     m_DriverController.a().onTrue(new CoralPlacer(elevator, ElevatorConstants.ELEVATOR_LEVEL_TWO, shooter));
     m_DriverController.b().onTrue(new CoralPlacer(elevator, ElevatorConstants.ELEVATOR_LEVEL_THREE, shooter));
     m_DriverController.y().onTrue(new CoralPlacer(elevator, ElevatorConstants.ELEVATOR_LEVEL_FOUR, shooter));    

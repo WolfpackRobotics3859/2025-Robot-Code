@@ -42,14 +42,14 @@ public class Elevator extends SubsystemBase
    */
   public Elevator()
   {
-    m_ElevatorMotorMain = new TalonFX(Hardware.ELEVATOR_MOTOR_LEFT_ID);
-    m_ElevatorMotorFollower = new TalonFX(Hardware.ELEVATOR_MOTOR_RIGHT_ID);
+    m_ElevatorMotorMain = new TalonFX(Hardware.ELEVATOR_MOTOR_LEFT);
+    m_ElevatorMotorFollower = new TalonFX(Hardware.ELEVATOR_MOTOR_RIGHT);
     m_CANdi = new CANdi(Hardware.CANDI_0);
 
     m_ElevatorMotorMain.getConfigurator().apply(ElevatorConstants.LEFT_MOTOR_CONFIG);
     m_ElevatorMotorFollower.getConfigurator().apply(ElevatorConstants.RIGHT_MOTOR_CONFIG);
 
-    Follower followRequest = new Follower(Hardware.ELEVATOR_MOTOR_LEFT_ID, false); 
+    Follower followRequest = new Follower(Hardware.ELEVATOR_MOTOR_LEFT, false); 
     m_ElevatorMotorFollower.setControl(followRequest);
 
     this.initializeSmartdashboardFields();

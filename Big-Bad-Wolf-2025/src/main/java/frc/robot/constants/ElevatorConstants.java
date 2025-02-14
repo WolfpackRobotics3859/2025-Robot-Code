@@ -24,18 +24,18 @@ import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 public class ElevatorConstants 
 {
     public static final double ELEVATOR_ZERO_POSITION = 0;
-    public static final double ELEVATOR_LEVEL_TWO = 10;
-    public static final double ELEVATOR_LEVEL_THREE = 20;
-    public static final double ELEVATOR_LEVEL_FOUR = 30;
+    public static final double ELEVATOR_LEVEL_TWO = 26;
+    public static final double ELEVATOR_LEVEL_THREE = 38;
+    public static final double ELEVATOR_LEVEL_FOUR = 60;
 
-    public static final double ELEVATOR_UP_VOLTAGE = -1.5;
-    public static final double ELEVATOR_DOWN_VOLTAGE = 1.5;
+    public static final double ELEVATOR_UP_VOLTAGE = 3;
+    public static final double ELEVATOR_DOWN_VOLTAGE = -1.5;
 
     // TalonFX Configs
 
     // LEFT MOTOR CONFIGS
     public static final MotorOutputConfigs LEFT_MOTOR_OUTPUT_CONFIG = new MotorOutputConfigs()
-                                                                          .withInverted(InvertedValue.Clockwise_Positive)
+                                                                          .withInverted(InvertedValue.CounterClockwise_Positive)
                                                                           .withNeutralMode(NeutralModeValue.Brake)
                                                                           .withPeakForwardDutyCycle(1)
                                                                           .withPeakReverseDutyCycle(-1);
@@ -44,7 +44,7 @@ public class ElevatorConstants
                                                                                              .withContinuousWrap(false);
 
     public static final CurrentLimitsConfigs LEFT_MOTOR_CURRENT_LIMIT_CONFIG = new CurrentLimitsConfigs()
-                                                                                    .withStatorCurrentLimit(80)
+                                                                                    .withStatorCurrentLimit(100)
                                                                                     .withStatorCurrentLimitEnable(true)
                                                                                     .withSupplyCurrentLimit(40)
                                                                                     .withSupplyCurrentLimitEnable(false)
@@ -53,18 +53,18 @@ public class ElevatorConstants
 
     public static final Slot0Configs LEFT_MOTOR_SLOT_0_CONFIG = new Slot0Configs()
                                                                     .withGravityType(GravityTypeValue.Elevator_Static)
-                                                                    .withKA(0.01) // Small acceleration feedforward, increase if acceleration is sluggish
-                                                                    .withKG(0.3)  // Gravity feedforward 
-                                                                    .withKP(0.5)  // Start small and increase until it holds position well
-                                                                    .withKI(0.0)  // Keep at 0; use if there's steady-state error
-                                                                    .withKD(0.01) // Helps with overshoot and oscillation
-                                                                    .withKS(0.2)  // Helps overcome static friction, tune with testing
-                                                                    .withKV(0.1)  // Helps with velocity control, adjust as needed
+                                                                    .withKA(0)
+                                                                    .withKD(0)
+                                                                    .withKG(0)
+                                                                    .withKI(0)
+                                                                    .withKP(15)
+                                                                    .withKS(0)
+                                                                    .withKV(0)
                                                                     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
 
     public static final MotionMagicConfigs LEFT_MOTOR_MOTION_MAGIC_CONFIG = new MotionMagicConfigs()
-                                                                                .withMotionMagicAcceleration(1)
-                                                                                .withMotionMagicCruiseVelocity(1)
+                                                                                .withMotionMagicAcceleration(20)
+                                                                                .withMotionMagicCruiseVelocity(40)
                                                                                 .withMotionMagicExpo_kA(0.1)
                                                                                 .withMotionMagicExpo_kV(0.12)
                                                                                 .withMotionMagicJerk(0);
@@ -87,13 +87,13 @@ public class ElevatorConstants
 
     // RIGHT MOTOR CONFIGS
     public static final MotorOutputConfigs RIGHT_MOTOR_OUTPUT_CONFIG = new MotorOutputConfigs()
-                                                                          .withInverted(InvertedValue.CounterClockwise_Positive)
+                                                                          .withInverted(InvertedValue.Clockwise_Positive)
                                                                           .withNeutralMode(NeutralModeValue.Brake)
                                                                           .withPeakForwardDutyCycle(1)
                                                                           .withPeakReverseDutyCycle(-1);
 
     public static final CurrentLimitsConfigs RIGHT_MOTOR_CURRENT_LIMIT_CONFIG = new CurrentLimitsConfigs()
-                                                                                    .withStatorCurrentLimit(80)
+                                                                                    .withStatorCurrentLimit(100)
                                                                                     .withStatorCurrentLimitEnable(true)
                                                                                     .withSupplyCurrentLimit(40)
                                                                                     .withSupplyCurrentLimitEnable(false)
