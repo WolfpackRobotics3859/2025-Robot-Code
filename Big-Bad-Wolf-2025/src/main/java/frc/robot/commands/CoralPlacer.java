@@ -16,7 +16,7 @@ public class CoralPlacer extends SequentialCommandGroup {
   public CoralPlacer(Elevator elevator, double elevatorLevel, Shooter shooter) {
     addCommands(
       elevator.goToPosition(elevatorLevel), //move to the requested level
-      shooter.applyShooterVoltage(ShooterConstants.SHOOTER_CORAL_DEPLOY_VOLTAGE), //deploy coral
+      shooter.applyShooterVoltage(ShooterConstants.CORAL_DEPLOYMENT_VOLTAGE), //deploy coral
       new WaitCommand(1), //lets shooter run for 1 second before lowering the elevator
       //wait command can  be removed later when  the shooter is able to stop itself based on sensor feedback
       elevator.goToPosition(ElevatorConstants.ELEVATOR_ZERO_POSITION) //move to zero position

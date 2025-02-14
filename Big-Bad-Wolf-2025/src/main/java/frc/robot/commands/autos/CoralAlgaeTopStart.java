@@ -43,7 +43,7 @@ public class CoralAlgaeTopStart extends SequentialCommandGroup
       elevator.goToPosition(ElevatorConstants.ELEVATOR_LEVEL_TWO),         //raises elevator
       shooter.applyWristVoltage(-3),        //wrist in shooting position
       new WaitCommand(1.5),
-      shooter.applyShooterVoltage(ShooterConstants.SHOOTER_CORAL_DEPLOY_VOLTAGE),   //scores coral 
+      shooter.applyShooterVoltage(ShooterConstants.CORAL_DEPLOYMENT_VOLTAGE),   //scores coral 
       new WaitCommand(0.5),                                                        
       //wait  can be removed when we have sensors that tell the shooter to stop
       shooter.applyWristVoltage(3),    //stow wrist
@@ -52,7 +52,7 @@ public class CoralAlgaeTopStart extends SequentialCommandGroup
       AutoBuilder.followPath(pickupPath),     //goes to algae
       intake.goToPositionThenRoll(IntakeConstants.INTAKE_WRIST_GROUND_POSITION, -3),    //intake algae  
       new WaitCommand(1),
-      intake.goToPositionThenRoll(IntakeConstants.INTAKE_WRIST_STOW_POSITION, 0),   //stow algae
+      intake.goToPositionThenRoll(IntakeConstants.INTAKE_WRIST_DEFAULT_POSITION, 0),   //stow algae
       AutoBuilder.followPath(secondScorePath),    //go to processor
       intake.goToPositionThenRoll(6, 3)     //processes algae
     );

@@ -2,8 +2,8 @@ package frc.robot.utilities.subsystemManager;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import frc.robot.subsystems.AlgaeCleaner;
-import frc.robot.subsystems.AlgaeIntake;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Elevator;
 import frc.robot.utilities.SubsystemManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,40 +23,40 @@ public class SubsystemManagerTest
     @Test
     void addSubsystemToManagerAndRetrieve()
     {
-        AlgaeIntake intake = new AlgaeIntake();
+        Intake intake = new Intake();
         assertTrue(UUT.addSubsystem(intake));
-        assertTrue(UUT.getSubsystemOfType(AlgaeIntake.class).get() == intake);
+        assertTrue(UUT.getSubsystemOfType(Intake.class).get() == intake);
     }
 
     @Test
     void attemptToAddTwoSubsystems()
     {
-        AlgaeIntake intake = new AlgaeIntake();
-        AlgaeCleaner cleaner = new AlgaeCleaner();
+        Intake intake = new Intake();
+        Elevator cleaner = new Elevator();
         assertTrue(UUT.addSubsystem(intake));
         assertTrue(UUT.addSubsystem(cleaner));
-        assertTrue(UUT.getSubsystemOfType(AlgaeCleaner.class).isPresent());
+        assertTrue(UUT.getSubsystemOfType(Elevator.class).isPresent());
         assertTrue(UUT.removeSubsystem(cleaner));
-        assertTrue(UUT.getSubsystemOfType(AlgaeIntake.class).get() == intake);
-        assertTrue(UUT.getSubsystemOfType(AlgaeCleaner.class).isEmpty());
-        assertFalse(UUT.addSubsystem(new AlgaeIntake()));
+        assertTrue(UUT.getSubsystemOfType(Intake.class).get() == intake);
+        assertTrue(UUT.getSubsystemOfType(Elevator.class).isEmpty());
+        assertFalse(UUT.addSubsystem(new Intake()));
         assertTrue(UUT.removeSubsystem(intake));
         assertTrue(UUT.addSubsystem(intake));
         assertTrue(UUT.addSubsystem(cleaner));
-        assertTrue(UUT.getSubsystemOfType(AlgaeIntake.class).get() == intake);
-        assertTrue(UUT.getSubsystemOfType(AlgaeCleaner.class).get() == cleaner);
+        assertTrue(UUT.getSubsystemOfType(Intake.class).get() == intake);
+        assertTrue(UUT.getSubsystemOfType(Elevator.class).get() == cleaner);
     }
 
     @Test
     void attemptToRemoveASubsystem()
     {
-        AlgaeIntake intake = new AlgaeIntake();
-        AlgaeCleaner cleaner = new AlgaeCleaner();
+        Intake intake = new Intake();
+        Elevator cleaner = new Elevator();
         assertTrue(UUT.addSubsystem(intake));
         assertTrue(UUT.addSubsystem(cleaner));
-        assertTrue(UUT.getSubsystemOfType(AlgaeIntake.class).get() == intake);
-        assertTrue(UUT.getSubsystemOfType(AlgaeCleaner.class).get() == cleaner);
-        assertFalse(UUT.addSubsystem(new AlgaeIntake()));
+        assertTrue(UUT.getSubsystemOfType(Intake.class).get() == intake);
+        assertTrue(UUT.getSubsystemOfType(Elevator.class).get() == cleaner);
+        assertFalse(UUT.addSubsystem(new Intake()));
     }
 
     @Test
@@ -64,10 +64,10 @@ public class SubsystemManagerTest
     {
         TestSubsystemAddedListener subscriber = new TestSubsystemAddedListener();
         UUT.subscribeSubsystemAdded(subscriber);
-        assertTrue(UUT.addSubsystem(new AlgaeCleaner()));
-        assertTrue(subscriber.subsystem.getClass() == AlgaeCleaner.class);
-        assertTrue(UUT.addSubsystem(new AlgaeIntake()));
-        assertTrue(subscriber.subsystem.getClass() == AlgaeIntake.class);
+        assertTrue(UUT.addSubsystem(new Elevator()));
+        assertTrue(subscriber.subsystem.getClass() == Elevator.class);
+        assertTrue(UUT.addSubsystem(new Intake()));
+        assertTrue(subscriber.subsystem.getClass() == Intake.class);
     }
 }
 
