@@ -11,20 +11,21 @@ public class Hardware
     public static final int ELEVATOR_MOTOR_MAIN_ID = 1;
     public static final int ELEVATOR_MOTOR_FOLLOWER_ID = 2;
     public static final int HALL_EFFECT_DIO_PORT_ID = 10;
+    public static final int CANdi_0 = 0;
 
     //ALGAE INTAKE
     public static final int ALGAE_INTAKE_ROLLER_MOTOR_ID = 3;
     public static final int ALGAE_INTAKE_WRIST_MOTOR_ID = 4;
 
-    //ALGAE CLEANER
-    public static final int ALGAE_CLEANER_WRIST_MOTOR_ID = 5;
-    public static final int ALGAE_CLEANER_SHOOTER_MOTOR_ID = 6;
+    // SHOOTER
+    public static final int SHOOTER_WRIST_MOTOR_ID = 5;
+    public static final int SHOOTER_ROLLER_MOTOR_ID = 6;
+    // double check these two motor ids
+    public static final int SHOOTER_ALGAE_MOTOR_ID = 6;
+    public static final int SHOOTER_CORAL_MOTOR_ID = 7;
 
-    //CORAL PLACER
-    public static final int CORAL_PLACER_ROLLER_MOTOR_ID = 7;
-    public static final int CORAL_PLACER_WRIST_MOTOR_ID = 11;
-    public static final int CORAL_PLACER_FRONT_LASER_ID = 8;
-    public static final int CORAL_PLACER_BACK_LASER_ID = 9;
+    public static final int SHOOTER_FRONT_LASER_ID = 8;
+    public static final int SHOOTER_BACK_LASER_ID = 9;
 
     //CLIMB
     public static final int CLIMB_WRIST_MOTOR_MAIN_ID = 8;

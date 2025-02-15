@@ -12,14 +12,22 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.AlgaeIntakeGroundCommand;
 import frc.robot.commands.AlgaeIntakeProcessingCommand;
+import frc.robot.commands.CoralIntake;
+import frc.robot.commands.CoralPurge;
+import frc.robot.commands.ElevatorGoHome;
+import frc.robot.commands.ElevatorLevelFour;
+import frc.robot.commands.ElevatorLevelThree;
 import frc.robot.commands.ElevatorLevelTwo;
+import frc.robot.commands.groups.PlaceCoralLevelFour;
+import frc.robot.commands.groups.PlaceCoralLevelThree;
+import frc.robot.commands.groups.PlaceCoralLevelTwo;
 import frc.robot.commands.groups.PlaceCoralOnReef;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Elevator;
 import frc.robot.utilities.SubsystemManager;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.subsystems.AlgaeCleaner;
+import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.CoralPlacer;
@@ -67,7 +75,7 @@ public class RobotContainer
     m_Manager.addSubsystem(TunerConstants.createDrivetrain());
     m_Manager.addSubsystem(new Elevator());
     m_Manager.addSubsystem(new AlgaeIntake());
-    m_Manager.addSubsystem(new AlgaeCleaner());
+    m_Manager.addSubsystem(new Shooter());
     m_Manager.addSubsystem(new CoralPlacer());
     m_Manager.addSubsystem(new Climb());
   }
@@ -75,6 +83,9 @@ public class RobotContainer
   private void configureBindings() 
   {
     CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
+    CoralPlacer coralPlacer = m_Manager.getSubsystemOfType(CoralPlacer.class).get();
+    Elevator elevator = m_Manager.getSubsystemOfType(Elevator.class).get();
+    Shooter shooter = m_Manager.getSubsystemOfType(Shooter.class).get();
 
     drivetrain.setDefaultCommand
     (
@@ -87,6 +98,16 @@ public class RobotContainer
 
       m_DriverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
       m_DriverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+
+      m_DriverController.leftTrigger().whileTrue(new CoralIntake(coralPlacer)).onChange(new CoralPurge(coralPlacer));
+
+      m_DriverController.a().whileTrue(new PlaceCoralOnReef(coralPlacer, new ElevatorLevelTwo(elevator))).onChange(new ElevatorGoHome(elevator));
+      m_DriverController.x().whileTrue(new PlaceCoralOnReef(coralPlacer, new ElevatorLevelThree(elevator))).onChange(new ElevatorGoHome(elevator));
+      m_DriverController.y().whileTrue(new PlaceCoralOnReef(coralPlacer, new ElevatorLevelFour(elevator))).onChange(new ElevatorGoHome(elevator));
+
+      m_DriverController.a().whileTrue(new PlaceCoralLevelTwo(shooter, new ElevatorLevelTwo(elevator))).onChange(new ElevatorGoHome(elevator));
+      m_DriverController.x().whileTrue(new PlaceCoralLevelThree(shooter, new ElevatorLevelThree(elevator))).onChange(new ElevatorGoHome(elevator));
+      m_DriverController.y().whileTrue(new PlaceCoralLevelFour(shooter, new ElevatorLevelFour(elevator))).onChange(new ElevatorGoHome(elevator));
   }
 
   /*

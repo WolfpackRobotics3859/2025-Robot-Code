@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.StaticBrake;
@@ -12,7 +13,11 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.playingwithfusion.TimeOfFlight;
 import edu.wpi.first.wpilibj.Timer;
 
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.constants.CoralPlacerConstants;
 import frc.robot.constants.Global;
 import frc.robot.constants.Hardware;
@@ -27,16 +32,19 @@ public class CoralPlacer extends SubsystemBase
 
   public final Timer intakeTimer;
 
+  private SysIdRoutine m_SysIdRoutine;
+
+
   /**
    * Creates new CoralPlacer subsystem; initializes motors and sensors
    */
   public CoralPlacer()
   {
-    m_CoralPlacerRollerMotor = new TalonFX(Hardware.CORAL_PLACER_ROLLER_MOTOR_ID);
-    m_CoralPlacerWristMotor = new TalonFX(Hardware.CORAL_PLACER_WRIST_MOTOR_ID);
+    m_CoralPlacerRollerMotor = new TalonFX(Hardware.SHOOTER_ROLLER_MOTOR_ID);
+    m_CoralPlacerWristMotor = new TalonFX(Hardware.SHOOTER_WRIST_MOTOR_ID);
 
-    m_FrontLaser = new TimeOfFlight(Hardware.CORAL_PLACER_FRONT_LASER_ID);
-    m_BackLaser = new TimeOfFlight(Hardware.CORAL_PLACER_BACK_LASER_ID);
+    m_FrontLaser = new TimeOfFlight(Hardware.SHOOTER_FRONT_LASER_ID);
+    m_BackLaser = new TimeOfFlight(Hardware.SHOOTER_BACK_LASER_ID);
     
     intakeTimer = new Timer();
   }
@@ -222,6 +230,24 @@ public class CoralPlacer extends SubsystemBase
         m_CoralPlacerWristMotor.setControl(brakeRequest);
         break;
     }
+  }
+
+  public SysIdRoutine BuildSysIdRoutine()
+  {
+    this.m_SysIdRoutine = new SysIdRoutine(
+      new SysIdRoutine.Config(
+         Volts.of(0.2).per(Seconds),         // Use default ramp rate (1 V/s)
+         Volts.of(0.3), // Reduce dynamic step voltage to 4 to prevent brownout
+         null,          // Use default timeout (10 s)
+         (state) -> SignalLogger.writeString("state", state.toString()) // Log state with Phoenix SignalLogger class
+      ),
+      new SysIdRoutine.Mechanism(
+         (volts) -> m_CoralPlacerWristMotor.setControl(new VoltageOut(volts.in(Volts))),
+         null,
+         this
+      )
+   );
+   return this.m_SysIdRoutine;
   }
 
   /**
