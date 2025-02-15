@@ -24,12 +24,38 @@ import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 public class ElevatorConstants 
 {
     public static final double ELEVATOR_ZERO_POSITION = 0;
+    public static final double ELEVATOR_LEVEL_ONE = 0;
     public static final double ELEVATOR_LEVEL_TWO = 26;
     public static final double ELEVATOR_LEVEL_THREE = 38;
     public static final double ELEVATOR_LEVEL_FOUR = 60;
+    public static final double CORAL_INTAKING_LEVEL = 28;
 
     public static final double ELEVATOR_UP_VOLTAGE = 3;
     public static final double ELEVATOR_DOWN_VOLTAGE = -1.5;
+
+    public static final double HOMING_VOLTAGE = -0.5;
+
+    public enum LEVELS 
+    {
+        HOME(ELEVATOR_ZERO_POSITION),
+        ONE(ELEVATOR_LEVEL_ONE),
+        TWO(ELEVATOR_LEVEL_TWO),
+        THREE(ELEVATOR_LEVEL_THREE),
+        FOUR(ELEVATOR_LEVEL_FOUR),
+        CORAL_INTAKE(CORAL_INTAKING_LEVEL);
+
+        private double levelValue;
+
+        LEVELS(double value)
+        {
+            this.levelValue = value;
+        }
+
+        public double getValue()
+        {
+            return levelValue;
+        }
+    }
 
     // TalonFX Configs
 

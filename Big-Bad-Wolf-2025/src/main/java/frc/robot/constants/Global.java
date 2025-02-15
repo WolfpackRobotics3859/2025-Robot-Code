@@ -30,5 +30,5 @@ public class Global
         INTAKE_DEBUG
     }
 
-    public static BUILD_TYPE ACTIVE_BUILD = BUILD_TYPE.DRIVETRAIN_DEBUG;
+    public static BUILD_TYPE ACTIVE_BUILD = BUILD_TYPE.ELEVATOR_DEBUG;
 }

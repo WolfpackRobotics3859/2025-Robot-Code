@@ -2,10 +2,12 @@ package frc.robot.constants;
 
 import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -16,33 +18,34 @@ public class ShooterConstants
 {
     // CORAL TOF SENSOR CONSTANTS
     public static final RangingMode CORAL_TOF_RANGING_MODE = RangingMode.Short;
-    public static final double CORAL_TOF_IN_RANGE_THRESHOLD = 0;
+    public static final double CORAL_TOF_IN_RANGE_THRESHOLD = 70;
 
     // CORAL MOTOR VOLTAGE
-    public static final double CORAL_INTAKE_VOLTAGE = 0;
-    public static final double CORAL_DEPLOYMENT_VOLTAGE = 0;
+    public static final double CORAL_INTAKE_VOLTAGE = 1;
+    public static final double CORAL_DEPLOYMENT_VOLTAGE = 3;
     
     // ALGAE MOTOR VOLTAGES  
     // Speed to use when cleaning the coral reef.
-    public static final double ALGAE_SWEEPING_VOLTAGE = 0;
+    public static final double ALGAE_SWEEPING_VOLTAGE = -2.0;
     // Speed to use when intaking algae from the ground.
-    public static final double ALGAE_GROUND_INTAKING_VOLTAGE = 0;
-    public static final double ALGAE_PROCESSOR_DEPLOYMENT_VOLTAGE = 0;
+    public static final double ALGAE_GROUND_INTAKING_VOLTAGE = -2.0;
+    public static final double ALGAE_PROCESSOR_DEPLOYMENT_VOLTAGE = 8;
     // This will most likely be a variable algorithmic speed if we ever reach that level of automation.
-    public static final double ALGAE_TROUGH_SHOOTING_VOLTAGE = 0;
+    public static final double ALGAE_TROUGH_SHOOTING_VOLTAGE = 8;
+    public static final double ALGAE_HOLDING_VOLTAGE = -0.5;
 
     // WRIST POSITIONS
-    public static final double WRIST_STOW_POSITION = 0;
-    public static final double WRIST_CORAL_DEPLOYMENT_POSITION = 0;
-    public static final double WRIST_CORAL_INTAKE_POSITION = 0;
-    public static final double WRIST_ALGAE_INTAKE_POSITION = 0;
-    public static final double WRIST_ALGAE_PROCESSOR_DEPLOYMENT_POSITION = 0;
-    public static final double WRIST_ALGAE_SHOOTING_POSITION = 0;
-    public static final double WRIST_ALGAE_SWEEPING_POSITION = 0;
+    public static final double WRIST_STOW_POSITION = -0.11;
+    public static final double WRIST_CORAL_DEPLOYMENT_POSITION = -0.13;
+    public static final double WRIST_CORAL_INTAKE_POSITION = -0.25; // -0.06
+    public static final double WRIST_ALGAE_INTAKE_POSITION = -0.23;
+    public static final double WRIST_ALGAE_PROCESSOR_DEPLOYMENT_POSITION = -0.38;
+    public static final double WRIST_ALGAE_SHOOTING_POSITION = -0.11;
+    public static final double WRIST_ALGAE_SWEEPING_POSITION = -0.18;
     
     // WRIST MOTOR CONFIGS
     public static final MotorOutputConfigs WRIST_MOTOR_OUTPUT_CONFIG = new MotorOutputConfigs()
-                                                                          .withInverted(InvertedValue.Clockwise_Positive)
+                                                                          .withInverted(InvertedValue.CounterClockwise_Positive)
                                                                           .withNeutralMode(NeutralModeValue.Brake)
                                                                           .withPeakForwardDutyCycle(1)
                                                                           .withPeakReverseDutyCycle(-1);
@@ -64,7 +67,7 @@ public class ShooterConstants
                                                                     .withKD(0)
                                                                     .withKG(0)
                                                                     .withKI(0)
-                                                                    .withKP(10)
+                                                                    .withKP(20)
                                                                     .withKS(0)
                                                                     .withKV(0)
                                                                     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
@@ -76,12 +79,17 @@ public class ShooterConstants
                                                                                 .withMotionMagicExpo_kV(0.12)
                                                                                 .withMotionMagicJerk(0);
     
+    public static final FeedbackConfigs WRIST_MOTOR_FEEDBACK_CONFIGS = new FeedbackConfigs()
+                                                                           .withFeedbackRemoteSensorID(Hardware.SHOOTER_WRIST_CANCODER)
+                                                                           .withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder);
+
     public static final TalonFXConfiguration WRIST_MOTOR_CONFIG = new TalonFXConfiguration()
                                                                      .withMotorOutput(WRIST_MOTOR_OUTPUT_CONFIG)
                                                                      .withClosedLoopGeneral(WRIST_MOTOR_CLOSED_LOOP_GENERAL_CONFIG)
                                                                      .withCurrentLimits(WRIST_MOTOR_CURRENT_LIMIT_CONFIG)
                                                                      .withSlot0(WRIST_MOTOR_SLOT_0_CONFIG)
-                                                                     .withMotionMagic(WRIST_MOTOR_MOTION_MAGIC_CONFIG);
+                                                                     .withMotionMagic(WRIST_MOTOR_MOTION_MAGIC_CONFIG)
+                                                                     .withFeedback(WRIST_MOTOR_FEEDBACK_CONFIGS);
 
     // SHOOTER ALGAE MOTOR CONFIGS
     public static final MotorOutputConfigs SHOOTER_ALGAE_MOTOR_OUTPUT_CONFIG = new MotorOutputConfigs()
@@ -102,9 +110,9 @@ public class ShooterConstants
                                                                      .withMotorOutput(SHOOTER_ALGAE_MOTOR_OUTPUT_CONFIG)
                                                                      .withCurrentLimits(SHOOTER_ALGAE_MOTOR_CURRENT_LIMIT_CONFIG);
 
-    // SHOOTER ALGAE MOTOR CONFIGS
+    // SHOOTER CORAL MOTOR CONFIGS
     public static final MotorOutputConfigs SHOOTER_CORAL_MOTOR_OUTPUT_CONFIG = new MotorOutputConfigs()
-                                                                          .withInverted(InvertedValue.Clockwise_Positive)
+                                                                          .withInverted(InvertedValue.CounterClockwise_Positive)
                                                                           .withNeutralMode(NeutralModeValue.Brake)
                                                                           .withPeakForwardDutyCycle(1)
                                                                           .withPeakReverseDutyCycle(-1);

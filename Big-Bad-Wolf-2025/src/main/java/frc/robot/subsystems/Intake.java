@@ -6,9 +6,12 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.constants.IntakeConstants;
+import frc.robot.utilities.MotorManager;
+
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.StaticBrake;
@@ -18,56 +21,61 @@ import frc.robot.constants.Hardware;
 // Creates a new  Intake subsystem.
 public class Intake extends SubsystemBase 
 {
-  private final TalonFX m_IntakeRollerMotor = new TalonFX(Hardware.INTAKE_ROLLER_MOTOR_ID);
-  private final TalonFX m_IntakeWristMotor = new TalonFX(Hardware.INTAKE_WRIST_MOTOR_ID);
+  private final TalonFX m_IntakeRollerMotor;
+  private final TalonFX m_IntakeWristMotor;
+
+  private final MotionMagicVoltage m_PositionRequest;
+  private final VoltageOut m_VoltageRequest;
+  private final StaticBrake m_BrakeRequest;
 
   /**
    *  Intake subsystem constructor.
    */
   public Intake() 
   {
-    m_IntakeRollerMotor.getConfigurator().apply(IntakeConstants.INTAKE_ROLLER_GAINS);
-    m_IntakeWristMotor.getConfigurator().apply(IntakeConstants.INTAKE_WRIST_CONFIGURATION);
+    MotorManager.AddMotor("INTAKE ROLLER MOTOR", Hardware.INTAKE_ROLLER_MOTOR);
+    MotorManager.AddMotor("INTAKE WRIST MOTOR", Hardware.INTAKE_WRIST_MOTOR);
+
+    m_IntakeRollerMotor = MotorManager.GetMotor(Hardware.INTAKE_ROLLER_MOTOR);
+    m_IntakeWristMotor = MotorManager.GetMotor(Hardware.INTAKE_WRIST_MOTOR);
+
+    MotorManager.ApplyConfigs(IntakeConstants.ROLLER_MOTOR_CONFIG, Hardware.INTAKE_ROLLER_MOTOR);
+    MotorManager.ApplyConfigs(IntakeConstants.WRIST_MOTOR_CONFIG, Hardware.INTAKE_WRIST_MOTOR);
+
+    m_PositionRequest = new MotionMagicVoltage(0);
+    m_VoltageRequest = new VoltageOut(0);
+    m_BrakeRequest = new StaticBrake();
   }
 
-  public Command goToPositionThenRoll(double position, double rollerVoltage)
+  public Command IntakeRoutine()
+  {
+    return new SequentialCommandGroup(MoveToPositionWhileRolling(IntakeConstants.WRIST_INTAKING_MID_EXTENSION, IntakeConstants.INTAKING_CLEARING_VOLTAGE),
+                                      MoveToPositionWhileRolling(IntakeConstants.WRIST_INTAKING_POSITION, IntakeConstants.INTAKING_VOLTAGE));
+  }
+
+  public Command Processing()
+  {
+    return this.runOnce(() -> this.setWristPosition(IntakeConstants.WRIST_STOW_POSITION).setRollerVoltage(IntakeConstants.PROCESSING_VOLTAGE));
+  }
+
+  public Command MoveToPositionWhileRolling(double position, double voltage)
   {
     return new FunctionalCommand(
       // Begin moving the intake to a desired position.
-      () -> m_IntakeWristMotor.setControl(new MotionMagicVoltage(position)),
+      () -> this.setWristPosition(position).setRollerVoltage(voltage),
       // Ensure the intake rollers aren't powered while moving the intake.
-      () -> m_IntakeRollerMotor.setControl(new VoltageOut(0)),
+      () -> {},
       // Spin up the intake rollers right before the command ends.
-      interrupted ->  m_IntakeRollerMotor.setControl(new VoltageOut(rollerVoltage)),
+      interrupted -> {},
       // Ends the command once the intake is in the desired position.
-      () -> this.getIntakeInPosition(0.1),
+      MotorManager.InPosition(Hardware.INTAKE_WRIST_MOTOR, 0.05),
       this
-  );
+    );
   }
 
-  public Command applyWristVoltage(double voltage)
+  public Command StowIntake()
   {
-    return this.startEnd(() -> m_IntakeWristMotor.setControl(new VoltageOut(voltage)), () -> m_IntakeWristMotor.setControl(new StaticBrake()));
-  }
-
-  public Command applyShooterVoltage(double voltage)
-  {
-    return this.startEnd(() -> m_IntakeRollerMotor.setControl(new VoltageOut(voltage)), () -> m_IntakeRollerMotor.setControl(new VoltageOut(0)));
-  }
-
-  public Command goToIntakePosition()
-  {
-    return this.runOnce(() -> this.setWristPosition(IntakeConstants.INTAKE_WRIST_GROUND_POSITION));
-  }
-
-  public Command goToStowPosition()
-  {
-    return this.runOnce(() -> this.setWristPosition(IntakeConstants.INTAKE_WRIST_DEFAULT_POSITION));
-  }
-
-  private boolean getIntakeInPosition(double tolerance)
-  {
-    return Math.abs(this.m_IntakeWristMotor.getClosedLoopError().getValueAsDouble()) < tolerance;
+    return this.runOnce(() -> this.BrakeRoller().setWristPosition(IntakeConstants.WRIST_STOW_POSITION));
   }
   
   /**
@@ -75,10 +83,10 @@ public class Intake extends SubsystemBase
    * 
    * @param voltage Assigns voltage to the motors (amount of applicable torque).
    */
-  private void setRollerVoltage(double voltage)
+  private Intake setRollerVoltage(double voltage)
   {
-    VoltageOut setVoltage = new VoltageOut(voltage);
-    m_IntakeRollerMotor.setControl(setVoltage);
+    MotorManager.ApplyControlRequest(m_VoltageRequest.withOutput(voltage), Hardware.INTAKE_ROLLER_MOTOR);
+    return this;
   }
 
   /**
@@ -86,10 +94,22 @@ public class Intake extends SubsystemBase
    * 
    * @param position Assigns wrist position to the motors (where intake arm is located in space).
    */
-  private void setWristPosition(double position)
+  private Intake setWristPosition(double position)
   {
-    MotionMagicVoltage setPosition = new MotionMagicVoltage(position);
-    m_IntakeWristMotor.setControl(setPosition);
+    MotorManager.ApplyControlRequest(m_PositionRequest.withPosition(position), Hardware.INTAKE_WRIST_MOTOR);
+    return this;
+  }
+
+  private Intake BrakeRoller()
+  {
+    MotorManager.ApplyControlRequest(m_BrakeRequest, Hardware.INTAKE_ROLLER_MOTOR);
+    return this;
+  }
+
+  private Intake BrakeWrist()
+  {
+    MotorManager.ApplyControlRequest(m_BrakeRequest, Hardware.INTAKE_WRIST_MOTOR);
+    return this;
   }
 
   @Override

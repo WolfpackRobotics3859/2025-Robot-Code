@@ -21,6 +21,7 @@ public class Hardware
     public static final int SHOOTER_ALGAE_MOTOR = 6;
     public static final int SHOOTER_CORAL_MOTOR = 7;
     public static final int CORAL_TOF_SENSOR = 0;
+    public static final int SHOOTER_WRIST_CANCODER = 0;
 
     //CLIMB
     public static final int CLIMB_WRIST_MOTOR_MAIN = 8;

@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.Global;
+import frc.robot.constants.ElevatorConstants.LEVELS;
 import frc.robot.constants.Global.BUILD_TYPE;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -98,7 +99,47 @@ public class RobotContainer
 
   private void configureCompetitionBindings()
   {
-    // Empty for now
+    CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
+
+    Elevator elevator = m_Manager.getSubsystemOfType(Elevator.class).get();
+    SmartDashboard.putData(elevator);
+
+    Shooter shooter = m_Manager.getSubsystemOfType(Shooter.class).get();
+    SmartDashboard.putData(shooter);
+
+    Intake intake = m_Manager.getSubsystemOfType(Intake.class).get();
+    SmartDashboard.putData(intake);
+
+    m_DriverController.rightBumper()
+      .onTrue(Commands.parallel(
+        elevator.MoveToLevel(LEVELS.CORAL_INTAKE),
+        shooter.IntakeCoral()
+      )
+      ).onFalse(Commands.parallel(
+        elevator.MoveToLevel(LEVELS.HOME),
+        shooter.StowShooter()
+      ));
+
+    m_DriverController.rightTrigger(0.35)
+      .onTrue(Commands.parallel(
+        elevator.MoveToSmartdashboardSelectedLevel(),
+        shooter.PrepareToDeployCoral()
+      )
+      ).onFalse(Commands.parallel(
+        elevator.MoveToLevel(LEVELS.HOME),
+        shooter.StowShooter()
+      ));
+
+    m_DriverController.rightTrigger(0.9).onTrue(shooter.DeployCoral());
+
+    drivetrain.setDefaultCommand
+    (
+        m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get().applyRequest(() ->
+            drive.withVelocityX(-m_DriverController.getLeftY() * TunerConstants.MaxSpeed)
+                 .withVelocityY(-m_DriverController.getLeftX() * TunerConstants.MaxSpeed)
+                 .withRotationalRate(-m_DriverController.getRightX() * TunerConstants.MaxAngularRate)
+        )
+    );
   }
 
   private void configureDrivetrainDebugBindings()
@@ -128,13 +169,10 @@ public class RobotContainer
     Elevator elevator = m_Manager.getSubsystemOfType(Elevator.class).get();
     SmartDashboard.putData(elevator);
 
-    m_DriverController.rightBumper().whileTrue(elevator.applyElevatorVoltage(ElevatorConstants.ELEVATOR_UP_VOLTAGE));
-    m_DriverController.leftBumper().whileTrue(elevator.applyElevatorVoltage(ElevatorConstants.ELEVATOR_DOWN_VOLTAGE));
-
-    m_DriverController.povDown().onTrue(elevator.goToPosition(ElevatorConstants.ELEVATOR_ZERO_POSITION));
-    m_DriverController.povRight().onTrue(elevator.goToPosition(ElevatorConstants.ELEVATOR_LEVEL_TWO));
-    m_DriverController.povUp().onTrue(elevator.goToPosition(ElevatorConstants.ELEVATOR_LEVEL_THREE));
-    m_DriverController.povLeft().onTrue(elevator.goToPosition(ElevatorConstants.ELEVATOR_LEVEL_FOUR));
+    m_DriverController.start().onTrue(elevator.ZeroElevator());
+    m_DriverController.a().onTrue(elevator.MoveToSmartdashboardSelectedLevel());
+    m_DriverController.povUp().onTrue(elevator.ApplyVoltage(3)).onFalse(elevator.ApplyVoltage(0));
+    m_DriverController.povDown().onTrue(elevator.ApplyVoltage(-0.8)).onFalse(elevator.ApplyVoltage(0));
 
     SysIdRoutine sysIdRoutine = elevator.BuildSysIdRoutine();
 
@@ -148,29 +186,26 @@ public class RobotContainer
   private void configureShooterDebugBindings()
   {
     Shooter shooter = m_Manager.getSubsystemOfType(Shooter.class).get();
+    SmartDashboard.putData(shooter);
 
-    m_DriverController.rightBumper().whileTrue(shooter.applyWristVoltage(1)); // FORWARD
-    m_DriverController.leftBumper().whileTrue(shooter.applyWristVoltage(-1)); // REVERSE
+    m_DriverController.a().onTrue(shooter.StowShooter());
+    m_DriverController.b().onTrue(shooter.IntakeAlgae()).onFalse(shooter.StowAndHoldAlgae());
+    m_DriverController.y().onTrue(shooter.PrepareToDeployCoral());
+    m_DriverController.x().onTrue(shooter.DeployCoral()).onFalse(shooter.StowShooter());
 
-    m_DriverController.a().whileTrue(shooter.applyShooterVoltage(3)); // SHOOT OUT
-    m_DriverController.b().whileTrue(shooter.applyShooterVoltage(-3)); // INTAKE IN
+    m_DriverController.povUp().onTrue(shooter.IntakeCoral()).onFalse(shooter.StowShooter());
+    m_DriverController.povDown().onTrue(shooter.ProcessAlgae()).onFalse(shooter.StowShooter());
+
     System.out.println("[Wolfpack] Shooter Debug bindings successfully configured.");
   }
 
   private void configureIntakeDebugBindings()
   {
     Intake intake = m_Manager.getSubsystemOfType(Intake.class).get();
+    SmartDashboard.putData(intake);
 
-    m_DriverController.rightBumper().whileTrue(intake.applyWristVoltage(1)); // FORWARD
-    m_DriverController.leftBumper().whileTrue(intake.applyWristVoltage(-1)); // REVERSE
 
-    m_DriverController.a().whileTrue(intake.applyShooterVoltage(3)); // SHOOT OUT
-    m_DriverController.b().whileTrue(intake.applyShooterVoltage(-3)); // INTAKE IN
-
-    m_DriverController.y().onTrue(intake.goToIntakePosition());
-    m_DriverController.x().onTrue(intake.goToStowPosition());
-
-    m_DriverController.povUp().onTrue(intake.goToPositionThenRoll(7.43, 3));
+    m_DriverController.a().onTrue(intake.IntakeRoutine()).onFalse(intake.StowIntake());
   }
 
   public Command getAutonomousCommand() 

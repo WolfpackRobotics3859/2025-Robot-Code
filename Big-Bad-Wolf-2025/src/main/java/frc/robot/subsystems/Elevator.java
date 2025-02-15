@@ -7,30 +7,38 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 import com.ctre.phoenix6.SignalLogger;
-import com.ctre.phoenix6.controls.ControlRequest;
-import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANdi;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.ReverseLimitValue;
+
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.constants.ElevatorConstants;
+import frc.robot.constants.ElevatorConstants.LEVELS;
 import frc.robot.constants.Hardware;
-import frc.robot.subsystems.elevator.ElevatorRequest;
+import frc.robot.utilities.MotorManager;
 
 public class Elevator extends SubsystemBase
 {
   // Hardware
-  private final TalonFX m_ElevatorMotorMain;
-  private final TalonFX m_ElevatorMotorFollower;
+  private final TalonFX m_ElevatorMotorLeft;
+  private final TalonFX m_ElevatorMotorRight;
   private final CANdi m_CANdi;
+
+  private final VoltageOut m_VoltageRequest;
+  private final MotionMagicVoltage m_PositionRequest;
+  private final StaticBrake m_BrakeRequest;
+
+  private final SendableChooser<LEVELS> m_LevelChooser;
   
-  private ElevatorRequest m_CurrentRequest;
   private SysIdRoutine m_SysIdRoutine;
 
   /**
@@ -38,103 +46,80 @@ public class Elevator extends SubsystemBase
    */
   public Elevator()
   {
-    m_ElevatorMotorMain = new TalonFX(Hardware.ELEVATOR_MOTOR_LEFT_ID);
-    m_ElevatorMotorFollower = new TalonFX(Hardware.ELEVATOR_MOTOR_RIGHT_ID);
+    MotorManager.AddMotor("ELEVATOR LEFT MOTOR", Hardware.ELEVATOR_MOTOR_LEFT);
+    MotorManager.AddMotor("ELEVATOR RIGHT MOTOR", Hardware.ELEVATOR_MOTOR_RIGHT);
+
+    m_ElevatorMotorLeft = MotorManager.GetMotor(Hardware.ELEVATOR_MOTOR_LEFT);
+    m_ElevatorMotorRight = MotorManager.GetMotor(Hardware.ELEVATOR_MOTOR_RIGHT);
     m_CANdi = new CANdi(Hardware.CANDI_0);
 
-    m_ElevatorMotorMain.getConfigurator().apply(ElevatorConstants.LEFT_MOTOR_CONFIG);
-    m_ElevatorMotorFollower.getConfigurator().apply(ElevatorConstants.RIGHT_MOTOR_CONFIG);
+    MotorManager.ApplyConfigs(ElevatorConstants.LEFT_MOTOR_CONFIG, Hardware.ELEVATOR_MOTOR_LEFT);
+    MotorManager.ApplyConfigs(ElevatorConstants.RIGHT_MOTOR_CONFIG, Hardware.ELEVATOR_MOTOR_RIGHT);
 
-    Follower followRequest = new Follower(Hardware.ELEVATOR_MOTOR_LEFT_ID, false); 
-    m_ElevatorMotorFollower.setControl(followRequest);
+    MotorManager.ApplyControlRequest(new Follower(Hardware.ELEVATOR_MOTOR_LEFT, false), Hardware.ELEVATOR_MOTOR_RIGHT);
 
-    this.initializeSmartdashboardFields();
+    m_VoltageRequest = new VoltageOut(0);
+    m_PositionRequest = new MotionMagicVoltage(0);
+    m_BrakeRequest = new StaticBrake();
+
+    m_LevelChooser = new SendableChooser<>();
+    m_LevelChooser.setDefaultOption("Home", LEVELS.HOME);
+    m_LevelChooser.addOption("ONE", LEVELS.ONE);
+    m_LevelChooser.addOption("TWO", LEVELS.TWO);
+    m_LevelChooser.addOption("THREE", LEVELS.THREE);
+    m_LevelChooser.addOption("FOUR", LEVELS.FOUR);
+    SmartDashboard.putData("Level Chooser", m_LevelChooser);
   }
 
-  public Command goToPosition(double position)
+  public Command MoveToSmartdashboardSelectedLevel()
   {
-    return this.runOnce(() -> this.ApplyRequest(new ElevatorRequest().Position(position)));
+    return this.MoveToLevel(m_LevelChooser.getSelected());
   }
 
-  public Command applyElevatorVoltage(double voltage)
+  public Command MoveToLevel(LEVELS level)
   {
-    return this.startEnd(() -> this.ApplyRequest(new ElevatorRequest().VoltageOut(voltage)), () -> this.ApplyRequest(new ElevatorRequest().Brake()));
+    return this.runOnce(() -> this.SetPosition(level.getValue()));
   }
 
-  public Command brakeElevator()
+  public Command ZeroElevator()
   {
-    return this.runOnce(() -> this.ApplyRequest(new ElevatorRequest().Brake()));
+    return new FunctionalCommand(
+      // Begin moving the intake to a desired position.
+      () -> this.SetVoltage(ElevatorConstants.HOMING_VOLTAGE),
+      () -> {},
+      interrupted -> this.BrakeElevator(),
+      // Ends the command once the intake is in the desired position.
+      () -> m_ElevatorMotorLeft.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround,
+      this
+    );
   }
 
-  public double getElevatorPosition()
+  public Command ApplyVoltage(double voltage)
   {
-    return this.m_ElevatorMotorMain.getPosition().getValueAsDouble();
+    return this.runOnce(() -> this.SetVoltage(voltage));
   }
 
-  /**
-   * Checks the closed loop position error againt a tolerance to see if the elevator is within range.
-   * @param tolerance the largest magnitude of error allowed.
-   * @return true if the elevator's closed loop error is within the allowable magnitude, false otherwise.
-   */
-  public boolean getIsElevatorInPosition(double tolerance)
+  private Elevator SetVoltage(double voltage)
   {
-    return Math.abs(this.m_ElevatorMotorMain.getClosedLoopError().getValueAsDouble()) < tolerance;
+    MotorManager.ApplyControlRequest(m_VoltageRequest.withOutput(voltage), Hardware.ELEVATOR_MOTOR_LEFT);
+    return this;
+  }
+
+  private Elevator SetPosition(double position)
+  {
+    MotorManager.ApplyControlRequest(m_PositionRequest.withPosition(position), Hardware.ELEVATOR_MOTOR_LEFT);
+    return this;
+  }
+
+  private Elevator BrakeElevator()
+  {
+    MotorManager.ApplyControlRequest(m_BrakeRequest, Hardware.ELEVATOR_MOTOR_LEFT);
+    return this;
   }
 
   public SysIdRoutine getSysIdRoutine()
   {
     return this.m_SysIdRoutine;
-  }
-
-  public void ApplyRequest(ElevatorRequest request)
-  {
-    ControlRequest motorRequest = null;
-
-    switch(request.GetType())
-    {
-      case NOOP:
-        if(this.m_CurrentRequest == null)
-        {
-          this.ApplyRequest(new ElevatorRequest().PercentOutput(0)); // If there is no previous request then create a neutral one. Otherwise, maintain previous request.
-          return;
-        }
-      break;
-
-      case BRAKE:
-      {
-        motorRequest = new StaticBrake();
-      }
-      break;
-
-      case VOLTAGE:
-      {
-        motorRequest = new VoltageOut(request.GetValue());
-      }
-      break;
-
-      case PERCENT:
-      {
-        motorRequest = new DutyCycleOut(request.GetValue());
-      }
-      break;
-
-      case POSITION:
-      {
-        motorRequest = new MotionMagicVoltage(request.GetValue());
-      }
-      break;
-    }
-
-    if(motorRequest == null)
-    {
-      System.out.println("ERROR: Attempted to assign a null control request to the elevator motors.");
-    }
-    else
-    {
-      SmartDashboard.putString("[Elevator] Current Request Type", request.GetType().name());
-      SmartDashboard.putNumber("[Elevator] Goal Value", request.GetValue());
-      this.m_ElevatorMotorMain.setControl(motorRequest);
-    }
   }
 
   // To-do: Move sysId settings to the constants file
@@ -148,7 +133,7 @@ public class Elevator extends SubsystemBase
          (state) -> SignalLogger.writeString("state", state.toString()) // Log state with Phoenix SignalLogger class
       ),
       new SysIdRoutine.Mechanism(
-         (volts) -> m_ElevatorMotorMain.setControl(new VoltageOut(volts.in(Volts))),
+         (volts) -> m_ElevatorMotorLeft.setControl(new VoltageOut(volts.in(Volts))),
          null,
          this
       )
@@ -162,12 +147,6 @@ public class Elevator extends SubsystemBase
   @Override
   public void periodic()
   {
-    SmartDashboard.putNumber("Elevator Position", this.getElevatorPosition());
-  }
-
-  private void initializeSmartdashboardFields()
-  {
-    SmartDashboard.putString("[Elevator] Current Request Type", "N/A");
-    SmartDashboard.putNumber("[Elevator] Goal Value", 0);
+    // Intentionally Empty
   }
 }
