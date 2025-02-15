@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.PhotonVision;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.CoralPlacer;
@@ -26,6 +27,7 @@ import frc.robot.subsystems.CoralPlacer;
 public class RobotContainer 
 {
   public static final CommandSwerveDrivetrain m_Drivetrain = TunerConstants.createDrivetrain(); 
+  public static final PhotonVision m_PhotonVision = new PhotonVision(m_Drivetrain);
   public static final Elevator m_Elevator = new Elevator();
   public static final AlgaeIntake m_AlgaeIntake = new AlgaeIntake();
   public static final CoralPlacer m_CoralPlacer = new CoralPlacer();
@@ -56,20 +58,20 @@ public class RobotContainer
 
   private void configureBindings() 
   {
-      // Note that X is defined as forward according to WPILib convention,
-      // and Y is defined as to the left according to WPILib convention.
-      m_Drivetrain.setDefaultCommand(
-          // Drivetrain will execute this command periodically
-          m_Drivetrain.applyRequest(() ->
-              drive.withVelocityX(-m_DriverController.getLeftY() * TunerConstants.MaxSpeed) // Drive forward with negative Y (forward)
-                  .withVelocityY(-m_DriverController.getLeftX() * TunerConstants.MaxSpeed) // Drive left with negative X (left)
-                  .withRotationalRate(-m_DriverController.getRightX() * TunerConstants.MaxAngularRate) // Drive counterclockwise with negative X (left)
-          )
-      );
+    // Note that X is defined as forward according to WPILib convention,
+    // and Y is defined as to the left according to WPILib convention.
+    m_Drivetrain.setDefaultCommand(
+        // Drivetrain will execute this command periodically
+        m_Drivetrain.applyRequest(() ->
+            drive.withVelocityX(-m_DriverController.getLeftY() * TunerConstants.MaxSpeed) // Drive forward with negative Y (forward)
+                .withVelocityY(-m_DriverController.getLeftX() * TunerConstants.MaxSpeed) // Drive left with negative X (left)
+                .withRotationalRate(-m_DriverController.getRightX() * TunerConstants.MaxAngularRate) // Drive counterclockwise with negative X (left)
+        )
+    );
 
-      m_DriverController.a().whileTrue(m_Drivetrain.applyRequest(() -> brake));
-  
-      m_DriverController.leftBumper().onTrue(m_Drivetrain.runOnce(() -> m_Drivetrain.seedFieldCentric()));
+    m_DriverController.a().whileTrue(m_Drivetrain.applyRequest(() -> brake));
+
+    m_DriverController.leftBumper().onTrue(m_Drivetrain.runOnce(() -> m_Drivetrain.seedFieldCentric()));
   }
 
   private void configureCharacterizationBindings()

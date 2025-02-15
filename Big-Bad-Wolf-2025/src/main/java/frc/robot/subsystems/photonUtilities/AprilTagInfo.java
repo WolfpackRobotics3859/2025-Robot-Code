@@ -14,7 +14,6 @@ import edu.wpi.first.apriltag.AprilTagFields;
  */
 public class AprilTagInfo 
 {
-    private AllianceColor color = AllianceColor.NONE;
     private Area area = Area.NONE;
     private int id = -1;
     private PhotonTrackedTarget target;
@@ -54,15 +53,6 @@ public class AprilTagInfo
         return this.id;
     }
 
-    /** Gets the color of the AprilTag according to the FRC manual.
-     * 
-     * @return the AllianceColor of the AprilTag.
-     * @see <a href = "https://firstfrc.blob.core.windows.net/frc2025/Manual/2025GameManual.pdf">FRC 2025 Game Manual</a>
-     */
-    public final AllianceColor getColor() 
-    {
-        return this.color;
-    }
     
     /** Gets the area of the AprilTag according to the FRC manual.
      * <ul>
@@ -72,7 +62,7 @@ public class AprilTagInfo
      * @return the Area of the AprilTag.
      * @see <a href = "https://firstfrc.blob.core.windows.net/frc2025/Manual/2025GameManual.pdf">FRC 2025 Game Manual</a>
      */
-    public final Area getArea() 
+    public final Area getTaskArea() 
     {
         return this.area;
     }
@@ -103,8 +93,6 @@ public class AprilTagInfo
     {
         this.id = newId;
         setArea();
-        setColor();
-
         if (this.id < 1 || this.id > 22 ) {
             System.out.println("AprilTag of ID " + this.id + " is nonexistent");
         }
@@ -115,48 +103,8 @@ public class AprilTagInfo
         this.cameraWitness = camera;
     }
 
-    /** 
-     * Sets the color using the current ID of the AprilTagInfo object.
-     */
-    public final void setColor() 
-    {
-        switch (this.id) {
-            // BLUE
-            case 12:
-            case 13:
-            case 3:
-            case 4:
-            case 14:
-            case 17:
-            case 18:
-            case 19:
-            case 20:
-            case 21:
-            case 22:
-            this.color = AllianceColor.BLUE;
-            break;
-
-            //RED
-            case 1:
-            case 2:
-            case 5:
-            case 6:
-            case 7:
-            case 8:
-            case 9:
-            case 10:
-            case 11:
-            case 15:
-            case 16:
-            this.color = AllianceColor.RED;
-            break;
-
-            // NONE
-            default:
-            this.color = AllianceColor.NONE;
-            break;
-        }
-    }
+   
+    
 
     /** 
      * Sets the area using the current ID of the AprilTagInfo object.
@@ -206,15 +154,6 @@ public class AprilTagInfo
         return (this.id > 0 && this.id < 23);
     }
 
-    /** 
-     * An enumeration corresponding to a side of the field.
-     */
-    public enum AllianceColor 
-    {
-        BLUE,
-        RED,
-        NONE
-    }
     
     /**
      * An enumeration corresponding to a region of the field.

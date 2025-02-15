@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -9,11 +10,26 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+// import com.pathplanner.lib.auto.AutoBuilder;
+// import com.pathplanner.lib.commands.PathPlannerAuto;
+// import com.pathplanner.lib.config.PIDConstants;
+// import com.pathplanner.lib.config.RobotConfig;
+// import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.controller.HolonomicDriveController;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
@@ -21,7 +37,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-
+import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 
 /**
@@ -30,9 +46,12 @@ import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
  */
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem 
 {
+    // private RobotConfig robotConfig;
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
+
+    // public PathPlannerAuto pathPlannerAuto;
 
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
@@ -128,6 +147,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         {
             startSimThread();
         }
+        // autoBuilder();
     }
 
     /**
@@ -153,6 +173,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         {
             startSimThread();
         }
+        // autoBuilder();
     }
 
     /**
@@ -186,6 +207,72 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         {
             startSimThread();
         }
+        // autoBuilder();
+    }
+
+    // private void autoBuilder() {
+    //     try {
+    //         robotConfig = RobotConfig.fromGUISettings();
+    //     } catch (Exception e) {
+    //         System.out.print("***** ROBOT CONFIG IS NULL ******");
+    //     }
+    //     AutoBuilder.configure(
+    //         this::getPose2d,
+    //         this::resetPose,
+    //         this::getCurrentSpeed,
+    //         (speeds,driveFeedForward) -> this.setControl(new SwerveRequest.ApplyRobotSpeeds().withSpeeds(speeds)),
+    //         new PPHolonomicDriveController(new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
+    //         robotConfig,
+    //         () -> false,
+    //         this);
+    //     pathPlannerAuto = new PathPlannerAuto("DriveStraight");
+    // }  
+
+    public ChassisSpeeds getCurrentSpeed() {
+        System.out.println("this.getKinematics().toChassisSpeeds(this.getState().ModuleStates): "+ this.getKinematics().toChassisSpeeds(this.getState().ModuleStates));
+       return this.getKinematics().toChassisSpeeds(this.getState().ModuleStates);
+    }
+
+    public Pose2d getPose2d() {
+        System.out.println("this.getState.Pose: " + this.getState().Pose);
+        return this.getState().Pose;
+    }
+
+    public void resetPose2d(Pose2d newPose) {
+        System.out.println("resetPose2d");
+        this.getState().Pose = newPose;
+    }
+
+    public Command driveRobotRelative(ChassisSpeeds chassisSpeeds) {
+        SwerveRequest.ApplyRobotSpeeds request = new SwerveRequest.ApplyRobotSpeeds().withSpeeds(chassisSpeeds);        
+        return run(() -> this.setControl(request));
+    }
+
+    public ChassisSpeeds poseToChassisSpeeds(Pose2d targetPose)
+    {
+        Pose2d currentPose = getPose2d();
+
+        HolonomicDriveController controller = new HolonomicDriveController(
+            new PIDController(1, 1, 1), // x PID NOT FINAL
+            new PIDController(1, 1, 1), // y PID NOT FINAL
+            // Angle PID: contraints sets the max velocity(90 degrees/sec) and max acceleration(45 degrees/sec^2) NOT FINAL
+            new ProfiledPIDController(1, 1, 1, new TrapezoidProfile.Constraints(Math.PI/2, TunerConstants.MaxAngularRate))
+        );
+
+        // Create trajectory using currentPose, waypoints, targetPose, and configurations
+        TrajectoryConfig trajectoryConfig = new TrajectoryConfig(TunerConstants.MaxSpeed, 1); // Placeholder values
+        Trajectory trajectory = TrajectoryGenerator.generateTrajectory(currentPose, List.of() /*No waypoints*/, targetPose, trajectoryConfig);
+        // Create state
+        double totalTime = trajectory.getTotalTimeSeconds();
+        Trajectory.State targetState = trajectory.sample(totalTime);
+
+        controller.getThetaController().enableContinuousInput(-Math.PI, Math.PI); // Enable most efficient route to angle
+        return controller.calculate(currentPose, targetState, targetPose.getRotation());
+    }
+
+    public Command driveToPosition(Pose2d targetPose)
+    {
+        return driveRobotRelative(poseToChassisSpeeds(targetPose));
     }
 
     /**
