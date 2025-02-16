@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.AlgaeIntakeGroundCommand;
 import frc.robot.commands.AlgaeIntakeProcessingCommand;
 import frc.robot.commands.ElevatorLevelTwo;
+import frc.robot.commands.groups.ClimbCommandGroup;
+import frc.robot.commands.groups.ClimbStowCommandGroup;
 import frc.robot.commands.groups.PlaceCoralOnReef;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -75,6 +77,7 @@ public class RobotContainer
   private void configureBindings() 
   {
     CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
+    Climb climb = m_Manager.getSubsystemOfType(Climb.class).get();
 
     drivetrain.setDefaultCommand
     (
@@ -85,8 +88,11 @@ public class RobotContainer
         )
     );
 
+      // Main driver controller bindings
       m_DriverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
-      m_DriverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+      // m_DriverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+      m_DriverController.rightBumper().whileTrue(new ClimbCommandGroup(climb));
+      m_DriverController.leftBumper().whileTrue(new ClimbStowCommandGroup(climb));
   }
 
   /*

@@ -15,7 +15,7 @@ public class FunnelClosedCommand extends Command
 
   /**
    * Funnel Closed command constructor.
-   * @param coralPlacer Coral Placer subsystem.
+   * @param climb Climb subsystem.
    */
   public FunnelClosedCommand(Climb climb) 
   {

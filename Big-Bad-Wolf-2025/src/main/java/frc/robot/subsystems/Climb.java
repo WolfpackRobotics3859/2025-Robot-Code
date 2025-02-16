@@ -6,8 +6,10 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.ClimbConstants;
 import frc.robot.constants.Hardware;
@@ -35,14 +37,34 @@ public class Climb extends SubsystemBase
     m_CoralFunnelMotor = new TalonFX(Hardware.CORAL_FUNNEL_MOTOR_ID);
   }
 
-  /**
-   * Sets the wrist position for the Climb wrist motor.
-   * @param climbPosition Assigns wrist position to the motors (where climb arm is located in space).
-   */
-  public void setClimbWristPosition(double climbPosition)
+  // Command for Climb arm to go to a set position.
+  public Command goToClimbPosition()
   {
-    MotionMagicVoltage climbPositionRequest = new MotionMagicVoltage(climbPosition);
-    m_ClimbWristMotorMain.setControl(climbPositionRequest);
+    return this.runOnce(() -> this.setClimbWristVoltage(ClimbConstants.CLIMB_WRIST_POSITION));
+  }
+
+  // Command for Climb arm to return to stow position.
+  public Command goToStowPosition()
+  {
+    return this.runOnce(() -> this.setClimbWristVoltage(ClimbConstants.CLIMB_DEFAULT_WRIST_POSITION));
+  }
+
+  // TEMPORARILY COMMENTED - UNTIL CHARACTERIZATION IS DETERMINED
+  // /**
+  //  * Sets the wrist position for the Climb wrist motor.
+  //  * @param climbPosition Assigns wrist position to the motors (where climb arm is located in space).
+  //  */
+  // public void setClimbWristPosition(double climbPosition)
+  // {
+  //   MotionMagicVoltage climbPositionRequest = new MotionMagicVoltage(climbPosition);
+  //   m_ClimbWristMotorMain.setControl(climbPositionRequest);
+  // }
+
+  // TEMPORARY - UNTIL CHARACTERIZATION IS DETERMINED
+  public void setClimbWristVoltage(double voltage)
+  {
+    VoltageOut positionRequest = new VoltageOut(voltage);
+    m_ClimbWristMotorMain.setControl(positionRequest);
   }
 
   /**
@@ -53,6 +75,15 @@ public class Climb extends SubsystemBase
   {
     MotionMagicVoltage positionRequest = new MotionMagicVoltage(funnelPosition);
     m_CoralFunnelMotor.setControl(positionRequest);
+  }
+
+  /**
+   * Gets the wrist position for the funnel wrist motor.
+   * @return Position funnel wrist is currently at.
+   */
+  public final double getFunnelWristPosition()
+  {
+    return m_CoralFunnelMotor.getPosition().getValueAsDouble();
   }
 
   @Override
