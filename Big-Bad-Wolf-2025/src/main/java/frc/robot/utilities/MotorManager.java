@@ -117,7 +117,8 @@ public class MotorManager
         }
 
         System.out.println("[ERROR] No motor with id " + id +  " found in " + MotorManager.class.getName());
-        for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+        for (StackTraceElement ste : Thread.currentThread().getStackTrace()) 
+        {
             System.out.println(ste + "\n");
         }
 
@@ -135,7 +136,8 @@ public class MotorManager
         }
 
         System.out.println("[ERROR] Failed to find the name of the given motor.");
-        for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+        for (StackTraceElement ste : Thread.currentThread().getStackTrace()) 
+        {
             System.out.println(ste + "\n");
         }
 
