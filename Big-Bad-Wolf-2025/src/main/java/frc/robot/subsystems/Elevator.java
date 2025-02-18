@@ -4,125 +4,141 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.controls.DutyCycleOut;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.CANdi;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.ReverseLimitValue;
 
-import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.Global;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.constants.ElevatorConstants;
+import frc.robot.constants.ElevatorConstants.LEVELS;
 import frc.robot.constants.Hardware;
+import frc.robot.utilities.MotorManager;
 
 public class Elevator extends SubsystemBase
 {
-  private final TalonFX m_ElevatorMotorMain;
-  private final TalonFX m_ElevatorMotorFollower;
+  // Hardware
+  private final TalonFX m_ElevatorMotorLeft;
+  private final TalonFX m_ElevatorMotorRight;
+  private final CANdi m_CANdi;
 
-  public final DigitalInput m_HallEffectSensor;// Curcuit has 0 volts if magnet is nearby, or else it has 5 volts
+  private final VoltageOut m_VoltageRequest;
+  private final MotionMagicVoltage m_PositionRequest;
+  private final StaticBrake m_BrakeRequest;
+
+  private final SendableChooser<LEVELS> m_LevelChooser;
+  
+  private SysIdRoutine m_SysIdRoutine;
 
   /**
    * Constructor which runs anything in it upon initialization and creates a new object.
    */
   public Elevator()
   {
-    m_ElevatorMotorMain = new TalonFX(Hardware.ELEVATOR_MOTOR_MAIN_ID);
-    m_ElevatorMotorFollower = new TalonFX(Hardware.ELEVATOR_MOTOR_FOLLOWER_ID);
+    MotorManager.AddMotor("ELEVATOR LEFT MOTOR", Hardware.ELEVATOR_MOTOR_LEFT);
+    MotorManager.AddMotor("ELEVATOR RIGHT MOTOR", Hardware.ELEVATOR_MOTOR_RIGHT);
 
-    Follower followRequest = new Follower(Hardware.ELEVATOR_MOTOR_MAIN_ID, false); 
-    m_ElevatorMotorFollower.setControl(followRequest);// Sets follower motor to follow whatever main motor does
+    m_ElevatorMotorLeft = MotorManager.GetMotor(Hardware.ELEVATOR_MOTOR_LEFT);
+    m_ElevatorMotorRight = MotorManager.GetMotor(Hardware.ELEVATOR_MOTOR_RIGHT);
+    m_CANdi = new CANdi(Hardware.CANDI_0);
 
-    m_HallEffectSensor = new DigitalInput(Hardware.HALL_EFFECT_DIO_PORT_ID);
+    MotorManager.ApplyConfigs(ElevatorConstants.LEFT_MOTOR_CONFIG, Hardware.ELEVATOR_MOTOR_LEFT);
+    MotorManager.ApplyConfigs(ElevatorConstants.RIGHT_MOTOR_CONFIG, Hardware.ELEVATOR_MOTOR_RIGHT);
+
+    MotorManager.ApplyControlRequest(new Follower(Hardware.ELEVATOR_MOTOR_LEFT, false), Hardware.ELEVATOR_MOTOR_RIGHT);
+
+    m_VoltageRequest = new VoltageOut(0);
+    m_PositionRequest = new MotionMagicVoltage(0);
+    m_BrakeRequest = new StaticBrake();
+
+    m_LevelChooser = new SendableChooser<>();
+    m_LevelChooser.setDefaultOption("Home", LEVELS.HOME);
+    m_LevelChooser.addOption("ONE", LEVELS.ONE);
+    m_LevelChooser.addOption("TWO", LEVELS.TWO);
+    m_LevelChooser.addOption("THREE", LEVELS.THREE);
+    m_LevelChooser.addOption("FOUR", LEVELS.FOUR);
+    SmartDashboard.putData("Level Chooser", m_LevelChooser);
   }
 
-  /**
-   * Uses Hall Effect Sensor to detect and return true when the elevator reaches the bottom.
-   * Magnet is attached to bottom of elevator where Hall Effect sensor can open(turn off) curcuit when it detects it.
-   * 
-   * @return True if magnet on bottom of elevator reaches Hall Effect sensor. 
-   */
-  public boolean elevatorAtZeroPosition()
+  public Command MoveToSmartdashboardSelectedLevel()
   {
-    return this.m_HallEffectSensor.get();// .get() checks if curcuit is on or off (true if off)
+    return this.MoveToLevel(m_LevelChooser.getSelected());
   }
 
-  /**
-   * Used to zero encoder values so it knows its position.
-   */
-  public void zeroElevator()
+  public Command MoveToLevel(LEVELS level)
   {
-    if (elevatorAtZeroPosition())
-    {
-      // If elevator is at zero position, set encoder value to 0
-      m_ElevatorMotorMain.setPosition(0);
-    }
+    return this.runOnce(() -> this.SetPosition(level.getValue()));
   }
 
-  /**
-   * Moves elevator based on what control mode and value is chosen.
-   * 
-   * @param controlMode Which type of mode to use for motor.
-   * @param value value fed as an argument into chosen method
-   */
-  public void elevatorRequest(Global.MODE controlMode, double value)
+  public Command ZeroElevator()
   {
-    switch(controlMode)
-    {
-      case VOLTAGE:
-        setElevatorVoltage(value);
-        break;
-      case PERCENT:
-        setElevatorPercentage(value);
-        break;
-      case POSITION:
-        setElevatorPosition(value);
-        break;
-      case BRAKE:
-        brakeElevator();
-        break;
-    }
+    return new FunctionalCommand(
+      // Begin moving the intake to a desired position.
+      () -> this.SetVoltage(ElevatorConstants.HOMING_VOLTAGE),
+      () -> {},
+      interrupted -> this.BrakeElevator(),
+      // Ends the command once the intake is in the desired position.
+      () -> m_ElevatorMotorLeft.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround,
+      this
+    );
   }
 
-  /** 
-   * Sets voltage for elevator motor
-   * 
-   * @param voltage amount of volts
-   */
-  private void setElevatorVoltage(double voltage)
+  public Command ApplyVoltage(double voltage)
   {
-    VoltageOut voltageRequest = new VoltageOut(voltage);
-    m_ElevatorMotorMain.setControl(voltageRequest);
+    return this.runOnce(() -> this.SetVoltage(voltage));
   }
 
-  /** 
-   * Sets elevator motor to work at a percentage of the max power it can.
-   * @param percentage percentage of max power motor works at
-   */
-  private void setElevatorPercentage(double percentage)
+  private Elevator SetVoltage(double voltage)
   {
-    DutyCycleOut dutyCycleRequest = new DutyCycleOut(percentage);
-    m_ElevatorMotorMain.setControl(dutyCycleRequest);
+    MotorManager.ApplyControlRequest(m_VoltageRequest.withOutput(voltage), Hardware.ELEVATOR_MOTOR_LEFT);
+    return this;
   }
 
-  /** 
-   * Sets elevator position
-   * @param position as an angle or value depending on motor purpose
-   */
-  private void setElevatorPosition(double position)
+  private Elevator SetPosition(double position)
   {
-    MotionMagicVoltage positionRequest = new MotionMagicVoltage(position);
-    m_ElevatorMotorMain.setControl(positionRequest);
+    MotorManager.ApplyControlRequest(m_PositionRequest.withPosition(position), Hardware.ELEVATOR_MOTOR_LEFT);
+    return this;
   }
 
-  /**
-   * Stops movement and discourages any further movement from external forces
-   */
-  private void brakeElevator()
+  private Elevator BrakeElevator()
   {
-    StaticBrake brakeRequest = new StaticBrake();
-    m_ElevatorMotorMain.setControl(brakeRequest);
+    MotorManager.ApplyControlRequest(m_BrakeRequest, Hardware.ELEVATOR_MOTOR_LEFT);
+    return this;
+  }
+
+  public SysIdRoutine getSysIdRoutine()
+  {
+    return this.m_SysIdRoutine;
+  }
+
+  // To-do: Move sysId settings to the constants file
+  public SysIdRoutine BuildSysIdRoutine()
+  {
+    this.m_SysIdRoutine = new SysIdRoutine(
+      new SysIdRoutine.Config(
+         Volts.of(0.5).per(Seconds),         // Use default ramp rate (1 V/s)
+         Volts.of(0.5), // Reduce dynamic step voltage to 4 to prevent brownout
+         null,          // Use default timeout (10 s)
+         (state) -> SignalLogger.writeString("state", state.toString()) // Log state with Phoenix SignalLogger class
+      ),
+      new SysIdRoutine.Mechanism(
+         (volts) -> m_ElevatorMotorLeft.setControl(new VoltageOut(volts.in(Volts))),
+         null,
+         this
+      )
+   );
+   return this.m_SysIdRoutine;
   }
 
   /**
@@ -131,6 +147,6 @@ public class Elevator extends SubsystemBase
   @Override
   public void periodic()
   {
-    zeroElevator();// Zeros elevator whenever elevator is at the zero position
+    // Intentionally Empty
   }
 }
