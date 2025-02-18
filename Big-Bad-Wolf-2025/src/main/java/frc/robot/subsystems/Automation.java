@@ -26,16 +26,13 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.AutomationConstants;
-import frc.robot.constants.ShooterConstants;
-import frc.robot.constants.ElevatorConstants.LEVELS;
-import frc.robot.utilities.DataSelector;
 import frc.robot.utilities.SubsystemManager;
 import frc.robot.utilities.subsystemManager.SubsystemAddedEvent;
 import frc.robot.utilities.subsystemManager.SubsystemAddedListener;
@@ -52,38 +49,9 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
 
   private SwerveRequest.ApplyRobotSpeeds m_SwerveRequest;
 
-  private boolean m_IsVisionEnabled;
-  private boolean m_CleanScheduled;
-
-  private Field2d m_Field = new Field2d();
-
   AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
-  private PathPlannerPath ONE_LEFT_ALIGN;
-  private PathPlannerPath ONE_RIGHT_ALIGN;
-  private PathPlannerPath TWO_LEFT_ALIGN;
-  private PathPlannerPath TWO_RIGHT_ALIGN;
-  private PathPlannerPath THREE_LEFT_ALIGN;
-  private PathPlannerPath THREE_RIGHT_ALIGN;
-  private PathPlannerPath FOUR_LEFT_ALIGN;
-  private PathPlannerPath FOUR_RIGHT_ALIGN;
-  private PathPlannerPath FIVE_LEFT_ALIGN;
-  private PathPlannerPath FIVE_RIGHT_ALIGN;
-  private PathPlannerPath SIX_LEFT_ALIGN;
-  private PathPlannerPath SIX_RIGHT_ALIGN;
-
-  private PathPlannerPath ONE_CLEAN_ALIGN;
-  private PathPlannerPath ONE_CLEAN_DEPARTURE;
-  private PathPlannerPath TWO_CLEAN_ALIGN;
-  private PathPlannerPath TWO_CLEAN_DEPARTURE;
-  private PathPlannerPath THREE_CLEAN_ALIGN;
-  private PathPlannerPath THREE_CLEAN_DEPARTURE;
-  private PathPlannerPath FOUR_CLEAN_ALIGN;
-  private PathPlannerPath FOUR_CLEAN_DEPARTURE;
-  private PathPlannerPath FIVE_CLEAN_ALIGN;
-  private PathPlannerPath FIVE_CLEAN_DEPARTURE;
-  private PathPlannerPath SIX_CLEAN_ALIGN;
-  private PathPlannerPath SIX_CLEAN_DEPARTURE;
+  StructPublisher<Pose2d> publisher = NetworkTableInstance.getDefault().getStructTopic("Robot Pose", Pose2d.struct).publish();
 
   public Automation(SubsystemManager manager) 
   {
@@ -113,117 +81,17 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
     {
       m_Subsystems.subscribeSubsystemAdded(this);
     }
-  }
 
-  public Command ResetTheStuffs()
-  {
-    return this.m_Shooter.StopCoral()
-                         .andThen(m_Shooter.SetWristPosition(ShooterConstants.WRIST_STOW_POSITION))
-                         .andThen(m_Elevator.MoveToLevel(LEVELS.HOME));
-  }
-
-
-  //FIXME: REPLACE CODE WTIH BETTER IMPLEMENTATION
-  // public Command oneCleanCoral() {
-  //   return AutoBuilder.followPath(ONE_CLEAN_ALIGN)
-  //   .alongWith(this.m_Elevator.MoveToLevel(LEVELS.HIGH_ALGAE))
-  //   .andThen(m_Shooter.SetWristPosition(ShooterConstants.WRIST_ALGAE_SWEEPING_POSITION))
-  //   .andThen(m_Shooter.SweepAlgae())
-  //   .andThen(AutoBuilder.followPath(ONE_CLEAN_DEPARTURE));
-  // }
-
-  // public Command oneCleanCoralExit() {
-  //   return AutoBuilder.followPath(ONE_CLEAN_DEPARTURE)
-  //   .alongWith(this.m_Elevator.MoveToLevel(LEVELS.HOME))
-  //   .alongWith(this.m_Shooter.StopAlgae());
-  // }
-
-  public Command CleanAlgae()
-  {
-    int selectedFace = 1;
-
-    PathPlannerPath desiredPath;
-    PathPlannerPath desiredDeparturePath;
-    boolean isHigh;
-
-    switch(selectedFace)
-    {
-      case 0:
-        desiredPath = this.ONE_CLEAN_ALIGN;
-        desiredDeparturePath = this.ONE_CLEAN_DEPARTURE;
-        isHigh = false;
-      break;
-
-      case 1:
-        desiredPath = this.TWO_CLEAN_ALIGN;
-        desiredDeparturePath = this.TWO_CLEAN_DEPARTURE;
-        isHigh = true;
-      break;
-
-      case 2:
-        desiredPath = this.THREE_CLEAN_ALIGN;
-        desiredDeparturePath = this.THREE_CLEAN_DEPARTURE;
-        isHigh = false;
-      break;
-
-      case 3:
-        desiredPath = this.FOUR_CLEAN_ALIGN;
-        desiredDeparturePath = this.FOUR_CLEAN_DEPARTURE;
-        isHigh = true;
-      break;
-
-      case 4:
-        desiredPath = this.FIVE_CLEAN_ALIGN;
-        desiredDeparturePath = this.FIVE_CLEAN_DEPARTURE;
-        isHigh = false;
-      break;
-
-      case 5:
-      
-      default:
-        desiredPath = this.SIX_CLEAN_ALIGN;
-        desiredDeparturePath = this.SIX_CLEAN_DEPARTURE;
-        isHigh = true;
-      break;
-    }
-
-    if(isHigh)
-    {
-      return this.m_Elevator.MoveToLevel(LEVELS.HIGH_ALGAE)
-                            .andThen(m_Shooter.SweepAlgae())
-                            .andThen(m_Shooter.SetWristPosition(ShooterConstants.WRIST_ALGAE_SWEEPING_POSITION))
-                            .andThen(AutoBuilder.followPath(desiredPath))
-                            .andThen(m_Shooter.HoldAlgae())
-                            .andThen(AutoBuilder.followPath(desiredDeparturePath))
-                            .andThen(m_Shooter.SetWristPosition(ShooterConstants.WRIST_STOW_POSITION));
-    }
-
-    return this.m_Elevator.MoveToLevel(LEVELS.LOW_ALGAE)
-                            .andThen(m_Shooter.SweepAlgae())
-                            .andThen(m_Shooter.SetWristPosition(ShooterConstants.WRIST_ALGAE_SWEEPING_POSITION))
-                            .andThen(AutoBuilder.followPath(desiredPath))
-                            .andThen(m_Shooter.HoldAlgae())
-                            .andThen(AutoBuilder.followPath(desiredDeparturePath))
-                            .andThen(m_Shooter.SetWristPosition(ShooterConstants.WRIST_STOW_POSITION));
-  }
-
-  public Command ToggleVision()
-  {
-    return this.runOnce(() -> this.ToggleVisionAndUpdateSmartdashboard());
-  }
-
-  public Command ScheduleCleaning()
-  {
-    return this.runOnce(() -> this.ScheduleACleaning());
+    publisher = NetworkTableInstance.getDefault().getStructTopic("Robot Pose", Pose2d.struct).publish();
+    this.ConfigureCameras();
   }
 
   @Override
   public void periodic() 
   {
     this.UpdateForwardCamera();
-    SmartDashboard.putData("Field", m_Field);
     SmartDashboard.putBoolean("Forward Camera Connected", this.m_ForwardCamera.isConnected());
-    m_Field.setRobotPose(this.m_Drivetrain.getState().Pose);
+    publisher.set(this.m_Drivetrain.getState().Pose);
   }
 
   @Override
@@ -249,13 +117,6 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
       m_Subsystems.unsubscribeSubsystemAdded(this);
       this.Configure();
     }
-
-    // if(event.getSubsystem().getClass() == CommandSwerveDrivetrain.class)
-    // {
-    //   this.m_Drivetrain = (CommandSwerveDrivetrain) event.getSubsystem();
-    //   m_Subsystems.unsubscribeSubsystemAdded(this);
-    //   this.Configure();
-    // }
   }
 
   public Command PathfindToPose(Pose2d goalPose)
@@ -284,14 +145,8 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
 
   private void Configure()
   {
-    this.ConfigureCameras();
     this.ConfigureAutobuilder(); // autobuilder should be configured last?
-    this.CachePathsAndAutos();
 
-    m_IsVisionEnabled = true;
-    m_CleanScheduled = false;
-    SmartDashboard.putBoolean("Clean Scheduled", m_CleanScheduled);
-    SmartDashboard.putBoolean("Vision Enabled", m_IsVisionEnabled);
     System.out.println("AUTOMATION CONFIGURATION COMPLETE.");
   }
 
@@ -314,7 +169,7 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
             () -> this.m_Drivetrain.getState().Speeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
             (speeds, feedforwards) -> this.m_Drivetrain.setControl(m_SwerveRequest.withSpeeds(speeds).withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesX()).withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesY())), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
             new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                    new PIDConstants(10, 0.0, 0.0), // Translation PID constants
                     new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
             ),
             config,
@@ -352,57 +207,6 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
           }  
         }
       }
-    }
-  }
-
-  private void ToggleVisionAndUpdateSmartdashboard()
-  {
-    this.m_IsVisionEnabled = !this.m_IsVisionEnabled;
-    SmartDashboard.putBoolean("Vision Enabled", m_IsVisionEnabled);
-  }
-
-  private void ScheduleACleaning()
-  {
-    this.m_CleanScheduled = !this.m_CleanScheduled;
-    SmartDashboard.putBoolean("CLEAN", m_CleanScheduled);
-  }
-
-  private void CachePathsAndAutos()
-  {
-    try
-    {
-        ONE_LEFT_ALIGN = PathPlannerPath.fromPathFile("ONE-LEFT-ALIGN");
-        ONE_RIGHT_ALIGN = PathPlannerPath.fromPathFile("ONE-RIGHT-ALIGN");
-        TWO_LEFT_ALIGN = PathPlannerPath.fromPathFile("TWO-LEFT-ALIGN");
-        TWO_RIGHT_ALIGN = PathPlannerPath.fromPathFile("TWO-RIGHT-ALIGN");
-        THREE_LEFT_ALIGN = PathPlannerPath.fromPathFile("THREE-LEFT-ALIGN");
-        THREE_RIGHT_ALIGN = PathPlannerPath.fromPathFile("THREE-RIGHT-ALIGN");
-        FOUR_LEFT_ALIGN = PathPlannerPath.fromPathFile("FOUR-LEFT-ALIGN");
-        FOUR_RIGHT_ALIGN = PathPlannerPath.fromPathFile("FOUR-RIGHT-ALIGN");
-        FIVE_LEFT_ALIGN = PathPlannerPath.fromPathFile("FIVE-LEFT-ALIGN");
-        FIVE_RIGHT_ALIGN = PathPlannerPath.fromPathFile("FIVE-RIGHT-ALIGN");
-        SIX_LEFT_ALIGN = PathPlannerPath.fromPathFile("SIX-LEFT-ALIGN");
-        SIX_RIGHT_ALIGN = PathPlannerPath.fromPathFile("SIX-RIGHT-ALIGN");
-
-        ONE_CLEAN_ALIGN = PathPlannerPath.fromPathFile("ONE-CLEAN-ALIGN");
-        ONE_CLEAN_DEPARTURE = PathPlannerPath.fromPathFile("ONE-CLEAN-DEPARTURE");
-        TWO_CLEAN_ALIGN = PathPlannerPath.fromPathFile("TWO-CLEAN-ALIGN");
-        TWO_CLEAN_DEPARTURE = PathPlannerPath.fromPathFile("TWO-CLEAN-DEPARTURE");
-        THREE_CLEAN_ALIGN = PathPlannerPath.fromPathFile("THREE-CLEAN-ALIGN");
-        THREE_CLEAN_DEPARTURE = PathPlannerPath.fromPathFile("THREE-CLEAN-DEPARTURE");
-        FOUR_CLEAN_ALIGN = PathPlannerPath.fromPathFile("FOUR-CLEAN-ALIGN");
-        FOUR_CLEAN_DEPARTURE = PathPlannerPath.fromPathFile("FOUR-CLEAN-DEPARTURE");
-        FIVE_CLEAN_ALIGN = PathPlannerPath.fromPathFile("FIVE-CLEAN-ALIGN");
-        FIVE_CLEAN_DEPARTURE = PathPlannerPath.fromPathFile("FIVE-CLEAN-DEPARTURE");
-        SIX_CLEAN_ALIGN = PathPlannerPath.fromPathFile("SIX-CLEAN-ALIGN");
-        SIX_CLEAN_DEPARTURE = PathPlannerPath.fromPathFile("SIX-CLEAN-DEPARTURE");
-
-        DataLogManager.log("Automation has successfully cached pathplanner autos and paths.");
-    } 
-    catch (Exception e) 
-    {
-        DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
-        DataLogManager.log("Automation has failed in caching pathplanner autos and paths.");
     }
   }
 }

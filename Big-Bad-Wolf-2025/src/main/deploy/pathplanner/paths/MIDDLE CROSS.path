@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.595250000000001,
-        "y": 7.48625
+        "x": 7.6,
+        "y": 4.0
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.133435912996042,
-        "y": 8.044618959790677
+        "x": 8.016938477614127,
+        "y": 4.016776991708973
       },
       "isLocked": false,
-      "linkedName": "FAR_LEFT_START"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.274590163934427,
-        "y": 5.0499487704918025
+        "x": 6.5,
+        "y": 4.0
       },
       "prevControl": {
-        "x": 5.09111091252464,
-        "y": 4.880138981898494
+        "x": 6.250015516805157,
+        "y": 3.9972146523004772
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "6L"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -42,10 +42,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -119.99999999999999
+    "rotation": 180.0
   },
   "reversed": false,
-  "folder": "FAR LEFT STARTS",
+  "folder": "CROSS PATHS",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0
