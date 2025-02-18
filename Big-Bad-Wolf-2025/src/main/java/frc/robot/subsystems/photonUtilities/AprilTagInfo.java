@@ -1,0 +1,183 @@
+package frc.robot.subsystems.photonUtilities;
+
+import java.io.UncheckedIOException;
+
+import org.photonvision.targeting.PhotonTrackedTarget;
+
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+
+/** <ul>
+ * <li>Uses an AprilTag ID to get its color and area of the field.</li>
+ * <li>Contains a PhotonTrackedTarget object for positioning/alignment code.</li>
+ * </ul>
+ */
+public class AprilTagInfo 
+{
+    private Area area = Area.NONE;
+    private int id = -1;
+    private PhotonTrackedTarget target;
+    private Camera cameraWitness;
+    
+    /** Initializes using an ID to figure out the color/area of the AprilTag.  Also initializes
+     * a PhotonTrackedTarget object to use the position of the tag on the camera.
+     * 
+     * @param initID
+     * @param initTarget
+     */
+    public AprilTagInfo(int initID, PhotonTrackedTarget initTarget, Camera witness) 
+    {
+        setID(initID);
+        setTarget(initTarget);
+        setCameraWitness(witness);
+    }
+
+    /** Initializes using an ID to figure out color/area of the AprilTag.
+     * 
+     * @param initID
+     * @param initTarget
+     */
+    public AprilTagInfo(int initID) 
+    {
+        setID(initID);
+    }
+
+    //  GETTER METHODS //
+
+    /** Gets the ID of the AprilTag.
+     * 
+     * @return the ID of the AprilTag.
+     */
+    public final int getID() 
+    {
+        return this.id;
+    }
+
+    
+    /** Gets the area of the AprilTag according to the FRC manual.
+     * <ul>
+     * <li></li>
+     * </ul>
+     * 
+     * @return the Area of the AprilTag.
+     * @see <a href = "https://firstfrc.blob.core.windows.net/frc2025/Manual/2025GameManual.pdf">FRC 2025 Game Manual</a>
+     */
+    public final Area getTaskArea() 
+    {
+        return this.area;
+    }
+
+    public final Camera getCameraWitness()
+    {
+        return this.cameraWitness;
+    }
+
+    /** Gets the PhotonTrackedTarget of the AprilTag which
+     * contains information about yaw, pitch, etc. 
+     * 
+     * @return the PhotonTrackedTarget of the AprilTag.
+     */
+    public final PhotonTrackedTarget getTarget() 
+    {
+        return this.target;
+    }
+
+    
+    // SETTER METHODS //
+
+    /** Uses a new ID to set the new color and area of the object.
+     * 
+     * @param newId The new ID to use for setting the areas and color.
+     */
+    public final void setID(int newId) 
+    {
+        this.id = newId;
+        setArea();
+        if (this.id < 1 || this.id > 22 ) {
+            System.out.println("AprilTag of ID " + this.id + " is nonexistent");
+        }
+    }
+
+    public final void setCameraWitness(Camera camera)
+    {
+        this.cameraWitness = camera;
+    }
+
+   
+    
+
+    /** 
+     * Sets the area using the current ID of the AprilTagInfo object.
+     */
+    public final void setArea() 
+    {
+        switch (this.id) {
+            case 1 : case 2 : case 12 : case 13 :
+            this.area = Area.CORAL_STATION;
+            break;
+
+            case 3 : case 16 :
+            this.area = Area.ALGAE_PROCESSOR;
+            break;
+
+            case 4 : case 5 : case 14 : case 15 :
+            this.area = Area.CLIMB;
+            break;
+
+            case 6 : case 7 : case 8 : case 9 : case 10 : case 11 : // red side
+            case 17 : case 18 : case 19 : case 20 : case 21 : case 22 : // blue side
+            this.area = Area.CORAL_REEF;
+            break;
+
+            default :
+            this.area = Area.NONE;
+            break;
+        }
+    }
+
+    /** Sets the PhotonTrackedTarget of the AprilTagInfo object.
+     * 
+     * @param newTarget The new PhotonTrackedTarget to assign to the object 
+     *                  for information about yaw, pitch, etc.
+     */
+    public final void setTarget(PhotonTrackedTarget newTarget) 
+    {
+        this.target = newTarget;
+    }
+
+    /** Sees if the AprilTag ID is existent.
+     * 
+     * @return if the AprilTag ID is within 1 and the max ID number
+     */
+    public final boolean isValid() 
+    {
+        return (this.id > 0 && this.id < 23);
+    }
+
+    
+    /**
+     * An enumeration corresponding to a region of the field.
+     */
+    public enum Area 
+    {
+        CORAL_REEF,
+        CORAL_STATION,
+        ALGAE_PROCESSOR,
+        CLIMB,
+        NONE
+    }   
+    
+    public static final AprilTagFieldLayout TAG_LAYOUT;
+    
+    // Gets the most recent AprilTag field
+    static {
+        try {
+            TAG_LAYOUT = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+        } 
+        catch (UncheckedIOException e) 
+        {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+}
