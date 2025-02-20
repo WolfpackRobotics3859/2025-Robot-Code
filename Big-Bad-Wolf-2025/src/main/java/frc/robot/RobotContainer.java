@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.AlignWithAprilTag;
 import frc.robot.constants.Global;
 import frc.robot.constants.ElevatorConstants.LEVELS;
 import frc.robot.constants.Global.BUILD_TYPE;
@@ -22,6 +23,7 @@ import frc.robot.utilities.SubsystemManager;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.PhotonVision;
 import frc.robot.subsystems.Climb;
 
 /**
@@ -34,7 +36,7 @@ public class RobotContainer
 {
   // Store subsystems in a public manager so other objects can easily cache them.
   public static final SubsystemManager m_Manager = new SubsystemManager();
-  
+
   private final CommandXboxController m_DriverController = new CommandXboxController(0);
   private final CommandXboxController m_CoDriverController = new CommandXboxController(1);
   
@@ -86,6 +88,12 @@ public class RobotContainer
       case INTAKE_DEBUG:
         m_Manager.addSubsystem(new Intake());
         this.configureIntakeDebugBindings();
+      break;
+
+      case PHOTON_DEBUG:
+        m_Manager.addSubsystem(new PhotonVision(m_Manager));
+        m_Manager.addSubsystem(TunerConstants.createDrivetrain());
+        this.configurePhotonDebugBindings();
       break;
 
       default:
@@ -162,6 +170,34 @@ public class RobotContainer
     m_DriverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
     m_DriverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
   }
+
+  private void configurePhotonDebugBindings()
+  {
+    CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
+    PhotonVision Photon = m_Manager.getSubsystemOfType(PhotonVision.class).get();
+
+
+    m_DriverController.rightTrigger().whileTrue(new AlignWithAprilTag(Photon));
+
+
+    m_DriverController.a().whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+    m_DriverController.b().whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+    m_DriverController.y().whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+    m_DriverController.x().whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+
+    drivetrain.setDefaultCommand
+    (
+        m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get().applyRequest(() ->
+            drive.withVelocityX(-m_DriverController.getLeftY() * TunerConstants.MaxSpeed)
+                 .withVelocityY(-m_DriverController.getLeftX() * TunerConstants.MaxSpeed)
+                 .withRotationalRate(-m_DriverController.getRightX() * TunerConstants.MaxAngularRate)
+        )
+    );
+
+    m_DriverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
+    m_DriverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+  }
+
 
   private void configureElevatorDebugBindings()
   {

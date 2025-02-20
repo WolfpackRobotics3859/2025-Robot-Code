@@ -12,37 +12,51 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-import com.ctre.phoenix6.swerve.SwerveDrivetrain;
-
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.PhotonConstants;
 import frc.robot.subsystems.photonUtilities.AprilTagInfo;
 import frc.robot.subsystems.photonUtilities.Camera;
+import frc.robot.utilities.SubsystemManager;
+import frc.robot.utilities.subsystemManager.SubsystemAddedEvent;
+import frc.robot.utilities.subsystemManager.SubsystemAddedListener;
 
-public class PhotonVision extends SubsystemBase
+public class PhotonVision extends SubsystemBase implements SubsystemAddedListener
 {
   private AprilTagInfo closestAprilTag;
   private double taskRange;
   public int desiredAprilTagId;
   private Optional<EstimatedRobotPose> optionalPose;
-  private final CommandSwerveDrivetrain m_Drivetrain;
   // public final Camera m_FrontCamera;
   // public final Camera m_BackCamera;
-  public static Camera m_RightCamera;
+  public Camera m_RightCamera;
   // public final Camera m_LeftCamera;
 
   private List<Camera> enabledCameras;
   // private List<PhotonPipelineResult> enabledCamerasFeed;
 
-  public PhotonVision(CommandSwerveDrivetrain p_Drivetrain)
+  private SubsystemManager m_Subsystems;
+  private CommandSwerveDrivetrain m_Drivetrain;
+
+  private Field2d field;
+
+  PIDController xyController;
+  PIDController angularController;
+
+  public PhotonVision(SubsystemManager manager)
   {
+    this.m_Subsystems = manager;
+    this.m_Drivetrain = this.m_Subsystems.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
+   
     enabledCameras = new ArrayList<>();
     // m_FrontCamera = PhotonConstants.frontCamera;
     // m_BackCamera = PhotonConstants.backCamera;
@@ -53,9 +67,12 @@ public class PhotonVision extends SubsystemBase
     enabledCameras.add(m_RightCamera);
     // enabledCameras.add(m_LeftCamera);
 
-    this.m_Drivetrain = p_Drivetrain;
-
     taskRange = 1.3; // In meters supposedly
+
+    xyController = new PIDController(1, 0, 0); 
+    angularController = new PIDController(1, 0, 0); 
+    angularController.enableContinuousInput(-Math.PI, Math.PI);
+    angularController.setTolerance(0.5);
   }
 
   public void setDesiredId(int id)
@@ -63,7 +80,12 @@ public class PhotonVision extends SubsystemBase
     desiredAprilTagId = id;
   }
 
-  public final Transform3d robotToTargetTransform3d(AprilTagInfo info)
+  public AprilTagInfo getClosestTag()
+  {
+    return closestAprilTag;
+  }
+
+  public final Transform3d getTargetTransform3d(AprilTagInfo info)
     {
       return info.getCameraWitness()
       .getCamera3DPosition()
@@ -88,7 +110,7 @@ public class PhotonVision extends SubsystemBase
    * @param camera The camera to estimate the pose of the robot
    * @param m_odometry The odometry object to send sensor values to
    */
-  public final void updatePositionWithCamera(Camera camera, SwerveDrivetrain m_odometry) 
+  public final void updatePositionWithCamera(Camera camera, SwerveDrivePoseEstimator m_odometry) 
   {
     // Returns if the camera is not connected
     if (!camera.getPhotonCamera().isConnected()) return;
@@ -112,6 +134,7 @@ public class PhotonVision extends SubsystemBase
       camera.setCameraExceptionCount(camera.getCameraExceptionCount() + 1);
     }
   }
+  
 
   private AprilTagInfo getInRangeTag(Camera camera)
   {
@@ -124,11 +147,12 @@ public class PhotonVision extends SubsystemBase
     System.out.println("AprilTag detected");
 
     // Iterates through all the AprilTags in the camera pipeline
+    Pose2d robotPosition = m_Drivetrain.getPose2d();
     PhotonTrackedTarget target = cameraReading.getTargets().get(cameraReading.getTargets().size()-1);
     double targetDistance = target.getBestCameraToTarget().plus(camera.getCamera3DPosition())
       .getTranslation()
         .toTranslation2d()
-          .getNorm();
+          .getDistance(new Translation2d(robotPosition.getX(), robotPosition.getY()));
 
     if (targetDistance <= taskRange)
     {
@@ -148,62 +172,70 @@ public class PhotonVision extends SubsystemBase
  * @param m_drivetrain The drivetrain to use when aligning/positioning
  * @return
  */
-  public final boolean aprilTagTaskCompleted(CommandSwerveDrivetrain m_drivetrain) 
+  public final boolean aprilTagTaskReady() 
   {
     // chekcs if the apriltag is valid
     if (!closestAprilTag.isValid()) return false;
     
      if (desiredAprilTagId == closestAprilTag.getID() && (desiredAprilTagId != -1 || closestAprilTag.getID() != -1))
      {
-        align(closestAprilTag);
+        return true;
      }
-
-    return true;
+    return false;
   }
 
   public final void align(AprilTagInfo aprilTag) 
   {
-    Pose2d currentRobotPosition = m_Drivetrain.getPose2d();
-    Translation2d robotToTarget = robotToTargetTransform3d(aprilTag).getTranslation().toTranslation2d();
-    double angularOffset = aprilTag.getTarget().getYaw();
-    Translation2d alignedPosition = currentRobotPosition.getTranslation().rotateAround(robotToTarget, new Rotation2d(Units.degreesToRadians(angularOffset)));
+    Pose2d currentRobotPosition2d = m_Drivetrain.getPose2d();
+    Translation2d aprilTagTranslation2d = getTargetTransform3d(aprilTag).getTranslation().toTranslation2d();
 
-    PIDController xyController = new PIDController(1, 0, 0);
-    PIDController angularController = new PIDController(1, 0, 0);
-    angularController.enableContinuousInput(-Math.PI, Math.PI);
-    angularController.setTolerance(1);
+    Rotation2d aprilTagFacingAwayAngle = aprilTag.getTarget().getBestCameraToTarget().getRotation().toRotation2d();
+    Translation2d alignedTranslation2d = currentRobotPosition2d.getTranslation().rotateAround(aprilTagTranslation2d, aprilTagFacingAwayAngle);
+    
+    double alignedX = alignedTranslation2d.getX();
+    double alignedY = alignedTranslation2d.getY();
 
-    double alignedX = alignedPosition.getX();
-    double alignedY = alignedPosition.getY();
-
-    double xCorrection = xyController.calculate(currentRobotPosition.getX(), alignedX);
-    double yCorrection = xyController.calculate(currentRobotPosition.getY(), alignedY);
-    double angularCorrection = Units.degreesToRadians(angularController.calculate(angularOffset, m_Drivetrain.getPigeon2().getRotation2d().getDegrees()));
-
+    double xCorrection = xyController.calculate(currentRobotPosition2d.getX(), alignedX);
+    double yCorrection = xyController.calculate(currentRobotPosition2d.getY(), alignedY);
+    double angularCorrection = Units.degreesToRadians(angularController.calculate(m_Drivetrain.getPigeon2().getRotation2d().getRadians(), aprilTagFacingAwayAngle.getRadians()));
+    
     ChassisSpeeds speeds = new ChassisSpeeds(xCorrection, yCorrection, angularCorrection);
-
     m_Drivetrain.driveRobotRelative(speeds);
+  
   }
 
-  // public final void rotateToAprilTag(AprilTagInfo info) 
-  // {
-  //   // Get the yaw of the AprilTag (degrees from the center of camera)
-  //   double tagYawOffset = info.getTarget().getYaw();
+  public final void rotateToAprilTag(AprilTagInfo info) 
+  {
+    // Get the yaw of the AprilTag (degrees from the center of camera)
+    double tagYawOffset = Units.degreesToRadians(info.getTarget().getYaw());
 
-  //   // Use Pigeon2 sensor to get the robot's raw yaw in degrees
-  //   double robotYawRaw = m_Drivetrain.getPigeon2().getRotation2d().getDegrees();
-  //   // (yawReading % 360) = current yaw in degrees 
-  //   double robotYawDegrees = ((robotYawRaw % 360) + 360) % 360; // Add 360 to find positive coterminal angle then % to get rid of values over 360
+    // Use Pigeon2 sensor to get the robot's raw yaw in degrees
+    double robotYawRaw = m_Drivetrain.getPigeon2().getRotation2d().getDegrees();
+    // (yawReading % 360) = current yaw in degrees 
+    double robotYaw = Units.degreesToRadians(((robotYawRaw % 360) + 360) % 360); // Add 360 to find positive coterminal angle then % to get rid of values over 360
+    // Where the robot should face depending on the AprilTag's yaw
 
-  //   // Where the robot should face depending on the AprilTag's yaw
-  //   double desiredYawDegrees = robotYawDegrees + tagYawOffset;
+    try (PIDController angularController = new PIDController(1, 0, 0)) {
+      angularController.enableContinuousInput(-Math.PI, Math.PI);
+      angularController.setTolerance(0.5);
 
-  //   // Convert the yaw to radians (since Rotation2d's constructor uses radians)
-  //   double desiredYawRadians = Units.degreesToRadians(desiredYawDegrees);
+      double angularCorrection = angularController.calculate(robotYaw, tagYawOffset);
 
-  //   Pose2d desiredPose = new Pose2d(0, 0, new Rotation2d(desiredYawRadians)); 
-  // }
+      ChassisSpeeds speeds = new ChassisSpeeds(0,0, angularCorrection);
+      m_Drivetrain.driveRobotRelative(speeds);
+    }
+  }
 
+
+  @Override
+  public void onSubsystemAddedEvent(SubsystemAddedEvent event) 
+  {
+    if(event.getSubsystem().getClass() == CommandSwerveDrivetrain.class)
+    {
+      this.m_Drivetrain = (CommandSwerveDrivetrain) event.getSubsystem();
+      m_Subsystems.unsubscribeSubsystemAdded(this);
+    }
+  }
   
   @Override
   public void periodic()
@@ -212,9 +244,18 @@ public class PhotonVision extends SubsystemBase
     {
       camera.updateUnreadPipelines();
       camera.updateMostRecentPipeline();
-      updatePositionWithCamera(camera, m_Drivetrain);
+      updatePositionWithCamera(camera, m_Drivetrain.odometry);
       closestAprilTag = getInRangeTag(camera);
       // enabledCamerasFeed.add(camera.getMostRecentPipeline());
+
+      field.setRobotPose(m_Drivetrain.getPose2d());
+      
+      SmartDashboard.putNumber("Closest AprilTag ID: ", closestAprilTag.getID());
+      SmartDashboard.putNumber("AprilTag Yaw: ", closestAprilTag.getTarget().getYaw());
+      SmartDashboard.putData("Robot Pose: ", field);
+
+      
+
     }
   }
 }

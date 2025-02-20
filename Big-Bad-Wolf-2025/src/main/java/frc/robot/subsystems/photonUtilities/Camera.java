@@ -1,9 +1,7 @@
 package frc.robot.subsystems.photonUtilities;
 
 import java.util.List;
-import java.util.Optional;
 
-import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
@@ -32,7 +30,6 @@ public class Camera
 
     private List<PhotonPipelineResult> unreadPipelines; // unread pipelines from the camera
     private PhotonPipelineResult mostRecentPipeline;
-    private Transform3d robotToTarget;
     
     /** Constructs the camera with the appropriate name and placement on the robot.
      * 
