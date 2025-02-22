@@ -309,7 +309,12 @@ public class PhotonVision extends SubsystemBase implements SubsystemAddedListene
 
       field.setRobotPose(m_Drivetrain.getPose2d());
       SmartDashboard.putNumber("Closest AprilTag ID: ", closestAprilTag.getID());
-      if (closestAprilTag.isValid()) SmartDashboard.putNumber("AprilTag Yaw: ", closestAprilTag.getTarget().getYaw());
+      if (closestAprilTag.isValid()) 
+      {
+        SmartDashboard.putNumber("AprilTag Yaw: ", closestAprilTag.getTarget().getYaw());
+        SmartDashboard.putNumber(getName(), desiredAprilTagId);
+      }
+      
       SmartDashboard.putData("Robot Pose: ", field);
       SmartDashboard.putBoolean("Camera_Front Connection Status: ", camera.getPhotonCamera().isConnected());
     }
