@@ -8,10 +8,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.PhotonVision;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class AlignWithAprilTag extends Command {
+public class LookAtAprilTag extends Command 
+{
   /** Creates a new AlignWithAprilTag. */
   private final PhotonVision m_PhotonVision;
-  public AlignWithAprilTag(PhotonVision p_PhotonVision) {
+  public LookAtAprilTag(PhotonVision p_PhotonVision) {
     this.m_PhotonVision = p_PhotonVision;
     addRequirements(this.m_PhotonVision);
     // Use addRequirements() here to declare subsystem dependencies.
@@ -21,7 +22,6 @@ public class AlignWithAprilTag extends Command {
   @Override
   public void initialize() 
   {
-    
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -30,10 +30,11 @@ public class AlignWithAprilTag extends Command {
   {
     if (m_PhotonVision.aprilTagTaskReady())
     {
-      m_PhotonVision.align(m_PhotonVision.getClosestTag());
+      m_PhotonVision.rotateToAprilTag(m_PhotonVision.getClosestTag());
     }
     System.out.println("NOT READY");
   }
+  
 
   // Called once the command ends or is interrupted.
   @Override
@@ -41,7 +42,8 @@ public class AlignWithAprilTag extends Command {
 
   // Returns true when the command should end.
   @Override
-  public boolean isFinished() {
+  public boolean isFinished() 
+  {
     return false;
   }
 }

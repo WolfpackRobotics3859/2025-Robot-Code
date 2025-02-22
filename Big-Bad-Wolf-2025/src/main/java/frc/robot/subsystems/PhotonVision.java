@@ -6,7 +6,6 @@ package frc.robot.subsystems;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.targeting.PhotonPipelineResult;
@@ -26,16 +25,16 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.PhotonConstants;
 import frc.robot.subsystems.photonUtilities.AprilTagInfo;
 import frc.robot.subsystems.photonUtilities.Camera;
-import frc.robot.utilities.SubsystemManager;
-import frc.robot.utilities.subsystemManager.SubsystemAddedEvent;
-import frc.robot.utilities.subsystemManager.SubsystemAddedListener;
+// import frc.robot.utilities.SubsystemManager;
+// import frc.robot.utilities.subsystemManager.SubsystemAddedEvent;
+// import frc.robot.utilities.subsystemManager.SubsystemAddedListener;
 
-public class PhotonVision extends SubsystemBase implements SubsystemAddedListener
+public class PhotonVision extends SubsystemBase /*implements SubsystemAddedListener*/
 {
   private AprilTagInfo closestAprilTag;
   private double taskRange;
   public int desiredAprilTagId;
-  private Optional<EstimatedRobotPose> optionalPose;
+  private EstimatedRobotPose visionPose;
   // public final Camera m_FrontCamera;
   // public final Camera m_BackCamera;
   public Camera m_RightCamera;
@@ -44,7 +43,7 @@ public class PhotonVision extends SubsystemBase implements SubsystemAddedListene
   private List<Camera> enabledCameras;
   // private List<PhotonPipelineResult> enabledCamerasFeed;
 
-  private SubsystemManager m_Subsystems;
+  // private SubsystemManager m_Subsystems;
   private CommandSwerveDrivetrain m_Drivetrain;
 
   private Field2d field;
@@ -52,10 +51,11 @@ public class PhotonVision extends SubsystemBase implements SubsystemAddedListene
   PIDController xyController;
   PIDController angularController;
 
-  public PhotonVision(SubsystemManager manager)
+  public PhotonVision(CommandSwerveDrivetrain p_Drivetrain)
   {
-    this.m_Subsystems = manager;
-    this.m_Drivetrain = this.m_Subsystems.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
+    // this.m_Subsystems = manager;
+    // this.m_Drivetrain = this.m_Subsystems.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
+    this.m_Drivetrain = p_Drivetrain;
    
     enabledCameras = new ArrayList<>();
     // m_FrontCamera = PhotonConstants.frontCamera;
@@ -67,7 +67,7 @@ public class PhotonVision extends SubsystemBase implements SubsystemAddedListene
     enabledCameras.add(m_RightCamera);
     // enabledCameras.add(m_LeftCamera);
 
-    taskRange = 1.3; // In meters supposedly
+    taskRange = 1.15; // In meters supposedly
 
     xyController = new PIDController(1, 0, 0); 
     angularController = new PIDController(1, 0, 0); 
@@ -95,14 +95,19 @@ public class PhotonVision extends SubsystemBase implements SubsystemAddedListene
     }
 
 
-  public Optional<EstimatedRobotPose> positionEstimation(Camera camera)
+  public EstimatedRobotPose positionEstimation(Camera camera)
   {
     // Creates an estimated position off most recent pipeline using camera pose estimator
-    return camera
-    .getCameraPoseEstimator()
-    .update(
-      camera.getMostRecentPipeline());
+    PhotonPipelineResult pipeline = camera.getMostRecentPipeline();
+    if (pipeline == null || !pipeline.hasTargets())
+    {
+      return null;
+    }
+    return camera.getCameraPoseEstimator()
+      .update(
+        camera.getMostRecentPipeline()).orElse(null);
   }
+  
   
   /** Uses a camera to update the odometry and help
    * the robot know where it is on the field
@@ -118,14 +123,19 @@ public class PhotonVision extends SubsystemBase implements SubsystemAddedListene
     try 
     {    
       // calculates robot position using camera
-      optionalPose = positionEstimation(camera);
+      visionPose = positionEstimation(camera);
 
       // Returns if the camera has not seen any AprilTags since last time this method was called
-      if (!optionalPose.isPresent()) return;
-
+      if (visionPose != null)
+      {
       // Adds the camera sensor's input to the odometry
-      EstimatedRobotPose pose = optionalPose.get();
+      EstimatedRobotPose pose = visionPose;
       m_odometry.addVisionMeasurement(pose.estimatedPose.toPose2d(), pose.timestampSeconds);
+      } 
+      else
+      {
+        System.out.println("Vision pose not present; skipping vision update.");
+      }
     } 
     catch (Exception e) 
     {
@@ -215,27 +225,25 @@ public class PhotonVision extends SubsystemBase implements SubsystemAddedListene
     double robotYaw = Units.degreesToRadians(((robotYawRaw % 360) + 360) % 360); // Add 360 to find positive coterminal angle then % to get rid of values over 360
     // Where the robot should face depending on the AprilTag's yaw
 
-    try (PIDController angularController = new PIDController(1, 0, 0)) {
-      angularController.enableContinuousInput(-Math.PI, Math.PI);
-      angularController.setTolerance(0.5);
+    angularController.enableContinuousInput(-Math.PI, Math.PI);
+    angularController.setTolerance(0.5);
 
-      double angularCorrection = angularController.calculate(robotYaw, tagYawOffset);
+    double angularCorrection = angularController.calculate(robotYaw, tagYawOffset);
 
-      ChassisSpeeds speeds = new ChassisSpeeds(0,0, angularCorrection);
-      m_Drivetrain.driveRobotRelative(speeds);
-    }
+    ChassisSpeeds speeds = new ChassisSpeeds(0,0, angularCorrection);
+    m_Drivetrain.driveRobotRelative(speeds);
   }
 
 
-  @Override
-  public void onSubsystemAddedEvent(SubsystemAddedEvent event) 
-  {
-    if(event.getSubsystem().getClass() == CommandSwerveDrivetrain.class)
-    {
-      this.m_Drivetrain = (CommandSwerveDrivetrain) event.getSubsystem();
-      m_Subsystems.unsubscribeSubsystemAdded(this);
-    }
-  }
+  // @Override
+  // public void onSubsystemAddedEvent(SubsystemAddedEvent event) 
+  // {
+  //   if(event.getSubsystem().getClass() == CommandSwerveDrivetrain.class)
+  //   {
+  //     this.m_Drivetrain = (CommandSwerveDrivetrain) event.getSubsystem();
+  //     m_Subsystems.unsubscribeSubsystemAdded(this);
+  //   }
+  // }
   
   @Override
   public void periodic()
@@ -244,7 +252,7 @@ public class PhotonVision extends SubsystemBase implements SubsystemAddedListene
     {
       camera.updateUnreadPipelines();
       camera.updateMostRecentPipeline();
-      updatePositionWithCamera(camera, m_Drivetrain.odometry);
+      // updatePositionWithCamera(camera, m_Drivetrain.odometry);
       closestAprilTag = getInRangeTag(camera);
       // enabledCamerasFeed.add(camera.getMostRecentPipeline());
 
@@ -253,9 +261,7 @@ public class PhotonVision extends SubsystemBase implements SubsystemAddedListene
       SmartDashboard.putNumber("Closest AprilTag ID: ", closestAprilTag.getID());
       SmartDashboard.putNumber("AprilTag Yaw: ", closestAprilTag.getTarget().getYaw());
       SmartDashboard.putData("Robot Pose: ", field);
-
-      
-
+      SmartDashboard.putBoolean("Camera_Front Connection Status: ", camera.getPhotonCamera().isConnected());
     }
   }
 }
