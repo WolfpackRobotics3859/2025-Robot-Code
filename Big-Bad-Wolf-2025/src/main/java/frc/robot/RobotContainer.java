@@ -36,8 +36,8 @@ public class RobotContainer
 {
   // Store subsystems in a public manager so other objects can easily cache them.
   public static final SubsystemManager m_Manager = new SubsystemManager();
-  public static final CommandSwerveDrivetrain m_Drivetrain = TunerConstants.createDrivetrain();
-  public static final PhotonVision m_PhotonVision = new PhotonVision(m_Drivetrain);
+  // public static final CommandSwerveDrivetrain m_Drivetrain = TunerConstants.createDrivetrain();
+  // public static final PhotonVision m_PhotonVision = new PhotonVision(m_Drivetrain);
 
 
   private final CommandXboxController m_DriverController = new CommandXboxController(0);
@@ -52,8 +52,8 @@ public class RobotContainer
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() 
   {
-    // this.configurationChooser(Global.ACTIVE_BUILD);
-    configurePhotonDebugBindings();
+    this.configurationChooser(Global.ACTIVE_BUILD);
+    // configurePhotonDebugBindings();
   }
 
   public static SubsystemManager getSubsystemManager()
@@ -96,7 +96,7 @@ public class RobotContainer
 
       case PHOTON_DEBUG:
         m_Manager.addSubsystem(TunerConstants.createDrivetrain());
-        // m_Manager.addSubsystem(new PhotonVision(m_Manager));
+        m_Manager.addSubsystem(new PhotonVision(m_Manager));
         this.configurePhotonDebugBindings();
       break;
 
@@ -177,8 +177,8 @@ public class RobotContainer
 
   private void configurePhotonDebugBindings()
   {
-    // CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
-    // PhotonVision Photon = m_Manager.getSubsystemOfType(PhotonVision.class).get();
+    CommandSwerveDrivetrain m_Drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
+    PhotonVision m_PhotonVision = m_Manager.getSubsystemOfType(PhotonVision.class).get();
 
 
     m_DriverController.rightTrigger().whileTrue(new AlignWithAprilTag(m_PhotonVision));

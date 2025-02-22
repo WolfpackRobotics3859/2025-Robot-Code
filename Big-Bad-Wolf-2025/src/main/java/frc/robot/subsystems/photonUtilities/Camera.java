@@ -247,7 +247,7 @@ public class Camera
     public void updateMostRecentPipeline()
     {
         List<PhotonPipelineResult> pipelines = this.getUnreadPipelines();
-        if (!pipelines.isEmpty())
+        if (!pipelines.isEmpty() || pipelines == null)
         {
             mostRecentPipeline = pipelines.get(this.getUnreadPipelines().size()-1);// Gets last index in pipeline list
         }
