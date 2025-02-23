@@ -62,18 +62,22 @@ public class Elevator extends SubsystemBase
     m_PositionRequest = new MotionMagicVoltage(0);
     m_BrakeRequest = new StaticBrake();
 
-    m_LevelChooser = new SendableChooser<>();
+    m_LevelChooser = new SendableChooser<LEVELS>();
     m_LevelChooser.setDefaultOption("Home", LEVELS.HOME);
     m_LevelChooser.addOption("ONE", LEVELS.ONE);
     m_LevelChooser.addOption("TWO", LEVELS.TWO);
     m_LevelChooser.addOption("THREE", LEVELS.THREE);
     m_LevelChooser.addOption("FOUR", LEVELS.FOUR);
     SmartDashboard.putData("Level Chooser", m_LevelChooser);
+
+    this.m_ElevatorMotorLeft.setPosition(0);
   }
 
   public Command MoveToSmartdashboardSelectedLevel()
   {
-    return this.MoveToLevel(m_LevelChooser.getSelected());
+    SendableChooser<LEVELS> chooser = (SendableChooser<LEVELS>) SmartDashboard.getData("Level Chooser");
+    System.out.println("Current Level Count: " + m_LevelChooser.getSelected().getValue());
+    return this.MoveToLevel(chooser.getSelected());
   }
 
   public Command MoveToLevel(LEVELS level)
@@ -147,6 +151,7 @@ public class Elevator extends SubsystemBase
   @Override
   public void periodic()
   {
+    SmartDashboard.putNumber("Elevator Position :)", this.m_ElevatorMotorLeft.getPosition().getValueAsDouble());
     // Intentionally Empty
   }
 }

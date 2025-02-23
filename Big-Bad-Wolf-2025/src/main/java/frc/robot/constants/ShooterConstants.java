@@ -22,7 +22,7 @@ public class ShooterConstants
 
     // CORAL MOTOR VOLTAGE
     public static final double CORAL_INTAKE_VOLTAGE = 1;
-    public static final double CORAL_DEPLOYMENT_VOLTAGE = 3;
+    public static final double CORAL_DEPLOYMENT_VOLTAGE = 4;
     
     // ALGAE MOTOR VOLTAGES  
     // Speed to use when cleaning the coral reef.
@@ -35,8 +35,8 @@ public class ShooterConstants
     public static final double ALGAE_HOLDING_VOLTAGE = -0.5;
 
     // WRIST POSITIONS
-    public static final double WRIST_STOW_POSITION = -0.11;
-    public static final double WRIST_CORAL_DEPLOYMENT_POSITION = -0.13;
+    public static final double WRIST_STOW_POSITION = -0.08;
+    public static final double WRIST_CORAL_DEPLOYMENT_POSITION = -0.06;
     public static final double WRIST_CORAL_INTAKE_POSITION = -0.25; // -0.06
     public static final double WRIST_ALGAE_INTAKE_POSITION = -0.23;
     public static final double WRIST_ALGAE_PROCESSOR_DEPLOYMENT_POSITION = -0.38;

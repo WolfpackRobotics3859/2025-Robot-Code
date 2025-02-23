@@ -4,10 +4,15 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.ClimbConstants;
 import frc.robot.constants.Hardware;
@@ -15,8 +20,8 @@ import frc.robot.constants.Hardware;
 // Creates a new Climb subsystem.
 public class Climb extends SubsystemBase
 {
-  //private final TalonFX m_ClimbWristMotorMain = new TalonFX(Hardware.CLIMB_WRIST_MOTOR_MAIN_ID);
- // private final TalonFX m_ClimbWristMotorFollower = new TalonFX(Hardware.CLIMB_WRIST_MOTOR_FOLLOWER_ID);
+  private final TalonFX m_ClimbWristMotorMain = new TalonFX(Hardware.CLIMB_WRIST_MOTOR_MAIN);
+  private final TalonFX m_ClimbWristMotorFollower = new TalonFX(Hardware.CLIMB_WRIST_MOTOR_FOLLOWER);
 
  // private final TalonFX m_CoralFunnelMotor;
   
@@ -25,14 +30,19 @@ public class Climb extends SubsystemBase
    */
   public Climb() 
   {
-   // m_ClimbWristMotorMain.getConfigurator().apply(ClimbConstants.CLIMB_WRIST_MAIN_CONFIGURATION);
-  //  m_ClimbWristMotorFollower.getConfigurator().apply(ClimbConstants.CLIMB_WRIST_FOLLOWER_CONFIGURATION);
+    m_ClimbWristMotorMain.getConfigurator().apply(ClimbConstants.CLIMB_WRIST_MAIN_CONFIGURATION);
+    m_ClimbWristMotorFollower.getConfigurator().apply(ClimbConstants.CLIMB_WRIST_FOLLOWER_CONFIGURATION);
 
     // Sets the main climb wrist motor to follow the secondary climb wrist motor.
-    //Follower climbFollowRequest = new Follower(Hardware.CLIMB_WRIST_MOTOR_MAIN_ID, false); 
-    //m_ClimbWristMotorFollower.setControl(climbFollowRequest);
+    Follower climbFollowRequest = new Follower(Hardware.CLIMB_WRIST_MOTOR_MAIN, false); 
+    m_ClimbWristMotorFollower.setControl(climbFollowRequest);
 
     //m_CoralFunnelMotor = new TalonFX(Hardware.CORAL_FUNNEL_MOTOR_ID);
+  }
+
+  public Command setVoltage(DoubleSupplier suppdawg)
+  {
+    return this.run(() -> this.setWristVoltage(suppdawg.getAsDouble()));
   }
 
   /**
@@ -53,6 +63,11 @@ public class Climb extends SubsystemBase
   {
    // MotionMagicVoltage positionRequest = new MotionMagicVoltage(funnelPosition);
   //  m_CoralFunnelMotor.setControl(positionRequest);
+  }
+
+  public void setWristVoltage(double voltage)
+  {
+    this.m_ClimbWristMotorMain.setControl(new VoltageOut(voltage));
   }
 
   @Override

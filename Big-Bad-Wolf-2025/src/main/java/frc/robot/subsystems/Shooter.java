@@ -71,7 +71,7 @@ public class Shooter extends SubsystemBase
 
   public Command DeployCoral()
   {
-    return this.runOnce(() -> this.SetCoralVoltage(ShooterConstants.CORAL_DEPLOYMENT_VOLTAGE));
+    return this.run(() -> this.SetCoralVoltage(ShooterConstants.CORAL_DEPLOYMENT_VOLTAGE));
   }
 
   public Command StowShooter()

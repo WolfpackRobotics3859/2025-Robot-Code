@@ -23,11 +23,11 @@ import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
  */
 public class ElevatorConstants 
 {
-    public static final double ELEVATOR_ZERO_POSITION = 0;
-    public static final double ELEVATOR_LEVEL_ONE = 0;
-    public static final double ELEVATOR_LEVEL_TWO = 26;
-    public static final double ELEVATOR_LEVEL_THREE = 38;
-    public static final double ELEVATOR_LEVEL_FOUR = 60;
+    public static final double ELEVATOR_ZERO_POSITION = 30;
+    public static final double ELEVATOR_LEVEL_ONE = 5;
+    public static final double ELEVATOR_LEVEL_TWO = 70;
+    public static final double ELEVATOR_LEVEL_THREE = 90;
+    public static final double ELEVATOR_LEVEL_FOUR = 115;
     public static final double CORAL_INTAKING_LEVEL = 28;
 
     public static final double ELEVATOR_UP_VOLTAGE = 3;
@@ -61,7 +61,7 @@ public class ElevatorConstants
 
     // LEFT MOTOR CONFIGS
     public static final MotorOutputConfigs LEFT_MOTOR_OUTPUT_CONFIG = new MotorOutputConfigs()
-                                                                          .withInverted(InvertedValue.CounterClockwise_Positive)
+                                                                          .withInverted(InvertedValue.Clockwise_Positive)
                                                                           .withNeutralMode(NeutralModeValue.Brake)
                                                                           .withPeakForwardDutyCycle(1)
                                                                           .withPeakReverseDutyCycle(-1);
@@ -83,14 +83,14 @@ public class ElevatorConstants
                                                                     .withKD(0)
                                                                     .withKG(0)
                                                                     .withKI(0)
-                                                                    .withKP(15)
+                                                                    .withKP(5)
                                                                     .withKS(0)
                                                                     .withKV(0)
                                                                     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
 
     public static final MotionMagicConfigs LEFT_MOTOR_MOTION_MAGIC_CONFIG = new MotionMagicConfigs()
-                                                                                .withMotionMagicAcceleration(20)
-                                                                                .withMotionMagicCruiseVelocity(40)
+                                                                                .withMotionMagicAcceleration(50)
+                                                                                .withMotionMagicCruiseVelocity(500)
                                                                                 .withMotionMagicExpo_kA(0.1)
                                                                                 .withMotionMagicExpo_kV(0.12)
                                                                                 .withMotionMagicJerk(0);
@@ -113,7 +113,7 @@ public class ElevatorConstants
 
     // RIGHT MOTOR CONFIGS
     public static final MotorOutputConfigs RIGHT_MOTOR_OUTPUT_CONFIG = new MotorOutputConfigs()
-                                                                          .withInverted(InvertedValue.Clockwise_Positive)
+                                                                          .withInverted(InvertedValue.CounterClockwise_Positive)
                                                                           .withNeutralMode(NeutralModeValue.Brake)
                                                                           .withPeakForwardDutyCycle(1)
                                                                           .withPeakReverseDutyCycle(-1);

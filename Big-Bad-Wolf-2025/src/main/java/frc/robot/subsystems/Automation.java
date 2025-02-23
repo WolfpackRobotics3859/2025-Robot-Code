@@ -4,14 +4,30 @@
 
 package frc.robot.subsystems;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.photonvision.EstimatedRobotPose;
+import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.targeting.PhotonPipelineResult;
+
+import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.AutomationConstants;
 import frc.robot.utilities.SubsystemManager;
 import frc.robot.utilities.subsystemManager.SubsystemAddedEvent;
 import frc.robot.utilities.subsystemManager.SubsystemAddedListener;
@@ -21,11 +37,20 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
   private SubsystemManager m_Subsystems;
   private CommandSwerveDrivetrain m_Drivetrain;
 
+  private PhotonCamera m_ForwardCamera;
+  private PhotonPoseEstimator m_ForwardCameraEstimator;
+
   private SwerveRequest.ApplyRobotSpeeds m_SwerveRequest;
+
+  private Field2d m_Field = new Field2d();
+
+  AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
   public Automation(SubsystemManager manager) 
   {
     this.m_Subsystems = manager;
+    this.m_SwerveRequest = new SwerveRequest.ApplyRobotSpeeds();
+
     if(this.m_Subsystems.getSubsystemOfType(CommandSwerveDrivetrain.class).isPresent())
     {
       this.m_Drivetrain = this.m_Subsystems.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
@@ -41,6 +66,9 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
   public void periodic() 
   {
     // This method will be called once per scheduler run
+    this.UpdateForwardCamera();
+    SmartDashboard.putData("Field", m_Field);
+    m_Field.setRobotPose(this.m_Drivetrain.getState().Pose);
   }
 
   @Override
@@ -56,6 +84,7 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
 
   private void Configure()
   {
+    this.ConfigureCameras();
     this.ConfigureAutobuilder(); // autobuilder should be configured last?
   }
 
@@ -91,5 +120,31 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
             },
             this.m_Drivetrain
     );
+  }
+
+  private void ConfigureCameras()
+  {
+    this.m_ForwardCamera = new PhotonCamera("FORWARD_CAM");
+    this.m_ForwardCameraEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.AVERAGE_BEST_TARGETS, AutomationConstants.FORWARD_CAMERA_TO_ROBOT);
+  }
+
+  private void UpdateForwardCamera()
+  {
+    if(m_ForwardCamera.isConnected())
+    {
+      List<PhotonPipelineResult> list = m_ForwardCamera.getAllUnreadResults();
+      if(!list.isEmpty())
+      {
+        if(this.m_Drivetrain != null)
+        {
+          Optional<EstimatedRobotPose> estimatedPose = m_ForwardCameraEstimator.update(list.get(0));
+          if(estimatedPose.isPresent())
+          {
+            this.m_Drivetrain.addVisionMeasurement(estimatedPose.get().estimatedPose.toPose2d(), Utils.getCurrentTimeSeconds());
+          }  
+        }
+        
+      }
+    }
   }
 }

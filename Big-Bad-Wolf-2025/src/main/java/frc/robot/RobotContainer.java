@@ -6,7 +6,9 @@ package frc.robot;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -22,6 +24,7 @@ import frc.robot.utilities.SubsystemManager;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Automation;
 import frc.robot.subsystems.Climb;
 
 /**
@@ -39,7 +42,7 @@ public class RobotContainer
   private final CommandXboxController m_CoDriverController = new CommandXboxController(1);
   
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-          .withDeadband(TunerConstants.MaxSpeed * 0.1).withRotationalDeadband(TunerConstants.MaxAngularRate * 0.1) // Add a 10% deadband
+          .withDeadband(TunerConstants.MaxSpeed * 0.05).withRotationalDeadband(TunerConstants.MaxAngularRate * 0.05) // Add a 10% deadband
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
@@ -65,6 +68,7 @@ public class RobotContainer
         m_Manager.addSubsystem(new Intake());
         m_Manager.addSubsystem(new Climb());
         m_Manager.addSubsystem(new Shooter());
+        m_Manager.addSubsystem(new Automation(m_Manager));
         this.configureCompetitionBindings();
       break;
 
@@ -88,6 +92,17 @@ public class RobotContainer
         this.configureIntakeDebugBindings();
       break;
 
+      case CLIMB_DEBUG:
+        m_Manager.addSubsystem(new Climb());
+        this.configureClimbDebugBindings();
+      break;
+
+      case AUTOMATION_DEBUG:
+        m_Manager.addSubsystem(TunerConstants.createDrivetrain());
+        m_Manager.addSubsystem(new Automation(m_Manager));
+        this.configureAutomationDebugBindings();
+      break;
+      
       default:
         System.out.println("Did you mean to configure nothing? :( Sad Robot Face");
       break;
@@ -119,9 +134,9 @@ public class RobotContainer
         shooter.StowShooter()
       ));
 
-    m_DriverController.rightTrigger(0.35)
+    m_DriverController.rightTrigger(0.1)
       .onTrue(Commands.parallel(
-        elevator.MoveToSmartdashboardSelectedLevel(),
+        elevator.MoveToLevel(LEVELS.FOUR),
         shooter.PrepareToDeployCoral()
       )
       ).onFalse(Commands.parallel(
@@ -129,16 +144,22 @@ public class RobotContainer
         shooter.StowShooter()
       ));
 
-    m_DriverController.rightTrigger(0.9).onTrue(shooter.DeployCoral());
+    m_DriverController.y().onTrue(intake.Processing()).onFalse(intake.StowIntake());
+
+    m_DriverController.b().onTrue(intake.IntakeRoutine()).onFalse(intake.StowIntake());
+
+    m_DriverController.a().whileTrue(shooter.DeployCoral());
 
     drivetrain.setDefaultCommand
     (
         m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get().applyRequest(() ->
-            drive.withVelocityX(-m_DriverController.getLeftY() * TunerConstants.MaxSpeed)
-                 .withVelocityY(-m_DriverController.getLeftX() * TunerConstants.MaxSpeed)
+            drive.withVelocityX(-m_DriverController.getLeftY() * TunerConstants.MaxSpeed *0.8)
+                 .withVelocityY(-m_DriverController.getLeftX() * TunerConstants.MaxSpeed * 0.8)
                  .withRotationalRate(-m_DriverController.getRightX() * TunerConstants.MaxAngularRate)
         )
     );
+
+    shooter.setDefaultCommand(shooter.StowShooter());
   }
 
   private void configureDrivetrainDebugBindings()
@@ -159,7 +180,7 @@ public class RobotContainer
         )
     );
 
-    m_DriverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
+    //m_DriverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
     m_DriverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
   }
 
@@ -169,7 +190,8 @@ public class RobotContainer
     SmartDashboard.putData(elevator);
 
     m_DriverController.start().onTrue(elevator.ZeroElevator());
-    m_DriverController.a().onTrue(elevator.MoveToSmartdashboardSelectedLevel());
+    m_DriverController.povRight().onTrue(elevator.MoveToLevel(LEVELS.FOUR));
+    m_DriverController.povLeft().onTrue(elevator.MoveToSmartdashboardSelectedLevel());
     m_DriverController.povUp().onTrue(elevator.ApplyVoltage(3)).onFalse(elevator.ApplyVoltage(0));
     m_DriverController.povDown().onTrue(elevator.ApplyVoltage(-0.8)).onFalse(elevator.ApplyVoltage(0));
 
@@ -206,6 +228,33 @@ public class RobotContainer
 
     m_DriverController.a().onTrue(intake.IntakeRoutine()).onFalse(intake.StowIntake());
   }
+
+  private void configureClimbDebugBindings()
+  {
+    Climb climb = m_Manager.getSubsystemOfType(Climb.class).get();
+    SmartDashboard.putData(climb);
+
+    climb.setDefaultCommand(climb.setVoltage(() -> -m_DriverController.getRawAxis(5)*10));
+  }
+
+  private void configureAutomationDebugBindings()
+  {
+    CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
+    
+    m_DriverController.start().onTrue(drivetrain.runOnce(() -> drivetrain.resetPose(new Pose2d())));
+
+    m_DriverController.a().toggleOnFalse(new PathPlannerAuto("New New Auto"));
+    m_DriverController.b().toggleOnFalse(new PathPlannerAuto("SIX-LEFT-AUTO"));
+    m_DriverController.y().toggleOnFalse(new PathPlannerAuto("SIX-RIGHT-AUTO"));
+    
+    drivetrain.setDefaultCommand
+    (
+        m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get().applyRequest(() ->
+            drive.withVelocityX(-m_DriverController.getLeftY() * TunerConstants.MaxSpeed)
+                 .withVelocityY(-m_DriverController.getLeftX() * TunerConstants.MaxSpeed)
+                 .withRotationalRate(-m_DriverController.getRightX() * TunerConstants.MaxAngularRate)
+        )
+    );
 
   public Command getAutonomousCommand() 
   {
