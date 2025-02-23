@@ -31,14 +31,14 @@ import frc.robot.utilities.subsystemManager.SubsystemAddedListener;
 
 public class PhotonVision extends SubsystemBase implements SubsystemAddedListener
 {
-  private AprilTagInfo closestAprilTag;
+  private AprilTagInfo inRangeAprilTag;
   private double taskRange;
   public int desiredAprilTagId;
   private EstimatedRobotPose visionPose;
 
-  // public final Camera m_FrontCamera;
+  public final Camera m_FrontCamera; // Camera still needs to be changed to match new name
   // public final Camera m_BackCamera;
-  public Camera m_RightCamera;
+  // public Camera m_RightCamera;
   // public final Camera m_LeftCamera;
 
   private List<Camera> enabledCameras;
@@ -64,22 +64,22 @@ public class PhotonVision extends SubsystemBase implements SubsystemAddedListene
    
     enabledCameras = new ArrayList<>();
 
-    // m_FrontCamera = PhotonConstants.frontCamera;
+    m_FrontCamera = PhotonConstants.frontCamera;
     // m_BackCamera = PhotonConstants.backCamera;
-    m_RightCamera = PhotonConstants.rightCamera;
+    // m_RightCamera = PhotonConstants.rightCamera;
     // m_LeftCamera = PhotonConstants.leftCamera;    
-    // enabledCameras.add(m_FrontCamera);
+    enabledCameras.add(m_FrontCamera);
     // enabledCameras.add(m_BackCamera);
-    enabledCameras.add(m_RightCamera);
+    // enabledCameras.add(m_RightCamera);
     // enabledCameras.add(m_LeftCamera);
 
     taskRange = 1.15; // In meters supposedly
-    closestAprilTag = new AprilTagInfo(-1);
+    inRangeAprilTag = new AprilTagInfo(-1);
     desiredAprilTagId = -1;
     field = new Field2d();
 
-    xyController = new PIDController(0.005, 0, 0.001); 
-    angularController = new PIDController(1, 0, 0); 
+    xyController = new PIDController(1, 0, 0); 
+    angularController = new PIDController(0.005, 0, 0.001); 
 
     xyController.setTolerance(0.1);
     angularController.enableContinuousInput(-Math.PI, Math.PI);
@@ -111,7 +111,7 @@ public class PhotonVision extends SubsystemBase implements SubsystemAddedListene
    */
   public AprilTagInfo getClosestTag()
   {
-    return closestAprilTag;
+    return inRangeAprilTag;
   }
 
   /**
@@ -229,8 +229,7 @@ public class PhotonVision extends SubsystemBase implements SubsystemAddedListene
   public final boolean aprilTagTaskReady() 
   {
     // checks if the apriltag is valid
-    if (!closestAprilTag.isValid()) return false;
-    if (desiredAprilTagId == closestAprilTag.getID()) return true;
+    if (inRangeAprilTag.isValid() && desiredAprilTagId == inRangeAprilTag.getID()) return true;
     return false;
   }
 
@@ -304,14 +303,14 @@ public class PhotonVision extends SubsystemBase implements SubsystemAddedListene
       camera.updateMostRecentPipeline();
 
       updatePositionWithCamera(camera, m_Drivetrain.odometry);
-      closestAprilTag = getInRangeTag(camera);
+      inRangeAprilTag = getInRangeTag(camera);
       // enabledCamerasFeed.add(camera.getMostRecentPipeline());
 
       field.setRobotPose(m_Drivetrain.getPose2d());
-      SmartDashboard.putNumber("Closest AprilTag ID: ", closestAprilTag.getID());
-      if (closestAprilTag.isValid()) 
+      SmartDashboard.putNumber("Closest AprilTag ID: ", inRangeAprilTag.getID());
+      if (inRangeAprilTag.isValid()) 
       {
-        SmartDashboard.putNumber("AprilTag Yaw: ", closestAprilTag.getTarget().getYaw());
+        SmartDashboard.putNumber("AprilTag Yaw: ", inRangeAprilTag.getTarget().getYaw());
         SmartDashboard.putNumber(getName(), desiredAprilTagId);
       }
       

@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.AlignWithAprilTag;
+import frc.robot.commands.LookAtAprilTag;
 import frc.robot.constants.Global;
 import frc.robot.constants.ElevatorConstants.LEVELS;
 import frc.robot.constants.Global.BUILD_TYPE;
@@ -181,7 +182,7 @@ public class RobotContainer
     PhotonVision m_PhotonVision = m_Manager.getSubsystemOfType(PhotonVision.class).get();
 
 
-    m_DriverController.rightTrigger().whileTrue(new AlignWithAprilTag(m_PhotonVision));
+    m_DriverController.leftTrigger().whileTrue(new LookAtAprilTag(m_PhotonVision));
     m_DriverController.rightTrigger().whileTrue(new AlignWithAprilTag(m_PhotonVision));
 
 
