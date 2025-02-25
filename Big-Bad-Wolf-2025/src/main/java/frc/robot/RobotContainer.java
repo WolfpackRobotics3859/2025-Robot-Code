@@ -5,11 +5,18 @@
 package frc.robot;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+
+import java.util.ArrayList;
+
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.hal.communication.NIRioStatus;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.constants.Global;
 import frc.robot.constants.ElevatorConstants.LEVELS;
@@ -18,6 +25,8 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Shooter;
+import frc.robot.utilities.DataSelector;
+import frc.robot.utilities.DataSelectorHelper;
 import frc.robot.utilities.SubsystemManager;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -65,6 +74,7 @@ public class RobotContainer
         m_Manager.addSubsystem(new Intake());
         m_Manager.addSubsystem(new Climb());
         m_Manager.addSubsystem(new Shooter());
+        m_Manager.addSubsystem(new DataSelector());
         this.configureCompetitionBindings();
       break;
 
@@ -108,6 +118,11 @@ public class RobotContainer
 
     Intake intake = m_Manager.getSubsystemOfType(Intake.class).get();
     SmartDashboard.putData(intake);
+
+    DataSelector dataSelector = m_Manager.getSubsystemOfType(DataSelector.class).get();
+    dataSelector.addColumn(DataSelectorHelper.LEFT_RIGHT_CLEAN_COLUMN);
+    dataSelector.addColumn(DataSelectorHelper.LEVELS_COLUMN);
+    dataSelector.addColumn(DataSelectorHelper.REEF_FACE_SELECTION_COLUMN);
 
     m_DriverController.rightBumper()
       .onTrue(Commands.parallel(
