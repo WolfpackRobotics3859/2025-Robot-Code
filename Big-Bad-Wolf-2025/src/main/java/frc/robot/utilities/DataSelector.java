@@ -86,6 +86,12 @@ public class DataSelector extends SubsystemBase {
         });
     }
 
+    public Command selectValue() {
+        return run(() -> {
+            currentColumn.setOptionStateTrue();
+        });
+    }
+
     @Override
     public void periodic() {
         //Intentionally Empty

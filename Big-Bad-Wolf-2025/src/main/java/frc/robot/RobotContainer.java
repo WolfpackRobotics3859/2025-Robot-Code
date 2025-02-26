@@ -123,6 +123,7 @@ public class RobotContainer
     dataSelector.addColumn(DataSelectorHelper.LEFT_RIGHT_CLEAN_COLUMN);
     dataSelector.addColumn(DataSelectorHelper.LEVELS_COLUMN);
     dataSelector.addColumn(DataSelectorHelper.REEF_FACE_SELECTION_COLUMN);
+    SmartDashboard.putData(dataSelector);
 
     m_DriverController.rightBumper()
       .onTrue(Commands.parallel(
@@ -154,6 +155,12 @@ public class RobotContainer
                  .withRotationalRate(-m_DriverController.getRightX() * TunerConstants.MaxAngularRate)
         )
     );
+
+    m_CoDriverController.rightBumper().onTrue(dataSelector.shiftColumnCategoryRight());
+    m_CoDriverController.leftBumper().onTrue(dataSelector.shiftColumnCategoryLeft());
+    m_CoDriverController.povUp().onTrue(dataSelector.toggleDownColumn());
+    m_CoDriverController.povDown().onTrue(dataSelector.toggleUpColumn());
+    m_CoDriverController.a().onTrue(dataSelector.selectValue());
   }
 
   private void configureDrivetrainDebugBindings()
