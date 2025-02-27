@@ -16,6 +16,7 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
@@ -35,6 +36,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.AutomationConstants;
 import frc.robot.constants.ShooterConstants;
 import frc.robot.constants.ElevatorConstants.LEVELS;
+import frc.robot.utilities.DataSelector;
 import frc.robot.utilities.SubsystemManager;
 import frc.robot.utilities.subsystemManager.SubsystemAddedEvent;
 import frc.robot.utilities.subsystemManager.SubsystemAddedListener;
@@ -45,6 +47,7 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
   private CommandSwerveDrivetrain m_Drivetrain;
   private Shooter m_Shooter;
   private Elevator m_Elevator;
+  private DataSelector m_DataSelector;
 
   private PhotonCamera m_ForwardCamera;
   private PhotonPoseEstimator m_ForwardCameraEstimator;
@@ -52,6 +55,7 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
   private SwerveRequest.ApplyRobotSpeeds m_SwerveRequest;
 
   private boolean m_IsVisionEnabled;
+  private boolean m_CleanScheduled;
 
   private Field2d m_Field = new Field2d();
 
@@ -70,6 +74,19 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
   private PathPlannerPath SIX_LEFT_ALIGN;
   private PathPlannerPath SIX_RIGHT_ALIGN;
 
+  private PathPlannerPath ONE_CLEAN_ALIGN;
+  private PathPlannerPath ONE_CLEAN_DEPARTURE;
+  private PathPlannerPath TWO_CLEAN_ALIGN;
+  private PathPlannerPath TWO_CLEAN_DEPARTURE;
+  private PathPlannerPath THREE_CLEAN_ALIGN;
+  private PathPlannerPath THREE_CLEAN_DEPARTURE;
+  private PathPlannerPath FOUR_CLEAN_ALIGN;
+  private PathPlannerPath FOUR_CLEAN_DEPARTURE;
+  private PathPlannerPath FIVE_CLEAN_ALIGN;
+  private PathPlannerPath FIVE_CLEAN_DEPARTURE;
+  private PathPlannerPath SIX_CLEAN_ALIGN;
+  private PathPlannerPath SIX_CLEAN_DEPARTURE;
+
   public Automation(SubsystemManager manager) 
   {
     this.m_Subsystems = manager;
@@ -87,10 +104,15 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
 
     if(this.m_Subsystems.getSubsystemOfType(Elevator.class).isPresent())
     {
-      this.m_Subsystems.getSubsystemOfType(Elevator.class).get();
+      this.m_Elevator = this.m_Subsystems.getSubsystemOfType(Elevator.class).get();
     }
 
-    if((this.m_Drivetrain != null) && (this.m_Shooter != null) && (this.m_Elevator != null))
+    if(this.m_Subsystems.getSubsystemOfType(DataSelector.class).isPresent())
+    {
+      this.m_DataSelector = this.m_Subsystems.getSubsystemOfType(DataSelector.class).get();
+    }
+
+    if((this.m_Drivetrain != null) && (this.m_Shooter != null) && (this.m_Elevator != null) && (this.m_DataSelector != null))
     {
       this.Configure();
     }
@@ -100,10 +122,86 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
     }
   }
 
+  public Command ResetTheStuffs()
+  {
+    return this.m_Shooter.StopCoral()
+                         .andThen(m_Shooter.SetWristPosition(ShooterConstants.WRIST_STOW_POSITION))
+                         .andThen(m_Elevator.MoveToLevel(LEVELS.HOME));
+  }
+
+  public Command CleanAlgae()
+  {
+    int selectedFace = m_DataSelector.getColumn("reefFaceSelection").getCurrentOptionIndex(); // get from dataselector
+
+    PathPlannerPath desiredPath;
+    PathPlannerPath desiredDeparturePath;
+    boolean isHigh;
+
+    switch(selectedFace)
+    {
+      case 0:
+        desiredPath = this.ONE_CLEAN_ALIGN;
+        desiredDeparturePath = this.ONE_CLEAN_DEPARTURE;
+        isHigh = false;
+      break;
+
+      case 1:
+        desiredPath = this.TWO_CLEAN_ALIGN;
+        desiredDeparturePath = this.TWO_CLEAN_DEPARTURE;
+        isHigh = true;
+      break;
+
+      case 2:
+        desiredPath = this.THREE_CLEAN_ALIGN;
+        desiredDeparturePath = this.THREE_CLEAN_DEPARTURE;
+        isHigh = false;
+      break;
+
+      case 3:
+        desiredPath = this.FOUR_CLEAN_ALIGN;
+        desiredDeparturePath = this.FOUR_CLEAN_DEPARTURE;
+        isHigh = true;
+      break;
+
+      case 4:
+        desiredPath = this.FIVE_CLEAN_ALIGN;
+        desiredDeparturePath = this.FIVE_CLEAN_DEPARTURE;
+        isHigh = false;
+      break;
+
+      case 5:
+      
+      default:
+        desiredPath = this.SIX_CLEAN_ALIGN;
+        desiredDeparturePath = this.SIX_CLEAN_DEPARTURE;
+        isHigh = true;
+      break;
+    }
+
+    if(isHigh)
+    {
+      return this.m_Elevator.MoveToLevel(LEVELS.HIGH_ALGAE)
+                            .andThen(m_Shooter.SweepAlgae())
+                            .andThen(m_Shooter.SetWristPosition(ShooterConstants.WRIST_ALGAE_SWEEPING_POSITION))
+                            .andThen(AutoBuilder.followPath(desiredPath))
+                            .andThen(m_Shooter.HoldAlgae())
+                            .andThen(AutoBuilder.followPath(desiredDeparturePath))
+                            .andThen(m_Shooter.SetWristPosition(ShooterConstants.WRIST_STOW_POSITION));
+    }
+
+    return this.m_Elevator.MoveToLevel(LEVELS.LOW_ALGAE)
+                            .andThen(m_Shooter.SweepAlgae())
+                            .andThen(m_Shooter.SetWristPosition(ShooterConstants.WRIST_ALGAE_SWEEPING_POSITION))
+                            .andThen(AutoBuilder.followPath(desiredPath))
+                            .andThen(m_Shooter.HoldAlgae())
+                            .andThen(AutoBuilder.followPath(desiredDeparturePath))
+                            .andThen(m_Shooter.SetWristPosition(ShooterConstants.WRIST_STOW_POSITION));
+  }
+
 
   public Command CoralPlacementRoutine()
   {  
-    int selectedLevel = 0; // Get from DataSelector later
+    int selectedLevel = m_DataSelector.getColumn("levels").getCurrentOptionIndex();
     LEVELS desiredLevel; 
 
     switch(selectedLevel)
@@ -127,8 +225,8 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
       break;
     }
 
-    int selectedFace = 0; // Get from DataSelector Later
-    int selectedLeftOrRight = 0; // get from data selector // left is 0
+    int selectedFace = m_DataSelector.getColumn("reefFaceSelection").getCurrentOptionIndex(); // Get from DataSelector Later
+    int selectedLeftOrRight = m_DataSelector.getColumn("leftRight").getCurrentOptionIndex(); // get from data selector // left is 0
     PathPlannerPath desiredPath;
 
     switch(selectedFace)
@@ -223,6 +321,11 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
     return this.runOnce(() -> this.ToggleVisionAndUpdateSmartdashboard());
   }
 
+  public Command ScheduleCleaning()
+  {
+    return this.runOnce(() -> this.ScheduleACleaning());
+  }
+
   @Override
   public void periodic() 
   {
@@ -247,10 +350,15 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
 
     if(this.m_Subsystems.getSubsystemOfType(Elevator.class).isPresent())
     {
-      this.m_Subsystems.getSubsystemOfType(Elevator.class).get();
+      this.m_Elevator = this.m_Subsystems.getSubsystemOfType(Elevator.class).get();
     }
 
-    if((this.m_Drivetrain != null) && (this.m_Shooter != null) && (this.m_Elevator != null))
+    if(this.m_Subsystems.getSubsystemOfType(DataSelector.class).isPresent())
+    {
+      this.m_DataSelector = this.m_Subsystems.getSubsystemOfType(DataSelector.class).get();
+    }
+
+    if((this.m_Drivetrain != null) && (this.m_Shooter != null) && (this.m_Elevator != null) && (this.m_DataSelector != null))
     {
       m_Subsystems.unsubscribeSubsystemAdded(this);
       this.Configure();
@@ -295,7 +403,10 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
     this.CachePathsAndAutos();
 
     m_IsVisionEnabled = true;
+    m_CleanScheduled = false;
+    SmartDashboard.putBoolean("Clean Scheduled", m_CleanScheduled);
     SmartDashboard.putBoolean("Vision Enabled", m_IsVisionEnabled);
+    System.out.println("AUTOMATION CONFIGURATION COMPLETE.");
   }
 
   private void ConfigureAutobuilder()
@@ -364,6 +475,12 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
     SmartDashboard.putBoolean("Vision Enabled", m_IsVisionEnabled);
   }
 
+  private void ScheduleACleaning()
+  {
+    this.m_CleanScheduled = !this.m_CleanScheduled;
+    SmartDashboard.putBoolean("CLEAN", m_CleanScheduled);
+  }
+
   private void CachePathsAndAutos()
   {
     try
@@ -380,6 +497,20 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
         FIVE_RIGHT_ALIGN = PathPlannerPath.fromPathFile("FIVE-RIGHT-ALIGN");
         SIX_LEFT_ALIGN = PathPlannerPath.fromPathFile("SIX-LEFT-ALIGN");
         SIX_RIGHT_ALIGN = PathPlannerPath.fromPathFile("SIX-RIGHT-ALIGN");
+
+        ONE_CLEAN_ALIGN = PathPlannerPath.fromPathFile("ONE-CLEAN-ALIGN");
+        ONE_CLEAN_DEPARTURE = PathPlannerPath.fromPathFile("ONE-CLEAN-DEPARTURE");
+        TWO_CLEAN_ALIGN = PathPlannerPath.fromPathFile("TWO-CLEAN-ALIGN");
+        TWO_CLEAN_DEPARTURE = PathPlannerPath.fromPathFile("TWO-CLEAN-DEPARTURE");
+        THREE_CLEAN_ALIGN = PathPlannerPath.fromPathFile("THREE-CLEAN-ALIGN");
+        THREE_CLEAN_DEPARTURE = PathPlannerPath.fromPathFile("THREE-CLEAN-DEPARTURE");
+        FOUR_CLEAN_ALIGN = PathPlannerPath.fromPathFile("FOUR-CLEAN-ALIGN");
+        FOUR_CLEAN_DEPARTURE = PathPlannerPath.fromPathFile("FOUR-CLEAN-DEPARTURE");
+        FIVE_CLEAN_ALIGN = PathPlannerPath.fromPathFile("FIVE-CLEAN-ALIGN");
+        FIVE_CLEAN_DEPARTURE = PathPlannerPath.fromPathFile("FIVE-CLEAN-DEPARTURE");
+        SIX_CLEAN_ALIGN = PathPlannerPath.fromPathFile("SIX-CLEAN-ALIGN");
+        SIX_CLEAN_DEPARTURE = PathPlannerPath.fromPathFile("SIX-CLEAN-DEPARTURE");
+
         DataLogManager.log("Automation has successfully cached pathplanner autos and paths.");
     } 
     catch (Exception e) 

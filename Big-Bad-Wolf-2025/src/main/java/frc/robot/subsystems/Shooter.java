@@ -95,6 +95,11 @@ public class Shooter extends SubsystemBase
                                  m_EmptySubsystemList);
   }
 
+  public Command StopCoral()
+  {
+    return this.runOnce(() -> this.SetCoralVoltage(0));
+  }
+
   public Command HoldAlgae()
   {
     return this.runOnce(() -> this.SetAlgaeVoltage(ShooterConstants.ALGAE_HOLDING_VOLTAGE));

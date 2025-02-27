@@ -18,15 +18,19 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.constants.Global;
+import frc.robot.constants.ShooterConstants;
 import frc.robot.constants.ElevatorConstants.LEVELS;
 import frc.robot.constants.Global.BUILD_TYPE;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Shooter;
+import frc.robot.utilities.DataSelector;
 import frc.robot.utilities.SubsystemManager;
+import frc.robot.utilities.dataSelector.DataSelectorHelper;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.Intake;
@@ -74,6 +78,7 @@ public class RobotContainer
         m_Manager.addSubsystem(new Intake());
         m_Manager.addSubsystem(new Climb());
         m_Manager.addSubsystem(new Shooter());
+        m_Manager.addSubsystem(new DataSelector(DataSelectorHelper.HEADER_COLUMN));
         m_Manager.addSubsystem(new Automation(m_Manager));
         this.configureCompetitionBindings();
       break;
@@ -132,63 +137,17 @@ public class RobotContainer
     Intake intake = m_Manager.getSubsystemOfType(Intake.class).get();
     SmartDashboard.putData(intake);
 
+    Climb climb = m_Manager.getSubsystemOfType(Climb.class).get();
+    SmartDashboard.putData(climb);
+
+    DataSelector dataSelector =m_Manager.getSubsystemOfType(DataSelector.class).get();
+    dataSelector.addColumn(DataSelectorHelper.LEFT_RIGHT_CLEAN_COLUMN);
+    dataSelector.addColumn(DataSelectorHelper.LEVELS_COLUMN);
+    dataSelector.addColumn(DataSelectorHelper.REEF_FACE_SELECTION_COLUMN);
+    SmartDashboard.putData(dataSelector);
+
     Automation automation = m_Manager.getSubsystemOfType(Automation.class).get();
     SmartDashboard.putData(automation);
-
-    m_DriverController.rightBumper()
-      .onTrue(Commands.parallel(
-        elevator.MoveToLevel(LEVELS.CORAL_INTAKE),
-        shooter.IntakeCoral()
-      )
-      ).onFalse(Commands.parallel(
-        elevator.MoveToLevel(LEVELS.HOME),
-        shooter.StowShooter()
-      ));
-
-    m_DriverController.povLeft()
-      .onTrue(Commands.parallel(
-        elevator.MoveToLevel(LEVELS.FOUR),
-        shooter.PrepareToDeployCoralHigh()
-      )
-      ).onFalse(Commands.parallel(
-        elevator.MoveToLevel(LEVELS.HOME),
-        shooter.StowShooter()
-      )).whileTrue(new PathPlannerAuto("SIX-LEFT-AUTO"));
-
-      m_DriverController.povUp()
-      .onTrue(Commands.parallel(
-        elevator.MoveToLevel(LEVELS.THREE),
-        shooter.PrepareToDeployCoralLow()
-      )
-      ).onFalse(Commands.parallel(
-        elevator.MoveToLevel(LEVELS.HOME),
-        shooter.StowShooter()
-      )).whileTrue(new PathPlannerAuto("SIX-LEFT-AUTO"));
-
-      m_DriverController.povRight()
-      .onTrue(Commands.parallel(
-        elevator.MoveToLevel(LEVELS.TWO),
-        shooter.PrepareToDeployCoralLow()
-      )
-      ).onFalse(Commands.parallel(
-        elevator.MoveToLevel(LEVELS.HOME),
-        shooter.StowShooter()
-      )).whileTrue(new PathPlannerAuto("SIX-LEFT-AUTO"));
-
-      m_DriverController.povDown()
-      .onTrue(Commands.parallel(
-        elevator.MoveToLevel(LEVELS.ONE),
-        shooter.PrepareToDeployCoralLow()
-      )
-      ).onFalse(Commands.parallel(
-        elevator.MoveToLevel(LEVELS.HOME),
-        shooter.StowShooter()
-      )).whileTrue(new PathPlannerAuto("SIX-LEFT-AUTO"));
-
-    m_DriverController.b().onTrue(elevator.MoveToSelectedLevel());
-
-    m_DriverController.a().whileTrue(shooter.DeployCoral());
-    
 
     drivetrain.setDefaultCommand
     (
@@ -199,11 +158,31 @@ public class RobotContainer
         )
     );
 
-    m_DriverController.x().onTrue(elevator.ApplyVoltage(-0.85));
+    m_DriverController.rightTrigger().onTrue(automation.CoralPlacementRoutine())
+                                     .onFalse(automation.ResetTheStuffs());
 
-    m_DriverController.y().onTrue(shooter.DeployCoralHigh());
+    m_DriverController.leftTrigger().onTrue(shooter.IntakeCoral().alongWith(elevator.MoveToLevel(LEVELS.CORAL_INTAKE)))
+                                    .onFalse(automation.ResetTheStuffs());
 
-    shooter.setDefaultCommand(shooter.StowShooter());
+    m_DriverController.rightBumper().onTrue(elevator.MoveToLevel(LEVELS.ALGAE_PROCESS)
+                                                    .andThen(shooter.SetWristPosition(ShooterConstants.WRIST_ALGAE_PROCESSOR_DEPLOYMENT_POSITION))
+                                                    .andThen(shooter.ProcessAlgae()))
+                                    .onFalse(shooter.StopAlgae()
+                                                    .andThen(automation.ResetTheStuffs()));
+          
+    m_DriverController.leftBumper().onTrue(automation.CleanAlgae())
+                                    .onFalse(automation.ResetTheStuffs());
+
+    m_CoDriverController.leftBumper().onTrue(dataSelector.toggleUpColumn());
+    m_CoDriverController.rightBumper().onTrue(dataSelector.toggleDownColumn());
+    m_CoDriverController.povUp().onTrue(dataSelector.shiftColumnCategoryLeft());
+    m_CoDriverController.povDown().onTrue(dataSelector.shiftColumnCategoryRight());
+
+    m_CoDriverController.start().onTrue(automation.ToggleVision());
+    m_CoDriverController.y().onTrue(elevator.ZeroElevator());
+    m_CoDriverController.x().whileTrue(elevator.ApplyVoltage(0).withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+
+    m_CoDriverController.a().whileTrue(climb.setClimbVoltage(() -> -m_CoDriverController.getRawAxis(2)*10));
   }
 
   private void configureDrivetrainDebugBindings()

@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.6354999999999995,
-        "y": 5.9555
+        "x": 3.0517499999999997,
+        "y": 4.0055
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.395881133348165,
-        "y": 5.550330906875527
+        "x": 2.0684853931542464,
+        "y": 3.968354525296703
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "4CLEAN"
     },
     {
       "anchor": {
-        "x": 5.15775,
-        "y": 5.204749999999999
+        "x": 2.1742500000000002,
+        "y": 4.0055
       },
       "prevControl": {
-        "x": 5.556290903545183,
-        "y": 5.890314001800551
+        "x": 3.6464999999999996,
+        "y": 4.015249999999999
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "6CLEAN"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 1.0,
+    "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -119.99999999999999
+    "rotation": 0.0
   },
   "reversed": false,
-  "folder": "ALIGNMENT-PATHS",
+  "folder": "CLEAN DEPARTURES",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -119.99999999999999
+    "rotation": 0.0
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }
