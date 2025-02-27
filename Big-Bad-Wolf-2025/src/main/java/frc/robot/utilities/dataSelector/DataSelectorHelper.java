@@ -12,16 +12,16 @@ public class DataSelectorHelper
 
     public static final Column LEFT_RIGHT_CLEAN_COLUMN = new Column.ColumnBuilder()
     .addColumnName("leftRight")
-    .addFirstOption("Left", true)
-    .addOption("Right")
+    .addFirstOption("Coral Left", true)
+    .addOption("Coral Right")
     .build();
 
     public static final Column LEVELS_COLUMN = new Column.ColumnBuilder()
     .addColumnName("levels")
-    .addFirstOption("one", true)
-    .addOption("two")
-    .addOption("three")
-    .addOption("four")
+    .addFirstOption("lvl one", true)
+    .addOption("lvl two")
+    .addOption("lvl three")
+    .addOption("lvl four")
     .build();
 
     public static final Column REEF_FACE_SELECTION_COLUMN = new Column.ColumnBuilder()
