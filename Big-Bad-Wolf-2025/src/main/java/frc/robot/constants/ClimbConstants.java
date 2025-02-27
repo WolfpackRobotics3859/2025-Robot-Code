@@ -11,20 +11,16 @@ import com.ctre.phoenix6.signals.InvertedValue;
 // Initializing constants for Climb.
 public class ClimbConstants 
 {
-    // Insert wrist feed forward and default position values when determined.
-    public static final double CLIMB_DEFAULT_WRIST_POSITION = 0;
-    public static final double CLIMB_WRIST_FEED_FORWARD = 0;
-
-    // (REMOVE_BEFORE_COMP) Insert coral funnel constants when determined.
-    public static final double CORAL_FUNNEL_SEPARATE_POSITION = 0;
-    public static final double CORAL_FUNNEL_CLOSED_POSITION = 0;
-
     public static final MotorOutputConfigs CLIMB_MAIN_MOTOR_OUTPUT = new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive);
     public static final MotorOutputConfigs CLIMB_FOLLOWER_MOTOR_OUTPUT = new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive);
+    public static final MotorOutputConfigs CORAL_FUNNEL_MOTOR_OUTPUT = new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive);
 
     public static final TalonFXConfiguration CLIMB_WRIST_MAIN_CONFIGURATION = new TalonFXConfiguration()
         .withMotorOutput(CLIMB_MAIN_MOTOR_OUTPUT);
 
     public static final TalonFXConfiguration CLIMB_WRIST_FOLLOWER_CONFIGURATION = new TalonFXConfiguration()
         .withMotorOutput(CLIMB_FOLLOWER_MOTOR_OUTPUT);
+    
+    public static final TalonFXConfiguration FUNNEL_LATCH_MOTOR_CONFIGURATION = new TalonFXConfiguration()
+        .withMotorOutput(CORAL_FUNNEL_MOTOR_OUTPUT);
 }

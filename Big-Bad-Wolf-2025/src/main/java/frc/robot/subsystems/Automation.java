@@ -20,17 +20,21 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.AutomationConstants;
+import frc.robot.constants.ShooterConstants;
+import frc.robot.constants.ElevatorConstants.LEVELS;
 import frc.robot.utilities.SubsystemManager;
 import frc.robot.utilities.subsystemManager.SubsystemAddedEvent;
 import frc.robot.utilities.subsystemManager.SubsystemAddedListener;
@@ -39,15 +43,32 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
 {
   private SubsystemManager m_Subsystems;
   private CommandSwerveDrivetrain m_Drivetrain;
+  private Shooter m_Shooter;
+  private Elevator m_Elevator;
 
   private PhotonCamera m_ForwardCamera;
   private PhotonPoseEstimator m_ForwardCameraEstimator;
 
   private SwerveRequest.ApplyRobotSpeeds m_SwerveRequest;
 
+  private boolean m_IsVisionEnabled;
+
   private Field2d m_Field = new Field2d();
 
   AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+
+  private PathPlannerPath ONE_LEFT_ALIGN;
+  private PathPlannerPath ONE_RIGHT_ALIGN;
+  private PathPlannerPath TWO_LEFT_ALIGN;
+  private PathPlannerPath TWO_RIGHT_ALIGN;
+  private PathPlannerPath THREE_LEFT_ALIGN;
+  private PathPlannerPath THREE_RIGHT_ALIGN;
+  private PathPlannerPath FOUR_LEFT_ALIGN;
+  private PathPlannerPath FOUR_RIGHT_ALIGN;
+  private PathPlannerPath FIVE_LEFT_ALIGN;
+  private PathPlannerPath FIVE_RIGHT_ALIGN;
+  private PathPlannerPath SIX_LEFT_ALIGN;
+  private PathPlannerPath SIX_RIGHT_ALIGN;
 
   public Automation(SubsystemManager manager) 
   {
@@ -57,12 +78,149 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
     if(this.m_Subsystems.getSubsystemOfType(CommandSwerveDrivetrain.class).isPresent())
     {
       this.m_Drivetrain = this.m_Subsystems.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
+    }
+
+    if(this.m_Subsystems.getSubsystemOfType(Shooter.class).isPresent())
+    {
+      this.m_Shooter = this.m_Subsystems.getSubsystemOfType(Shooter.class).get();
+    }
+
+    if(this.m_Subsystems.getSubsystemOfType(Elevator.class).isPresent())
+    {
+      this.m_Subsystems.getSubsystemOfType(Elevator.class).get();
+    }
+
+    if((this.m_Drivetrain != null) && (this.m_Shooter != null) && (this.m_Elevator != null))
+    {
       this.Configure();
     }
     else
     {
       m_Subsystems.subscribeSubsystemAdded(this);
     }
+  }
+
+
+  public Command CoralPlacementRoutine()
+  {  
+    int selectedLevel = 0; // Get from DataSelector later
+    LEVELS desiredLevel; 
+
+    switch(selectedLevel)
+    {
+      case 0:
+        desiredLevel = LEVELS.ONE;
+      break;
+
+      case 1:
+        desiredLevel = LEVELS.TWO;
+      break;
+
+      case 2:
+        desiredLevel = LEVELS.THREE;
+      break;
+
+      case 3:
+
+      default:
+        desiredLevel = LEVELS.FOUR;
+      break;
+    }
+
+    int selectedFace = 0; // Get from DataSelector Later
+    int selectedLeftOrRight = 0; // get from data selector // left is 0
+    PathPlannerPath desiredPath;
+
+    switch(selectedFace)
+    {
+      case 0:
+        if(selectedLeftOrRight == 0)
+        {
+          desiredPath = this.ONE_LEFT_ALIGN;
+        }
+        desiredPath = this.ONE_RIGHT_ALIGN;
+      break;
+
+      case 1:
+        if(selectedLeftOrRight == 0)
+        {
+          desiredPath = this.TWO_LEFT_ALIGN;
+        }
+        desiredPath = this.TWO_RIGHT_ALIGN;
+      break;
+
+      case 2:
+        if(selectedLeftOrRight == 0)
+        {
+          desiredPath = this.THREE_LEFT_ALIGN;
+        }
+        desiredPath = this.THREE_RIGHT_ALIGN;
+      break;
+
+      case 3:
+        if(selectedLeftOrRight == 0)
+        {
+          desiredPath = this.FOUR_LEFT_ALIGN;
+        }
+        desiredPath = this.FOUR_RIGHT_ALIGN;
+      break;
+
+      case 4:
+        if(selectedLeftOrRight == 0)
+        {
+          desiredPath = this.FIVE_LEFT_ALIGN;
+        }
+        desiredPath = this.FIVE_RIGHT_ALIGN;
+      break;
+
+      case 5:
+      
+      default:
+        if(selectedLeftOrRight == 0)
+        {
+          desiredPath = this.SIX_LEFT_ALIGN;
+        }
+        desiredPath = this.SIX_RIGHT_ALIGN;
+      break;
+    }
+
+    if(this.m_IsVisionEnabled)
+    {
+      if(desiredLevel == LEVELS.FOUR)
+      {
+        return AutoBuilder.followPath(desiredPath)
+                        .andThen(this.m_Elevator.MoveToLevel(desiredLevel))
+                        .andThen(this.m_Shooter.SetWristPosition(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION))
+                        .andThen(this.m_Shooter.DeployCoralHigh());
+      }
+      else
+      {
+        return AutoBuilder.followPath(desiredPath)
+                        .andThen(this.m_Elevator.MoveToLevel(desiredLevel))
+                        .andThen(this.m_Shooter.SetWristPosition(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION_LOW))
+                        .andThen(this.m_Shooter.DeployCoral());
+      }
+    }
+    else
+    {
+      if(desiredLevel == LEVELS.FOUR)
+      {
+        return this.m_Elevator.MoveToLevel(desiredLevel)
+                              .andThen(this.m_Shooter.SetWristPosition(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION))
+                              .andThen(this.m_Shooter.DeployCoralHigh());
+      }
+      else
+      {
+        return this.m_Elevator.MoveToLevel(desiredLevel)
+                              .andThen(this.m_Shooter.SetWristPosition(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION_LOW))
+                              .andThen(this.m_Shooter.DeployCoral());
+      }
+    }
+  }
+
+  public Command ToggleVision()
+  {
+    return this.runOnce(() -> this.ToggleVisionAndUpdateSmartdashboard());
   }
 
   @Override
@@ -77,12 +235,33 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
   @Override
   public void onSubsystemAddedEvent(SubsystemAddedEvent event) 
   {
-    if(event.getSubsystem().getClass() == CommandSwerveDrivetrain.class)
+    if(this.m_Subsystems.getSubsystemOfType(CommandSwerveDrivetrain.class).isPresent())
     {
-      this.m_Drivetrain = (CommandSwerveDrivetrain) event.getSubsystem();
+      this.m_Drivetrain = this.m_Subsystems.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
+    }
+
+    if(this.m_Subsystems.getSubsystemOfType(Shooter.class).isPresent())
+    {
+      this.m_Shooter = this.m_Subsystems.getSubsystemOfType(Shooter.class).get();
+    }
+
+    if(this.m_Subsystems.getSubsystemOfType(Elevator.class).isPresent())
+    {
+      this.m_Subsystems.getSubsystemOfType(Elevator.class).get();
+    }
+
+    if((this.m_Drivetrain != null) && (this.m_Shooter != null) && (this.m_Elevator != null))
+    {
       m_Subsystems.unsubscribeSubsystemAdded(this);
       this.Configure();
     }
+
+    // if(event.getSubsystem().getClass() == CommandSwerveDrivetrain.class)
+    // {
+    //   this.m_Drivetrain = (CommandSwerveDrivetrain) event.getSubsystem();
+    //   m_Subsystems.unsubscribeSubsystemAdded(this);
+    //   this.Configure();
+    // }
   }
 
   public Command PathfindToPose(Pose2d goalPose)
@@ -100,10 +279,23 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
     );
   }
 
+  public Command PathfindThenFollowPath(PathPlannerPath path)
+  {
+    PathConstraints constraints = new PathConstraints(
+      3.0, 4.0,
+      Units.degreesToRadians(540), Units.degreesToRadians(720));
+
+    return AutoBuilder.pathfindThenFollowPath(path, constraints);
+  }
+
   private void Configure()
   {
     this.ConfigureCameras();
     this.ConfigureAutobuilder(); // autobuilder should be configured last?
+    this.CachePathsAndAutos();
+
+    m_IsVisionEnabled = true;
+    SmartDashboard.putBoolean("Vision Enabled", m_IsVisionEnabled);
   }
 
   private void ConfigureAutobuilder()
@@ -131,7 +323,8 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
             config,
             () -> {
               var alliance = DriverStation.getAlliance();
-              if (alliance.isPresent()) {
+              if (alliance.isPresent())
+              {
                 return alliance.get() == DriverStation.Alliance.Red;
               }
               return false;
@@ -162,6 +355,37 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
           }  
         }
       }
+    }
+  }
+
+  private void ToggleVisionAndUpdateSmartdashboard()
+  {
+    this.m_IsVisionEnabled = !this.m_IsVisionEnabled;
+    SmartDashboard.putBoolean("Vision Enabled", m_IsVisionEnabled);
+  }
+
+  private void CachePathsAndAutos()
+  {
+    try
+    {
+        ONE_LEFT_ALIGN = PathPlannerPath.fromPathFile("ONE-LEFT-ALIGN");
+        ONE_RIGHT_ALIGN = PathPlannerPath.fromPathFile("ONE-RIGHT-ALIGN");
+        TWO_LEFT_ALIGN = PathPlannerPath.fromPathFile("TWO-LEFT-ALIGN");
+        TWO_RIGHT_ALIGN = PathPlannerPath.fromPathFile("TWO-RIGHT-ALIGN");
+        THREE_LEFT_ALIGN = PathPlannerPath.fromPathFile("THREE-LEFT-ALIGN");
+        THREE_RIGHT_ALIGN = PathPlannerPath.fromPathFile("THREE-RIGHT-ALIGN");
+        FOUR_LEFT_ALIGN = PathPlannerPath.fromPathFile("FOUR-LEFT-ALIGN");
+        FOUR_RIGHT_ALIGN = PathPlannerPath.fromPathFile("FOUR-RIGHT-ALIGN");
+        FIVE_LEFT_ALIGN = PathPlannerPath.fromPathFile("FIVE-LEFT-ALIGN");
+        FIVE_RIGHT_ALIGN = PathPlannerPath.fromPathFile("FIVE-RIGHT-ALIGN");
+        SIX_LEFT_ALIGN = PathPlannerPath.fromPathFile("SIX-LEFT-ALIGN");
+        SIX_RIGHT_ALIGN = PathPlannerPath.fromPathFile("SIX-RIGHT-ALIGN");
+        DataLogManager.log("Automation has successfully cached pathplanner autos and paths.");
+    } 
+    catch (Exception e) 
+    {
+        DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
+        DataLogManager.log("Automation has failed in caching pathplanner autos and paths.");
     }
   }
 }

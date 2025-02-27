@@ -30,6 +30,7 @@ public class ElevatorConstants
     public static final double ELEVATOR_LEVEL_THREE = 58.5;
     public static final double ELEVATOR_LEVEL_FOUR = 105;
     public static final double CORAL_INTAKING_LEVEL = 5;
+    public static final double ALGAE_PROCESSING_POSITION = 10;
 
     // Max Height should be around 100-105
 
@@ -46,7 +47,8 @@ public class ElevatorConstants
         TWO(ELEVATOR_LEVEL_TWO),
         THREE(ELEVATOR_LEVEL_THREE),
         FOUR(ELEVATOR_LEVEL_FOUR),
-        CORAL_INTAKE(CORAL_INTAKING_LEVEL);
+        CORAL_INTAKE(CORAL_INTAKING_LEVEL),
+        ALGAE_PROCESS(ALGAE_PROCESSING_POSITION);
 
         private double levelValue;
 

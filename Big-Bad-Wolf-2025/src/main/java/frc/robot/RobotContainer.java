@@ -269,13 +269,13 @@ public class RobotContainer
     Shooter shooter = m_Manager.getSubsystemOfType(Shooter.class).get();
     SmartDashboard.putData(shooter);
 
-    m_DriverController.a().onTrue(shooter.StowShooter());
-    m_DriverController.b().onTrue(shooter.IntakeAlgae()).onFalse(shooter.StowAndHoldAlgae());
-    m_DriverController.y().onTrue(shooter.PrepareToDeployCoralLow());
-    m_DriverController.x().onTrue(shooter.DeployCoral()).onFalse(shooter.StowShooter());
+    // m_DriverController.a().onTrue(shooter.StowShooter());
+    // m_DriverController.b().onTrue(shooter.IntakeAlgae()).onFalse(shooter.StowAndHoldAlgae());
+    // m_DriverController.y().onTrue(shooter.PrepareToDeployCoralLow());
+    // m_DriverController.x().onTrue(shooter.DeployCoral()).onFalse(shooter.StowShooter());
 
-    m_DriverController.povUp().onTrue(shooter.IntakeCoral()).onFalse(shooter.StowShooter());
-    m_DriverController.povDown().onTrue(shooter.ProcessAlgae()).onFalse(shooter.StowShooter());
+    // m_DriverController.povUp().onTrue(shooter.IntakeCoral()).onFalse(shooter.StowShooter());
+    // m_DriverController.povDown().onTrue(shooter.ProcessAlgae()).onFalse(shooter.StowShooter());
 
     System.out.println("[Wolfpack] Shooter Debug bindings successfully configured.");
   }
@@ -294,7 +294,7 @@ public class RobotContainer
     Climb climb = m_Manager.getSubsystemOfType(Climb.class).get();
     SmartDashboard.putData(climb);
 
-    climb.setDefaultCommand(climb.setVoltage(() -> -m_DriverController.getRawAxis(5)*10));
+   // climb.setDefaultCommand(climb.setVoltage(() -> -m_DriverController.getRawAxis(5)*10));
   }
 
   private void configureAutomationDebugBindings()

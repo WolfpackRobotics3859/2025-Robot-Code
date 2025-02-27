@@ -3,7 +3,11 @@
   "robotLength": 0.9,
   "holonomicMode": true,
   "pathFolders": [
-    "ALIGNMENT-PATHS"
+    "ALIGNMENT-PATHS",
+    "FACE TO INTAKE",
+    "FAR LEFT STARTS",
+    "FAR RIGHT STARTS",
+    "CLEAN DEPARTURES"
   ],
   "autoFolders": [
     "ALIGNMENT-AUTOS"

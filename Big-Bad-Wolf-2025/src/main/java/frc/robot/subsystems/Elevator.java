@@ -33,8 +33,6 @@ public class Elevator extends SubsystemBase
   private final TalonFX m_ElevatorMotorRight;
   private final CANdi m_CANdi;
 
-  private SendableChooser<Double> m_SelectedLevel = new SendableChooser<>();
-
   private final VoltageOut m_VoltageRequest;
   private final MotionMagicVoltage m_PositionRequest;
   private final StaticBrake m_BrakeRequest;
@@ -61,36 +59,25 @@ public class Elevator extends SubsystemBase
     m_VoltageRequest = new VoltageOut(0);
     m_PositionRequest = new MotionMagicVoltage(0);
     m_BrakeRequest = new StaticBrake();
-
-    m_SelectedLevel.addOption("ZERO", 0.0);
-    m_SelectedLevel.addOption("ONE", LEVELS.ONE.getValue());
-    m_SelectedLevel.addOption("TWO", LEVELS.TWO.getValue());
-    m_SelectedLevel.addOption("THREE", LEVELS.THREE.getValue());
-    m_SelectedLevel.setDefaultOption("FOUR", LEVELS.FOUR.getValue());
-
-    SmartDashboard.putData("Level", m_SelectedLevel);
-
-    this.m_ElevatorMotorLeft.setPosition(0);
   }
 
   public Command MoveToLevel(LEVELS level)
   {
-    return this.runOnce(() -> this.SetPosition(level.getValue()));
-  }
-
-  public Command MoveToSelectedLevel()
-  {
-    return this.runOnce(() -> this.SetPosition(m_SelectedLevel.getSelected()));
+    return new FunctionalCommand(
+      () -> this.SetPosition(level.getValue()),
+      () -> {},
+      interrupted -> {},
+      MotorManager.InPosition(Hardware.ELEVATOR_MOTOR_LEFT, 0.025),
+      this
+    );
   }
 
   public Command ZeroElevator()
   {
     return new FunctionalCommand(
-      // Begin moving the intake to a desired position.
       () -> this.SetVoltage(ElevatorConstants.HOMING_VOLTAGE),
       () -> {},
-      interrupted -> this.BrakeElevator(),
-      // Ends the command once the intake is in the desired position.
+      interrupted -> {},
       () -> m_ElevatorMotorLeft.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround,
       this
     );
@@ -150,6 +137,6 @@ public class Elevator extends SubsystemBase
   public void periodic()
   {
     SmartDashboard.putNumber("Elevator Position :)", this.m_ElevatorMotorLeft.getPosition().getValueAsDouble());
-    // Intentionally Empty
+    SmartDashboard.putNumber("Shooter Closed Loop Error", m_ElevatorMotorLeft.getClosedLoopError().getValueAsDouble());
   }
 }

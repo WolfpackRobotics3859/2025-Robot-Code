@@ -23,8 +23,9 @@ public class ShooterConstants
     // CORAL MOTOR VOLTAGE
     public static final double CORAL_INTAKE_VOLTAGE = 2;
     public static final double CORAL_DEPLOYMENT_VOLTAGE = 10;
+    public static final double CORAL_DEPLOYMENT_VOLTAGE_HIGH = 8;
     
-    // ALGAE MOTOR VOLTAGES  
+    // ALGAE MOTOR VOLTAGES   
     // Speed to use when cleaning the coral reef.
     public static final double ALGAE_SWEEPING_VOLTAGE = -2.0;
     // Speed to use when intaking algae from the ground.
