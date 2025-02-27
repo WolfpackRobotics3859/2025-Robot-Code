@@ -1,15 +1,18 @@
-package frc.robot.utilities;
+package frc.robot.utilities.dataSelector;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Column {
-    
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+public class Column 
+{    
     private String columnName;
     private int chooserCurrentOptionIndex;
     private Option chooserCurrentOption;
     private int currentOptionIndex;
     private Option currentOption;
+
     
     List<Option> options;
 
@@ -39,13 +42,16 @@ public class Column {
     }
 
     public void incrementColumn() {
-        if(!(chooserCurrentOptionIndex + 1 > options.size())) {
+        if(chooserCurrentOptionIndex >= options.size() - 1)
+        {
             chooserCurrentOptionIndex ++;
         }
     }
 
-    public void decrementColumn() {
-        if(!(chooserCurrentOptionIndex - 1 < 0)) {
+    public void decrementColumn() 
+    {
+        if(chooserCurrentOptionIndex > 0) 
+        {
             chooserCurrentOptionIndex --;
         }
     }
@@ -97,7 +103,8 @@ public class Column {
         return false;
     }
 
-    public static class ColumnBuilder {
+    public static class ColumnBuilder 
+    {
         private String columnName;
         private ArrayList<Option> options = new ArrayList<>();
 
@@ -120,13 +127,18 @@ public class Column {
         private final String name;
         private boolean state = false;
 
-        public Option(String name) {
+        public Option(String name) 
+        {
             this.name = name;
+            SmartDashboard.putBoolean(name, false);
         }
 
         public void setState(boolean state) {
             this.state = state;
             //FIXME: UPDATE SMART DASHBOARD VALUE
+
+            // update it later
+            // something in your column must be true
         }
 
         public String getName() {

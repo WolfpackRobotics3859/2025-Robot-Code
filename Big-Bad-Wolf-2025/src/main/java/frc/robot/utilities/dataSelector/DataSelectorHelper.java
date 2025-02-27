@@ -1,6 +1,7 @@
-package frc.robot.utilities;
+package frc.robot.utilities.dataSelector;
 
-public class DataSelectorHelper {
+public class DataSelectorHelper
+{
     public static  final Column LEFT_RIGHT_CLEAN_COLUMN = new Column.ColumnBuilder()
     .addColumnName("leftRightClean")
     .addOption("Left")
