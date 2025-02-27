@@ -3,17 +3,21 @@ package frc.robot.utilities;
 import java.util.ArrayList;
 
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utilities.dataSelector.Column;
 
 public class DataSelector extends SubsystemBase 
 {
-    ArrayList<Column> columns;
-    Column currentColumn;
-    int currentColumnIndex;
+    private final Column header;
+    private ArrayList<Column> columns;
+    private Column currentColumn;
+    private int currentColumnIndex;
 
-    public DataSelector() {
+    public DataSelector(Column header)
+     {
+        this.header = header;
         columns = new ArrayList<>();
     }
 
@@ -28,7 +32,7 @@ public class DataSelector extends SubsystemBase
 
     public Column getColumn(String columnName) {
         for (Column c : columns) {
-            if(c.getColumnName().equals(columnName)) {
+            if(c.getName().equals(columnName)) {
                 return c;
             }
         }
@@ -42,7 +46,7 @@ public class DataSelector extends SubsystemBase
 
     public boolean hasColumn(String columnName) {
         for (Column c : columns){
-            if(c.getColumnName().equals(columnName)) {
+            if(c.getName().equals(columnName)) {
                 return true;
             }
         }
@@ -58,38 +62,43 @@ public class DataSelector extends SubsystemBase
     }
 
     public Command shiftColumnCategoryLeft() {
-        return run(() -> {
-            if (currentColumnIndex - 1 >= 0) {
-                currentColumn = columns.get(currentColumnIndex - 1);
+        return runOnce(() -> {
+            if(header.decrementColumn()) {
                 currentColumnIndex--;
+                currentColumn = columns.get(currentColumnIndex);
             }
         });
     }
 
     public Command shiftColumnCategoryRight() {
-        return run(() -> {
-            if (currentColumnIndex + 1 < columns.size()) {
-                currentColumn = columns.get(currentColumnIndex + 1);
+        return runOnce(() -> {
+            if (header.incrementColumn()) {
                 currentColumnIndex++;
+                currentColumn = columns.get(currentColumnIndex);
             }
         });
     }
 
     public Command toggleUpColumn() {
-        return run(() -> {
+        return runOnce(() -> {
             currentColumn.decrementColumn();
         });
     }
 
     public Command toggleDownColumn() {
-        return run(() -> {
+        return runOnce(() -> {
             currentColumn.incrementColumn();
         });
     }
 
-    public Command selectValue() {
-        return run(() -> {
-            currentColumn.setOptionStateTrue();
+    public Command dumpData() {
+        return runOnce(() -> {
+            // SmartDashboard.putString("Current Column Name", this.currentColumn.getName());
+            // SmartDashboard.putString("Current option", this.currentColumn.getCurrentOption().getName());
+            // SmartDashboard.putBoolean("Current option state", this.currentColumn.getCurrentOption().getState());
+            for(Column c : columns) {
+                SmartDashboard.putString(c.getName(), c.getCurrentOption().getName());
+            }
         });
     }
 

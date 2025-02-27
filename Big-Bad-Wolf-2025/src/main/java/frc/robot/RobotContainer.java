@@ -74,7 +74,7 @@ public class RobotContainer
         m_Manager.addSubsystem(new Intake());
         m_Manager.addSubsystem(new Climb());
         m_Manager.addSubsystem(new Shooter());
-        m_Manager.addSubsystem(new DataSelector());
+        m_Manager.addSubsystem(new DataSelector(DataSelectorHelper.HEADER_COLUMN));
         this.configureCompetitionBindings();
       break;
 
@@ -160,7 +160,8 @@ public class RobotContainer
     m_CoDriverController.leftBumper().onTrue(dataSelector.shiftColumnCategoryLeft());
     m_CoDriverController.povUp().onTrue(dataSelector.toggleDownColumn());
     m_CoDriverController.povDown().onTrue(dataSelector.toggleUpColumn());
-    m_CoDriverController.a().onTrue(dataSelector.selectValue());
+
+    m_CoDriverController.a().onTrue(dataSelector.dumpData());
   }
 
   private void configureDrivetrainDebugBindings()

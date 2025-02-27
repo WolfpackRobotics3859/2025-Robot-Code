@@ -2,16 +2,23 @@ package frc.robot.utilities.dataSelector;
 
 public class DataSelectorHelper
 {
-    public static  final Column LEFT_RIGHT_CLEAN_COLUMN = new Column.ColumnBuilder()
-    .addColumnName("leftRightClean")
-    .addOption("Left")
+    public static final Column HEADER_COLUMN = new Column.ColumnBuilder()
+    .addColumnName("headerColumn")
+    .addFirstOption("LeftORRight", true)
+    .addOption("Levels")
+    .addOption("Face")
+    .build();
+
+
+    public static final Column LEFT_RIGHT_CLEAN_COLUMN = new Column.ColumnBuilder()
+    .addColumnName("leftRight")
+    .addFirstOption("Left", true)
     .addOption("Right")
-    .addOption("Clean")
     .build();
 
     public static final Column LEVELS_COLUMN = new Column.ColumnBuilder()
     .addColumnName("levels")
-    .addOption("one")
+    .addFirstOption("one", true)
     .addOption("two")
     .addOption("three")
     .addOption("four")
@@ -19,11 +26,11 @@ public class DataSelectorHelper
 
     public static final Column REEF_FACE_SELECTION_COLUMN = new Column.ColumnBuilder()
     .addColumnName("reefFaceSelection")
-    .addOption("one")
-    .addOption("two")
-    .addOption("three")
-    .addOption("four")
-    .addOption("five")
-    .addOption("six")
+    .addFirstOption("0", true)
+    .addOption("1")
+    .addOption("2")
+    .addOption("3")
+    .addOption("4")
+    .addOption("5")
     .build();
 }

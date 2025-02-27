@@ -8,28 +8,24 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Column 
 {    
     private String columnName;
-    private int chooserCurrentOptionIndex;
-    private Option chooserCurrentOption;
+
     private int currentOptionIndex;
     private Option currentOption;
 
-    
     List<Option> options;
 
     public Column(ColumnBuilder columnBuilder) {
         this.columnName = columnBuilder.columnName;
-        this.options = List.copyOf(columnBuilder.options);
+        this.options = columnBuilder.options;
+        this.currentOption = options.get(0);
+        this.currentOptionIndex = 0;
     }
 
     public int getCurrentOptionIndex() {
         return this.currentOptionIndex;
     }
 
-    public int getChoooserCurrentOptionIndex() {
-        return this.chooserCurrentOptionIndex;
-    }
-
-    public String getColumnName() {
+    public String getName() {
         return this.columnName;
     }
 
@@ -37,52 +33,50 @@ public class Column
         return this.currentOption;
     }
 
-    public Option getChooserCurrentOption() {
-        return this.chooserCurrentOption;
-    }
-
-    public void incrementColumn() {
-        if(chooserCurrentOptionIndex >= options.size() - 1)
+    public boolean incrementColumn() {
+        if(currentOptionIndex + 1 < options.size())
         {
-            chooserCurrentOptionIndex ++;
-        }
-    }
-
-    public void decrementColumn() 
-    {
-        if(chooserCurrentOptionIndex > 0) 
-        {
-            chooserCurrentOptionIndex --;
-        }
-    }
-
-    public void setOptionStateTrue() {
-        if (chooserCurrentOption.equals(currentOption)) {
-            if (!(currentOption.getState() == true)){
-                currentOption.setState(true);
-            }
-        } else {
             currentOption.setState(false);
-            currentOptionIndex = chooserCurrentOptionIndex;
-            currentOption = chooserCurrentOption;
+
+            currentOptionIndex ++;
+
+            currentOption = options.get(currentOptionIndex);
             currentOption.setState(true);
+            return true;
         }
+        return false;
+    }
+
+    public boolean decrementColumn() 
+    {
+        if(currentOptionIndex > 0) 
+        {
+            currentOption.setState(false);
+
+            currentOptionIndex --;
+
+            currentOption = options.get(currentOptionIndex);
+            currentOption.setState(true);
+            return true;
+        }
+        return false;
     }
 
     public List<Option> getOptions() {
         return options;
     }
 
-    public void addOption(String name) {
-        options.add(new Option(name)); 
-
+    public Column addOption(String name) {
+        Option option;
         if(currentOption == null) {
-            currentOption = options.get(0);
-            currentOption.setState(true);
+            option = new Option(name, true);
             currentOptionIndex = 0;
-            chooserCurrentOption = options.get(0);
-            chooserCurrentOptionIndex = 0;
+            currentOption = option;
+        } else {
+            option = new Option(name);
         }
+        options.add(option);
+        return this; 
     }
 
     public Option getOption(String name) {
@@ -113,8 +107,13 @@ public class Column
             return this;
         }
 
+        public ColumnBuilder addFirstOption(String optionName, boolean isFirstOption) {
+            options.add(new Option(optionName, isFirstOption));
+            return this;
+        }
+
         public ColumnBuilder addOption(String optionName) {
-            this.options.add(new Option(optionName));
+            options.add(new Option(optionName));
             return this;
         }
 
@@ -133,12 +132,15 @@ public class Column
             SmartDashboard.putBoolean(name, false);
         }
 
+        public Option(String name, boolean firstValueOfList) {
+            this.name = name;
+            this.state = firstValueOfList;
+            SmartDashboard.putBoolean(name, firstValueOfList);
+        }
+
         public void setState(boolean state) {
             this.state = state;
-            //FIXME: UPDATE SMART DASHBOARD VALUE
-
-            // update it later
-            // something in your column must be true
+            SmartDashboard.putBoolean(this.name, state);
         }
 
         public String getName() {
