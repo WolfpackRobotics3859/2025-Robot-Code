@@ -5,10 +5,16 @@
 package frc.robot;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+
+import static edu.wpi.first.units.Units.Degrees;
+
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -79,11 +85,13 @@ public class RobotContainer
 
       case ELEVATOR_DEBUG:
         m_Manager.addSubsystem(new Elevator());
+        m_Manager.addSubsystem(TunerConstants.createDrivetrain());
         this.configureElevatorDebugBindings();
       break;
 
       case SHOOTER_DEBUG:
         m_Manager.addSubsystem(new Shooter());
+        m_Manager.addSubsystem(TunerConstants.createDrivetrain());
         this.configureShooterDebugBindings();
       break;
 
@@ -124,6 +132,9 @@ public class RobotContainer
     Intake intake = m_Manager.getSubsystemOfType(Intake.class).get();
     SmartDashboard.putData(intake);
 
+    Automation automation = m_Manager.getSubsystemOfType(Automation.class).get();
+    SmartDashboard.putData(automation);
+
     m_DriverController.rightBumper()
       .onTrue(Commands.parallel(
         elevator.MoveToLevel(LEVELS.CORAL_INTAKE),
@@ -134,21 +145,50 @@ public class RobotContainer
         shooter.StowShooter()
       ));
 
-    m_DriverController.rightTrigger(0.1)
+    m_DriverController.povLeft()
       .onTrue(Commands.parallel(
         elevator.MoveToLevel(LEVELS.FOUR),
-        shooter.PrepareToDeployCoral()
+        shooter.PrepareToDeployCoralHigh()
       )
       ).onFalse(Commands.parallel(
         elevator.MoveToLevel(LEVELS.HOME),
         shooter.StowShooter()
-      ));
+      )).whileTrue(new PathPlannerAuto("SIX-LEFT-AUTO"));
 
-    m_DriverController.y().onTrue(intake.Processing()).onFalse(intake.StowIntake());
+      m_DriverController.povUp()
+      .onTrue(Commands.parallel(
+        elevator.MoveToLevel(LEVELS.THREE),
+        shooter.PrepareToDeployCoralLow()
+      )
+      ).onFalse(Commands.parallel(
+        elevator.MoveToLevel(LEVELS.HOME),
+        shooter.StowShooter()
+      )).whileTrue(new PathPlannerAuto("SIX-LEFT-AUTO"));
 
-    m_DriverController.b().onTrue(intake.IntakeRoutine()).onFalse(intake.StowIntake());
+      m_DriverController.povRight()
+      .onTrue(Commands.parallel(
+        elevator.MoveToLevel(LEVELS.TWO),
+        shooter.PrepareToDeployCoralLow()
+      )
+      ).onFalse(Commands.parallel(
+        elevator.MoveToLevel(LEVELS.HOME),
+        shooter.StowShooter()
+      )).whileTrue(new PathPlannerAuto("SIX-LEFT-AUTO"));
+
+      m_DriverController.povDown()
+      .onTrue(Commands.parallel(
+        elevator.MoveToLevel(LEVELS.ONE),
+        shooter.PrepareToDeployCoralLow()
+      )
+      ).onFalse(Commands.parallel(
+        elevator.MoveToLevel(LEVELS.HOME),
+        shooter.StowShooter()
+      )).whileTrue(new PathPlannerAuto("SIX-LEFT-AUTO"));
+
+    m_DriverController.b().onTrue(elevator.MoveToSelectedLevel());
 
     m_DriverController.a().whileTrue(shooter.DeployCoral());
+    
 
     drivetrain.setDefaultCommand
     (
@@ -158,6 +198,10 @@ public class RobotContainer
                  .withRotationalRate(-m_DriverController.getRightX() * TunerConstants.MaxAngularRate)
         )
     );
+
+    m_DriverController.x().onTrue(elevator.ApplyVoltage(-0.85));
+
+    m_DriverController.y().onTrue(shooter.DeployCoralHigh());
 
     shooter.setDefaultCommand(shooter.StowShooter());
   }
@@ -189,18 +233,34 @@ public class RobotContainer
     Elevator elevator = m_Manager.getSubsystemOfType(Elevator.class).get();
     SmartDashboard.putData(elevator);
 
+    CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
+
     m_DriverController.start().onTrue(elevator.ZeroElevator());
-    m_DriverController.povRight().onTrue(elevator.MoveToLevel(LEVELS.FOUR));
-    m_DriverController.povLeft().onTrue(elevator.MoveToSmartdashboardSelectedLevel());
+    m_DriverController.povLeft().onTrue(elevator.MoveToLevel(LEVELS.HOME));
     m_DriverController.povUp().onTrue(elevator.ApplyVoltage(3)).onFalse(elevator.ApplyVoltage(0));
     m_DriverController.povDown().onTrue(elevator.ApplyVoltage(-0.8)).onFalse(elevator.ApplyVoltage(0));
 
     SysIdRoutine sysIdRoutine = elevator.BuildSysIdRoutine();
 
-    m_DriverController.a().whileTrue(sysIdRoutine.dynamic(Direction.kForward));
-    m_DriverController.b().whileTrue(sysIdRoutine.dynamic(Direction.kReverse));
-    m_DriverController.y().whileTrue(sysIdRoutine.quasistatic(Direction.kForward));
-    m_DriverController.x().whileTrue(sysIdRoutine.quasistatic(Direction.kReverse));
+    m_DriverController.a().onTrue(elevator.MoveToLevel(LEVELS.ONE));
+    m_DriverController.b().onTrue(elevator.MoveToLevel(LEVELS.TWO));
+    m_DriverController.y().onTrue(elevator.MoveToLevel(LEVELS.THREE));
+    m_DriverController.x().onTrue(elevator.MoveToLevel(LEVELS.FOUR));
+
+    // m_DriverController.a().whileTrue(sysIdRoutine.dynamic(Direction.kForward));
+    // m_DriverController.b().whileTrue(sysIdRoutine.dynamic(Direction.kReverse));
+    // m_DriverController.y().whileTrue(sysIdRoutine.quasistatic(Direction.kForward));
+    // m_DriverController.x().whileTrue(sysIdRoutine.quasistatic(Direction.kReverse));
+
+    drivetrain.setDefaultCommand
+    (
+        m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get().applyRequest(() ->
+            drive.withVelocityX(-m_DriverController.getLeftY() * TunerConstants.MaxSpeed)
+                 .withVelocityY(-m_DriverController.getLeftX() * TunerConstants.MaxSpeed)
+                 .withRotationalRate(-m_DriverController.getRightX() * TunerConstants.MaxAngularRate)
+        )
+    );
+
     System.out.println("[Wolfpack] Elevator Debug bindings successfully configured.");
   }
 
@@ -211,7 +271,7 @@ public class RobotContainer
 
     m_DriverController.a().onTrue(shooter.StowShooter());
     m_DriverController.b().onTrue(shooter.IntakeAlgae()).onFalse(shooter.StowAndHoldAlgae());
-    m_DriverController.y().onTrue(shooter.PrepareToDeployCoral());
+    m_DriverController.y().onTrue(shooter.PrepareToDeployCoralLow());
     m_DriverController.x().onTrue(shooter.DeployCoral()).onFalse(shooter.StowShooter());
 
     m_DriverController.povUp().onTrue(shooter.IntakeCoral()).onFalse(shooter.StowShooter());
@@ -257,7 +317,7 @@ public class RobotContainer
     );
 
   }
-  
+
   public Command getAutonomousCommand() 
   {
     return Commands.print("No autonomous command configured");

@@ -19,13 +19,16 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.AutomationConstants;
 import frc.robot.utilities.SubsystemManager;
@@ -65,9 +68,9 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
   @Override
   public void periodic() 
   {
-    // This method will be called once per scheduler run
     this.UpdateForwardCamera();
     SmartDashboard.putData("Field", m_Field);
+    SmartDashboard.putBoolean("Forward Camera Connected", this.m_ForwardCamera.isConnected());
     m_Field.setRobotPose(this.m_Drivetrain.getState().Pose);
   }
 
@@ -80,6 +83,21 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
       m_Subsystems.unsubscribeSubsystemAdded(this);
       this.Configure();
     }
+  }
+
+  public Command PathfindToPose(Pose2d goalPose)
+  {
+    // Create the constraints to use while pathfinding
+    PathConstraints constraints = new PathConstraints(
+          3.0, 4.0,
+          Units.degreesToRadians(540), Units.degreesToRadians(720));
+
+    // Since AutoBuilder is configured, we can use it to build pathfinding commands
+    return AutoBuilder.pathfindToPose(
+          goalPose,
+          constraints,
+          0.0 // Goal end velocity in meters/sec
+    );
   }
 
   private void Configure()
@@ -125,7 +143,7 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
   private void ConfigureCameras()
   {
     this.m_ForwardCamera = new PhotonCamera("FORWARD_CAM");
-    this.m_ForwardCameraEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.AVERAGE_BEST_TARGETS, AutomationConstants.FORWARD_CAMERA_TO_ROBOT);
+    this.m_ForwardCameraEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, AutomationConstants.FORWARD_CAMERA_TO_ROBOT);
   }
 
   private void UpdateForwardCamera()
@@ -143,7 +161,6 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
             this.m_Drivetrain.addVisionMeasurement(estimatedPose.get().estimatedPose.toPose2d(), Utils.getCurrentTimeSeconds());
           }  
         }
-        
       }
     }
   }

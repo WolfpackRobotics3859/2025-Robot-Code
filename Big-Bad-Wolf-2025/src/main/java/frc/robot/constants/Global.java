@@ -32,5 +32,5 @@ public class Global
         AUTOMATION_DEBUG
     }
 
-    public static BUILD_TYPE ACTIVE_BUILD = BUILD_TYPE.AUTOMATION_DEBUG;
+    public static BUILD_TYPE ACTIVE_BUILD = BUILD_TYPE.COMPETITION;
 }

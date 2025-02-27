@@ -60,12 +60,21 @@ public class Shooter extends SubsystemBase
     m_BrakeRequest = new StaticBrake();
   }
 
-  public Command PrepareToDeployCoral()
+  public Command PrepareToDeployCoralLow()
+  {
+    return new FunctionalCommand(() -> this.BrakeAlgae().BrakeCoral().SetWristPosition(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION_LOW),
+                                 () -> {}, 
+                                 interrupted -> {},
+                                 () -> false,
+                                 this);
+  }
+
+  public Command PrepareToDeployCoralHigh()
   {
     return new FunctionalCommand(() -> this.BrakeAlgae().BrakeCoral().SetWristPosition(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION),
                                  () -> {}, 
                                  interrupted -> {},
-                                 MotorManager.InPosition(Hardware.SHOOTER_WRIST_MOTOR, 0.1),
+                                 () -> false,
                                  this);
   }
 
@@ -74,12 +83,18 @@ public class Shooter extends SubsystemBase
     return this.run(() -> this.SetCoralVoltage(ShooterConstants.CORAL_DEPLOYMENT_VOLTAGE));
   }
 
+  public Command DeployCoralHigh()
+  {
+    return this.run(() -> this.SetCoralVoltage(8));
+  }
+
+
   public Command StowShooter()
   {
     return new FunctionalCommand(() -> this.BrakeAlgae().BrakeCoral().SetWristPosition(ShooterConstants.WRIST_STOW_POSITION),
                                  () -> {}, 
                                  interrupted -> {},
-                                 MotorManager.InPosition(Hardware.SHOOTER_WRIST_MOTOR, 0.1),
+                                 () -> false,
                                  this);
   }
 
@@ -88,7 +103,7 @@ public class Shooter extends SubsystemBase
     return new FunctionalCommand(() -> this.SetAlgaeVoltage(ShooterConstants.ALGAE_HOLDING_VOLTAGE).BrakeCoral().SetWristPosition(ShooterConstants.WRIST_STOW_POSITION),
                                  () -> {}, 
                                  interrupted -> {},
-                                 MotorManager.InPosition(Hardware.SHOOTER_WRIST_MOTOR, 0.1),
+                                 () -> false,
                                  this);
   }
 

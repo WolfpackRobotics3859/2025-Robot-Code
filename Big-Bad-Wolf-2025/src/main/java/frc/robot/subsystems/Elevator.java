@@ -33,11 +33,11 @@ public class Elevator extends SubsystemBase
   private final TalonFX m_ElevatorMotorRight;
   private final CANdi m_CANdi;
 
+  private SendableChooser<Double> m_SelectedLevel = new SendableChooser<>();
+
   private final VoltageOut m_VoltageRequest;
   private final MotionMagicVoltage m_PositionRequest;
   private final StaticBrake m_BrakeRequest;
-
-  private final SendableChooser<LEVELS> m_LevelChooser;
   
   private SysIdRoutine m_SysIdRoutine;
 
@@ -62,27 +62,25 @@ public class Elevator extends SubsystemBase
     m_PositionRequest = new MotionMagicVoltage(0);
     m_BrakeRequest = new StaticBrake();
 
-    m_LevelChooser = new SendableChooser<LEVELS>();
-    m_LevelChooser.setDefaultOption("Home", LEVELS.HOME);
-    m_LevelChooser.addOption("ONE", LEVELS.ONE);
-    m_LevelChooser.addOption("TWO", LEVELS.TWO);
-    m_LevelChooser.addOption("THREE", LEVELS.THREE);
-    m_LevelChooser.addOption("FOUR", LEVELS.FOUR);
-    SmartDashboard.putData("Level Chooser", m_LevelChooser);
+    m_SelectedLevel.addOption("ZERO", 0.0);
+    m_SelectedLevel.addOption("ONE", LEVELS.ONE.getValue());
+    m_SelectedLevel.addOption("TWO", LEVELS.TWO.getValue());
+    m_SelectedLevel.addOption("THREE", LEVELS.THREE.getValue());
+    m_SelectedLevel.setDefaultOption("FOUR", LEVELS.FOUR.getValue());
+
+    SmartDashboard.putData("Level", m_SelectedLevel);
 
     this.m_ElevatorMotorLeft.setPosition(0);
-  }
-
-  public Command MoveToSmartdashboardSelectedLevel()
-  {
-    SendableChooser<LEVELS> chooser = (SendableChooser<LEVELS>) SmartDashboard.getData("Level Chooser");
-    System.out.println("Current Level Count: " + m_LevelChooser.getSelected().getValue());
-    return this.MoveToLevel(chooser.getSelected());
   }
 
   public Command MoveToLevel(LEVELS level)
   {
     return this.runOnce(() -> this.SetPosition(level.getValue()));
+  }
+
+  public Command MoveToSelectedLevel()
+  {
+    return this.runOnce(() -> this.SetPosition(m_SelectedLevel.getSelected()));
   }
 
   public Command ZeroElevator()

@@ -23,12 +23,15 @@ import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
  */
 public class ElevatorConstants 
 {
-    public static final double ELEVATOR_ZERO_POSITION = 30;
-    public static final double ELEVATOR_LEVEL_ONE = 5;
-    public static final double ELEVATOR_LEVEL_TWO = 70;
-    public static final double ELEVATOR_LEVEL_THREE = 90;
-    public static final double ELEVATOR_LEVEL_FOUR = 115;
-    public static final double CORAL_INTAKING_LEVEL = 28;
+    public static final double ELEVATOR_ZERO_POSITION = 0;
+    public static final double ELEVATOR_HOME_POSITION = 30;
+    public static final double ELEVATOR_LEVEL_ONE = 15;
+    public static final double ELEVATOR_LEVEL_TWO = 30;
+    public static final double ELEVATOR_LEVEL_THREE = 58.5;
+    public static final double ELEVATOR_LEVEL_FOUR = 105;
+    public static final double CORAL_INTAKING_LEVEL = 5;
+
+    // Max Height should be around 100-105
 
     public static final double ELEVATOR_UP_VOLTAGE = 3;
     public static final double ELEVATOR_DOWN_VOLTAGE = -1.5;
@@ -37,7 +40,8 @@ public class ElevatorConstants
 
     public enum LEVELS 
     {
-        HOME(ELEVATOR_ZERO_POSITION),
+        ZERO(ELEVATOR_ZERO_POSITION),
+        HOME(ELEVATOR_HOME_POSITION),
         ONE(ELEVATOR_LEVEL_ONE),
         TWO(ELEVATOR_LEVEL_TWO),
         THREE(ELEVATOR_LEVEL_THREE),
