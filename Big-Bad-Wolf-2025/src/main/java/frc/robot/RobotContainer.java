@@ -168,11 +168,11 @@ public class RobotContainer
         )
     );
 
-    // m_DriverController.rightTrigger().whileTrue(automation.CoralPlacementRoutine())
-    //                                  .onFalse(automation.ResetTheStuffs());
+    m_DriverController.rightTrigger().whileTrue(automation.CoralPlacementRoutine())
+                                      .onFalse(automation.ResetTheStuffs());
 
-    m_DriverController.rightTrigger().onTrue(automation.HardCodePath())
-                                    .onFalse(automation.ResetTheStuffs());
+    // m_DriverController.rightTrigger().onTrue(automation.HardCodePath())
+    //                                 .onFalse(automation.ResetTheStuffs());
 
     m_DriverController.leftTrigger().onTrue(elevator.MoveToLevel(LEVELS.CORAL_INTAKE)
                                                     .alongWith(shooter.IntakeCoral()))
@@ -187,10 +187,10 @@ public class RobotContainer
     m_DriverController.leftBumper().onTrue(automation.CleanAlgae())
                                     .onFalse(automation.ResetTheStuffs());
 
-    m_CoDriverController.leftBumper().onTrue(dataStuff.Left().ignoringDisable(true));
-    m_CoDriverController.rightBumper().onTrue(dataStuff.Right().ignoringDisable(true));
-    m_CoDriverController.povUp().onTrue(dataStuff.Up().ignoringDisable(true));
-    m_CoDriverController.povDown().onTrue(dataStuff.Down().ignoringDisable(true));
+    m_CoDriverController.leftBumper().onTrue(dataStuff.Right().ignoringDisable(true));
+    m_CoDriverController.rightBumper().onTrue(dataStuff.Left().ignoringDisable(true));
+    m_CoDriverController.povUp().onTrue(dataStuff.Down().ignoringDisable(true));
+    m_CoDriverController.povDown().onTrue(dataStuff.Up().ignoringDisable(true));
 
     m_CoDriverController.start().onTrue(automation.ToggleVision());
     m_CoDriverController.y().onTrue(elevator.ZeroElevator());

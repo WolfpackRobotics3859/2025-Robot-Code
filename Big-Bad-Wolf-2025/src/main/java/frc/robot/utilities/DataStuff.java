@@ -23,7 +23,7 @@ public class DataStuff extends SubsystemBase
 
     public DataStuff()
     {
-        // Intentionally Empty
+        UpdateEverything();
     }
 
     public Command Up()
@@ -143,26 +143,26 @@ public class DataStuff extends SubsystemBase
 
     private static void IncrementSide()
     {
-        if(currentFace == 1)
+        if(currentSide == 1)
         {
-            currentFace = 0;
+            currentSide = 0;
         }
         else
         {
-            currentFace += 1;
+            currentSide += 1;
         }
         UpdateSideSmartDashboard();
     }
 
     private static void DecrementSide()
     {
-        if(currentFace == 0)
+        if(currentSide == 0)
         {
-            currentFace = 1;
+            currentSide = 1;
         }
         else
         {
-            currentFace -= 1;
+            currentSide -= 1;
         }
         UpdateSideSmartDashboard();
     }
@@ -179,30 +179,31 @@ public class DataStuff extends SubsystemBase
             SmartDashboard.putBoolean(leftRight[0], false);
             SmartDashboard.putBoolean(leftRight[1], true);
         }
+        SmartDashboard.putNumber("SELECTED SIDE: ", currentSide);
     }
 
     private static void IncrementLevel()
     {
-        if(currentFace == 3)
+        if(currentLevel == 3)
         {
-            currentFace = 0;
+            currentLevel = 0;
         }
         else
         {
-            currentFace += 1;
+            currentLevel += 1;
         }
         UpdateLevelSmartDashboard();
     }
 
     private static void DecrementLevel()
     {
-        if(currentFace == 0)
+        if(currentLevel == 0)
         {
-            currentFace = 3;
+            currentLevel = 3;
         }
         else
         {
-            currentFace -= 1;
+            currentLevel -= 1;
         }
         UpdateLevelSmartDashboard();
     }
@@ -237,6 +238,7 @@ public class DataStuff extends SubsystemBase
             SmartDashboard.putBoolean(level[2], false);
             SmartDashboard.putBoolean(level[3], true);
         }
+        SmartDashboard.putNumber("SELECTED LEVEL: ", currentLevel);
     }
 
     private static void IncrementFace()
@@ -322,9 +324,16 @@ public class DataStuff extends SubsystemBase
             SmartDashboard.putBoolean(face[4], false);
             SmartDashboard.putBoolean(face[5], true);
         }
+        SmartDashboard.putNumber("CURRENT FACE: ", currentFace);
     }
 
 
-
+    private void UpdateEverything()
+    {
+        UpdateColumnSmartDashboard();
+        UpdateFaceSmartdashboard();
+        UpdateLevelSmartDashboard();
+        UpdateSideSmartDashboard();
+    }
 
 }

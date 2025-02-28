@@ -63,6 +63,24 @@ public class Shooter extends SubsystemBase
     m_BrakeRequest = new StaticBrake();
   }
 
+  public Command DeployCoralLow()
+  {
+    return new FunctionalCommand(() -> this.SetCoralVoltage(ShooterConstants.CORAL_DEPLOYMENT_VOLTAGE).SetWristPositionMotor(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION_LOW),
+                                 () -> {}, 
+                                 interrupted -> this.BrakeCoral(),
+                                 () -> !this.CoralDetected(),
+                                 this);
+  }
+
+  public Command DeployCoralHigh()
+  {
+    return new FunctionalCommand(() -> this.SetCoralVoltage(ShooterConstants.CORAL_DEPLOYMENT_VOLTAGE_HIGH).SetWristPositionMotor(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION),
+                                 () -> {}, 
+                                 interrupted -> this.BrakeCoral(),
+                                 () -> !this.CoralDetected(),
+                                 this);
+  }
+
   public Command StowAndKillShooter()
   {
     return this.runOnce(() -> this.BrakeAlgae().BrakeCoral().SetWristPosition(ShooterConstants.WRIST_STOW_POSITION));
@@ -74,24 +92,6 @@ public class Shooter extends SubsystemBase
                                  () -> {}, 
                                  interrupted -> this.BrakeCoral(),
                                  () -> this.CoralDetected(),
-                                 this);
-  }
-
-  public Command DeployCoral()
-  {
-    return new FunctionalCommand(() -> this.SetCoralVoltage(ShooterConstants.CORAL_DEPLOYMENT_VOLTAGE),
-                                 () -> {}, 
-                                 interrupted -> this.BrakeCoral(),
-                                 () -> false,
-                                 this);
-  }
-
-  public Command DeployCoralHigh()
-  {
-    return new FunctionalCommand(() -> this.SetCoralVoltage(ShooterConstants.CORAL_DEPLOYMENT_VOLTAGE_HIGH),
-                                 () -> {}, 
-                                 interrupted -> this.BrakeCoral(),
-                                 () -> false,
                                  this);
   }
 

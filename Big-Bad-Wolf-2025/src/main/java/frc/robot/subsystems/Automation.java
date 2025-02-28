@@ -128,7 +128,6 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
   {
     return AutoBuilder.followPath(FOUR_LEFT_ALIGN)
                         .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
-                        .alongWith(this.m_Shooter.SetWristPosition(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION))
                         .andThen(this.m_Shooter.DeployCoralHigh());
   }
 
@@ -199,6 +198,66 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
                             .andThen(m_Shooter.HoldAlgae())
                             .andThen(AutoBuilder.followPath(desiredDeparturePath))
                             .andThen(m_Shooter.SetWristPosition(ShooterConstants.WRIST_STOW_POSITION));
+  }
+
+  public Command DeployToCertainFace()
+  {
+    int selectedFace = DataStuff.GetFace();
+    int selectedLeftOrRight = DataStuff.GetSide(); // get from data selector // left is 0
+
+    switch(selectedFace)
+    {
+      case 0:
+        if(selectedLeftOrRight == 0)
+        {
+          desiredPath = this.ONE_LEFT_ALIGN;
+        }
+        desiredPath = this.ONE_RIGHT_ALIGN;
+      break;
+
+      case 1:
+        if(selectedLeftOrRight == 0)
+        {
+          desiredPath = this.TWO_LEFT_ALIGN;
+        }
+        desiredPath = this.TWO_RIGHT_ALIGN;
+      break;
+
+      case 2:
+        if(selectedLeftOrRight == 0)
+        {
+          desiredPath = this.THREE_LEFT_ALIGN;
+        }
+        desiredPath = this.THREE_RIGHT_ALIGN;
+      break;
+
+      case 3:
+        if(selectedLeftOrRight == 0)
+        {
+          desiredPath = this.FOUR_LEFT_ALIGN;
+        }
+        desiredPath = this.FOUR_RIGHT_ALIGN;
+      break;
+
+      case 4:
+        if(selectedLeftOrRight == 0)
+        {
+          desiredPath = this.FIVE_LEFT_ALIGN;
+        }
+        desiredPath = this.FIVE_RIGHT_ALIGN;
+      break;
+
+      case 5:
+      
+      default:
+        if(selectedLeftOrRight == 0)
+        {
+          desiredPath = this.SIX_LEFT_ALIGN;
+        }
+        desiredPath = this.SIX_RIGHT_ALIGN;
+      break;
+    }
+
   }
 
 
@@ -303,7 +362,7 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
         return AutoBuilder.followPath(desiredPath)
                         .andThen(this.m_Elevator.MoveToLevel(desiredLevel))
                         .andThen(this.m_Shooter.SetWristPosition(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION_LOW))
-                        .andThen(this.m_Shooter.DeployCoral());
+                        .andThen(this.m_Shooter.DeployCoralLow());
       }
     }
     else
@@ -318,7 +377,7 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
       {
         return this.m_Elevator.MoveToLevel(desiredLevel)
                               .andThen(this.m_Shooter.SetWristPosition(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION_LOW))
-                              .andThen(this.m_Shooter.DeployCoral());
+                              .andThen(this.m_Shooter.DeployCoralLow());
       }
     }
   }
