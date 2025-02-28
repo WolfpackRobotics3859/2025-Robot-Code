@@ -201,6 +201,15 @@ public class RobotContainer
 
     // TEMPORARY
     m_DriverController.a().onTrue(elevator.ZeroElevator()).onFalse(elevator.ApplyVoltage(0));
+
+    SmartDashboard.putData("Six LVL 4", automation.sixRightAlignLevelFour());
+    SmartDashboard.putData("Five LVL 4", automation.fiveRightAlignLevelFour());
+    SmartDashboard.putData("Four LVL 4", automation.fourRightAlignLevelFour());
+    SmartDashboard.putData("Three LVL 4", automation.threeRightAlignLevelFour());
+    SmartDashboard.putData("Two LVL 4", automation.twoRightAlignLevelFour());
+    SmartDashboard.putData("One LVL 4", automation.oneRightAlignLevelFour());
+
+
   }
 
   private void configureDrivetrainDebugBindings()
