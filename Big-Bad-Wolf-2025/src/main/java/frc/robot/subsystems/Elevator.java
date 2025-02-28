@@ -14,6 +14,7 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANdi;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
+import com.ctre.phoenix6.signals.S1StateValue;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -66,7 +67,7 @@ public class Elevator extends SubsystemBase
       () -> this.SetPosition(level.getValue()),
       () -> {},
       interrupted -> {},
-      MotorManager.InPosition(Hardware.ELEVATOR_MOTOR_LEFT, 0.025),
+      MotorManager.InPosition(Hardware.ELEVATOR_MOTOR_LEFT, 0.05),
       this
     );
   }
@@ -76,8 +77,8 @@ public class Elevator extends SubsystemBase
     return new FunctionalCommand(
       () -> this.SetVoltage(ElevatorConstants.HOMING_VOLTAGE),
       () -> {},
-      interrupted -> {},
-      () -> m_ElevatorMotorLeft.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround,
+      interrupted -> this.SetPosition(0),
+      () -> m_CANdi.isConnected() && (m_CANdi.getS1State().getValue() == S1StateValue.Low) && m_CANdi.getS1Closed().getValue(),
       this
     );
   }
@@ -135,6 +136,10 @@ public class Elevator extends SubsystemBase
   @Override
   public void periodic()
   {
+    if(m_CANdi.isConnected() && (m_CANdi.getS1State().getValue() == S1StateValue.Low) && m_CANdi.getS1Closed().refresh().getValue())
+    {
+      this.m_ElevatorMotorLeft.setPosition(0);
+    }
     SmartDashboard.putNumber("Elevator Position :)", this.m_ElevatorMotorLeft.getPosition().getValueAsDouble());
     SmartDashboard.putNumber("Shooter Closed Loop Error", m_ElevatorMotorLeft.getClosedLoopError().getValueAsDouble());
   }

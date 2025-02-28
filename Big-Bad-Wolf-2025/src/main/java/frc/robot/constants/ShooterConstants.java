@@ -21,7 +21,7 @@ public class ShooterConstants
     public static final double CORAL_TOF_IN_RANGE_THRESHOLD = 70;
 
     // CORAL MOTOR VOLTAGE
-    public static final double CORAL_INTAKE_VOLTAGE = 2;
+    public static final double CORAL_INTAKE_VOLTAGE = 3;
     public static final double CORAL_DEPLOYMENT_VOLTAGE = 10;
     public static final double CORAL_DEPLOYMENT_VOLTAGE_HIGH = 8;
     
@@ -39,7 +39,7 @@ public class ShooterConstants
     public static final double WRIST_STOW_POSITION = -0.58;
     public static final double WRIST_CORAL_DEPLOYMENT_POSITION_LOW = -0.58;
     public static final double WRIST_CORAL_DEPLOYMENT_POSITION = -0.55;
-    public static final double WRIST_CORAL_INTAKE_POSITION = -0.6;
+    public static final double WRIST_CORAL_INTAKE_POSITION = -0.64;
     public static final double WRIST_ALGAE_INTAKE_POSITION = -0.23;
     public static final double WRIST_ALGAE_PROCESSOR_DEPLOYMENT_POSITION = -0.38;
     public static final double WRIST_ALGAE_SHOOTING_POSITION = -0.11;
@@ -69,7 +69,7 @@ public class ShooterConstants
                                                                     .withKD(0)
                                                                     .withKG(0)
                                                                     .withKI(0)
-                                                                    .withKP(20)
+                                                                    .withKP(10)
                                                                     .withKS(0)
                                                                     .withKV(0)
                                                                     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);

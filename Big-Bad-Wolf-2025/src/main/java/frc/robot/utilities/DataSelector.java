@@ -30,18 +30,9 @@ public class DataSelector extends SubsystemBase
         }
     }
 
-    public Column getColumn(String columnName) {
-        for (Column c : columns) {
-            if(c.getName().equals(columnName)) {
-                return c;
-            }
-        }
-        // return something better.
-        DataLogManager.log("ERROR: invalid column");
-        for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
-            System.out.println(ste + "\n");
-        }
-        return null;
+    public Column getColumn(int id)
+    {
+        return this.columns.get(id);
     }
 
     public boolean hasColumn(String columnName) {

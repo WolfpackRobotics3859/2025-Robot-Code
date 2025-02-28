@@ -70,11 +70,11 @@ public class Shooter extends SubsystemBase
 
   public Command IntakeCoral()
   {
-    return new FunctionalCommand(() -> this.SetCoralVoltage(ShooterConstants.CORAL_INTAKE_VOLTAGE).SetWristPosition(ShooterConstants.WRIST_CORAL_INTAKE_POSITION),
+    return new FunctionalCommand(() -> this.SetCoralVoltage(ShooterConstants.CORAL_INTAKE_VOLTAGE).SetWristPositionMotor(ShooterConstants.WRIST_CORAL_INTAKE_POSITION),
                                  () -> {}, 
                                  interrupted -> this.BrakeCoral(),
                                  () -> this.CoralDetected(),
-                                 m_EmptySubsystemList);
+                                 this);
   }
 
   public Command DeployCoral()
@@ -82,8 +82,8 @@ public class Shooter extends SubsystemBase
     return new FunctionalCommand(() -> this.SetCoralVoltage(ShooterConstants.CORAL_DEPLOYMENT_VOLTAGE),
                                  () -> {}, 
                                  interrupted -> this.BrakeCoral(),
-                                 () -> !this.CoralDetected(),
-                                 m_EmptySubsystemList);
+                                 () -> false,
+                                 this);
   }
 
   public Command DeployCoralHigh()
@@ -91,8 +91,8 @@ public class Shooter extends SubsystemBase
     return new FunctionalCommand(() -> this.SetCoralVoltage(ShooterConstants.CORAL_DEPLOYMENT_VOLTAGE_HIGH),
                                  () -> {}, 
                                  interrupted -> this.BrakeCoral(),
-                                 () -> !this.CoralDetected(),
-                                 m_EmptySubsystemList);
+                                 () -> false,
+                                 this);
   }
 
   public Command StopCoral()

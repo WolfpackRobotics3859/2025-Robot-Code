@@ -37,6 +37,7 @@ import frc.robot.constants.AutomationConstants;
 import frc.robot.constants.ShooterConstants;
 import frc.robot.constants.ElevatorConstants.LEVELS;
 import frc.robot.utilities.DataSelector;
+import frc.robot.utilities.DataStuff;
 import frc.robot.utilities.SubsystemManager;
 import frc.robot.utilities.subsystemManager.SubsystemAddedEvent;
 import frc.robot.utilities.subsystemManager.SubsystemAddedListener;
@@ -47,7 +48,6 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
   private CommandSwerveDrivetrain m_Drivetrain;
   private Shooter m_Shooter;
   private Elevator m_Elevator;
-  private DataSelector m_DataSelector;
 
   private PhotonCamera m_ForwardCamera;
   private PhotonPoseEstimator m_ForwardCameraEstimator;
@@ -107,12 +107,7 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
       this.m_Elevator = this.m_Subsystems.getSubsystemOfType(Elevator.class).get();
     }
 
-    if(this.m_Subsystems.getSubsystemOfType(DataSelector.class).isPresent())
-    {
-      this.m_DataSelector = this.m_Subsystems.getSubsystemOfType(DataSelector.class).get();
-    }
-
-    if((this.m_Drivetrain != null) && (this.m_Shooter != null) && (this.m_Elevator != null) && (this.m_DataSelector != null))
+    if((this.m_Drivetrain != null) && (this.m_Shooter != null) && (this.m_Elevator != null))
     {
       this.Configure();
     }
@@ -129,9 +124,17 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
                          .andThen(m_Elevator.MoveToLevel(LEVELS.HOME));
   }
 
+  public Command HardCodePath()
+  {
+    return AutoBuilder.followPath(FOUR_LEFT_ALIGN)
+                        .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
+                        .alongWith(this.m_Shooter.SetWristPosition(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION))
+                        .andThen(this.m_Shooter.DeployCoralHigh());
+  }
+
   public Command CleanAlgae()
   {
-    int selectedFace = m_DataSelector.getColumn("reefFaceSelection").getCurrentOptionIndex(); // get from dataselector
+    int selectedFace = DataStuff.GetFace();
 
     PathPlannerPath desiredPath;
     PathPlannerPath desiredDeparturePath;
@@ -201,7 +204,8 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
 
   public Command CoralPlacementRoutine()
   {  
-    int selectedLevel = m_DataSelector.getColumn("levels").getCurrentOptionIndex();
+    int selectedLevel = DataStuff.GetLevel();
+    SmartDashboard.putNumber("Selected Level", selectedLevel);
     LEVELS desiredLevel; 
 
     switch(selectedLevel)
@@ -225,9 +229,12 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
       break;
     }
 
-    int selectedFace = m_DataSelector.getColumn("reefFaceSelection").getCurrentOptionIndex(); // Get from DataSelector Later
-    int selectedLeftOrRight = m_DataSelector.getColumn("leftRight").getCurrentOptionIndex(); // get from data selector // left is 0
+    int selectedFace = DataStuff.GetFace(); // Get from DataSelector Later
+    int selectedLeftOrRight = DataStuff.GetSide(); // get from data selector // left is 0
     PathPlannerPath desiredPath;
+
+    SmartDashboard.putNumber("Selected Face", selectedFace);
+    SmartDashboard.putNumber("Selected LR", selectedLeftOrRight);
 
     switch(selectedFace)
     {
@@ -353,12 +360,7 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
       this.m_Elevator = this.m_Subsystems.getSubsystemOfType(Elevator.class).get();
     }
 
-    if(this.m_Subsystems.getSubsystemOfType(DataSelector.class).isPresent())
-    {
-      this.m_DataSelector = this.m_Subsystems.getSubsystemOfType(DataSelector.class).get();
-    }
-
-    if((this.m_Drivetrain != null) && (this.m_Shooter != null) && (this.m_Elevator != null) && (this.m_DataSelector != null))
+    if((this.m_Drivetrain != null) && (this.m_Shooter != null) && (this.m_Elevator != null))
     {
       m_Subsystems.unsubscribeSubsystemAdded(this);
       this.Configure();
