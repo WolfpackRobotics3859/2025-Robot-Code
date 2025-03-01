@@ -21,10 +21,10 @@ import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 // Initializing constants for Algae Intake.
 public class IntakeConstants
 {
-    public static final double WRIST_STOW_POSITION = 0;
+    public static final double WRIST_STOW_POSITION = 1;
     public static final double WRIST_INTAKING_MID_EXTENSION = 3;
-    public static final double WRIST_INTAKING_POSITION = 7.48;
-    public static final double WRIST_PROCESSING_POSITION = 0;
+    public static final double WRIST_INTAKING_POSITION = 6;
+    public static final double WRIST_PROCESSING_POSITION = -0.5;
 
     public static final double INTAKING_CLEARING_VOLTAGE = 1.5;
     public static final double INTAKING_VOLTAGE = -3;

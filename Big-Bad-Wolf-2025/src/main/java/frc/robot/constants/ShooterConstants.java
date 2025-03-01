@@ -21,10 +21,11 @@ public class ShooterConstants
     public static final double CORAL_TOF_IN_RANGE_THRESHOLD = 70;
 
     // CORAL MOTOR VOLTAGE
-    public static final double CORAL_INTAKE_VOLTAGE = 1;
-    public static final double CORAL_DEPLOYMENT_VOLTAGE = 3;
+    public static final double CORAL_INTAKE_VOLTAGE = 3;
+    public static final double CORAL_DEPLOYMENT_VOLTAGE = 10;
+    public static final double CORAL_DEPLOYMENT_VOLTAGE_HIGH = 8;
     
-    // ALGAE MOTOR VOLTAGES  
+    // ALGAE MOTOR VOLTAGES   
     // Speed to use when cleaning the coral reef.
     public static final double ALGAE_SWEEPING_VOLTAGE = -2.0;
     // Speed to use when intaking algae from the ground.
@@ -35,9 +36,10 @@ public class ShooterConstants
     public static final double ALGAE_HOLDING_VOLTAGE = -0.5;
 
     // WRIST POSITIONS
-    public static final double WRIST_STOW_POSITION = -0.11;
-    public static final double WRIST_CORAL_DEPLOYMENT_POSITION = -0.13;
-    public static final double WRIST_CORAL_INTAKE_POSITION = -0.25; // -0.06
+    public static final double WRIST_STOW_POSITION = -0.58;
+    public static final double WRIST_CORAL_DEPLOYMENT_POSITION_LOW = -0.58;
+    public static final double WRIST_CORAL_DEPLOYMENT_POSITION = -0.55;
+    public static final double WRIST_CORAL_INTAKE_POSITION = -0.62;
     public static final double WRIST_ALGAE_INTAKE_POSITION = -0.23;
     public static final double WRIST_ALGAE_PROCESSOR_DEPLOYMENT_POSITION = -0.38;
     public static final double WRIST_ALGAE_SHOOTING_POSITION = -0.11;
@@ -45,7 +47,7 @@ public class ShooterConstants
     
     // WRIST MOTOR CONFIGS
     public static final MotorOutputConfigs WRIST_MOTOR_OUTPUT_CONFIG = new MotorOutputConfigs()
-                                                                          .withInverted(InvertedValue.CounterClockwise_Positive)
+                                                                          .withInverted(InvertedValue.Clockwise_Positive)
                                                                           .withNeutralMode(NeutralModeValue.Brake)
                                                                           .withPeakForwardDutyCycle(1)
                                                                           .withPeakReverseDutyCycle(-1);
@@ -67,7 +69,7 @@ public class ShooterConstants
                                                                     .withKD(0)
                                                                     .withKG(0)
                                                                     .withKI(0)
-                                                                    .withKP(20)
+                                                                    .withKP(10)
                                                                     .withKS(0)
                                                                     .withKV(0)
                                                                     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);

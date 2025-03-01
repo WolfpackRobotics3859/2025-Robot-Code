@@ -5,23 +5,35 @@
 package frc.robot;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.constants.Global;
+import frc.robot.constants.PathConstants;
+import frc.robot.constants.ShooterConstants;
 import frc.robot.constants.ElevatorConstants.LEVELS;
 import frc.robot.constants.Global.BUILD_TYPE;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Shooter;
+import frc.robot.utilities.CoralCommandBuilder;
 import frc.robot.utilities.SubsystemManager;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Automation;
 import frc.robot.subsystems.Climb;
 
 /**
@@ -39,10 +51,14 @@ public class RobotContainer
   private final CommandXboxController m_CoDriverController = new CommandXboxController(1);
   
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-          .withDeadband(TunerConstants.MaxSpeed * 0.1).withRotationalDeadband(TunerConstants.MaxAngularRate * 0.1) // Add a 10% deadband
+          .withDeadband(TunerConstants.MaxSpeed * 0.05).withRotationalDeadband(TunerConstants.MaxAngularRate * 0.05) // Add a 10% deadband
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+
+  public SendableChooser<Command> commandChooser = new SendableChooser<>();
+
+  private CoralCommandBuilder commandBuilder;
   
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() 
@@ -55,6 +71,18 @@ public class RobotContainer
     return m_Manager;
   }
 
+  public void InitializeDefaultCommands()
+  {
+    Elevator elevator = m_Manager.getSubsystemOfType(Elevator.class).get();
+    SmartDashboard.putData(elevator);
+
+    Shooter shooter = m_Manager.getSubsystemOfType(Shooter.class).get();
+    SmartDashboard.putData(shooter);
+
+    elevator.MoveToLevel(LEVELS.HOME).schedule();
+    shooter.SetWristPosition(ShooterConstants.WRIST_STOW_POSITION).schedule();
+  }
+
   private void configurationChooser(BUILD_TYPE type)
   {
     switch(type)
@@ -65,6 +93,7 @@ public class RobotContainer
         m_Manager.addSubsystem(new Intake());
         m_Manager.addSubsystem(new Climb());
         m_Manager.addSubsystem(new Shooter());
+        m_Manager.addSubsystem(new Automation(m_Manager));
         this.configureCompetitionBindings();
       break;
 
@@ -75,11 +104,13 @@ public class RobotContainer
 
       case ELEVATOR_DEBUG:
         m_Manager.addSubsystem(new Elevator());
+        m_Manager.addSubsystem(TunerConstants.createDrivetrain());
         this.configureElevatorDebugBindings();
       break;
 
       case SHOOTER_DEBUG:
         m_Manager.addSubsystem(new Shooter());
+        m_Manager.addSubsystem(TunerConstants.createDrivetrain());
         this.configureShooterDebugBindings();
       break;
 
@@ -88,6 +119,17 @@ public class RobotContainer
         this.configureIntakeDebugBindings();
       break;
 
+      case CLIMB_DEBUG:
+        m_Manager.addSubsystem(new Climb());
+        this.configureClimbDebugBindings();
+      break;
+
+      case AUTOMATION_DEBUG:
+        m_Manager.addSubsystem(TunerConstants.createDrivetrain());
+        m_Manager.addSubsystem(new Automation(m_Manager));
+        this.configureAutomationDebugBindings();
+      break;
+      
       default:
         System.out.println("Did you mean to configure nothing? :( Sad Robot Face");
       break;
@@ -109,36 +151,110 @@ public class RobotContainer
     Intake intake = m_Manager.getSubsystemOfType(Intake.class).get();
     SmartDashboard.putData(intake);
 
-    m_DriverController.rightBumper()
-      .onTrue(Commands.parallel(
-        elevator.MoveToLevel(LEVELS.CORAL_INTAKE),
-        shooter.IntakeCoral()
-      )
-      ).onFalse(Commands.parallel(
-        elevator.MoveToLevel(LEVELS.HOME),
-        shooter.StowShooter()
-      ));
+    Climb climb = m_Manager.getSubsystemOfType(Climb.class).get();
+    SmartDashboard.putData(climb);
 
-    m_DriverController.rightTrigger(0.35)
-      .onTrue(Commands.parallel(
-        elevator.MoveToSmartdashboardSelectedLevel(),
-        shooter.PrepareToDeployCoral()
-      )
-      ).onFalse(Commands.parallel(
-        elevator.MoveToLevel(LEVELS.HOME),
-        shooter.StowShooter()
-      ));
-
-    m_DriverController.rightTrigger(0.9).onTrue(shooter.DeployCoral());
+    Automation automation = m_Manager.getSubsystemOfType(Automation.class).get();
+    SmartDashboard.putData(automation);
 
     drivetrain.setDefaultCommand
     (
         m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get().applyRequest(() ->
-            drive.withVelocityX(-m_DriverController.getLeftY() * TunerConstants.MaxSpeed)
-                 .withVelocityY(-m_DriverController.getLeftX() * TunerConstants.MaxSpeed)
+            drive.withVelocityX(-m_DriverController.getLeftY() * TunerConstants.MaxSpeed *0.8)
+                 .withVelocityY(-m_DriverController.getLeftX() * TunerConstants.MaxSpeed * 0.8)
                  .withRotationalRate(-m_DriverController.getRightX() * TunerConstants.MaxAngularRate)
         )
     );
+
+    //m_DriverController.rightTrigger().whileTrue(automation.CoralPlacementRoutine())
+                                //      .onFalse(automation.ResetTheStuffs());
+
+    // m_DriverController.rightTrigger().onTrue(automation.HardCodePath())
+    //                                 .onFalse(automation.ResetTheStuffs());
+
+    m_DriverController.leftTrigger().onTrue(elevator.MoveToLevel(LEVELS.CORAL_INTAKE)
+                                                    .alongWith(shooter.IntakeCoral()))
+                                    .onFalse(shooter.StopCoral());
+
+    // m_DriverController.rightBumper().onTrue(elevator.MoveToLevel(LEVELS.ALGAE_PROCESS)
+    //                                                 .andThen(shooter.SetWristPosition(ShooterConstants.WRIST_ALGAE_PROCESSOR_DEPLOYMENT_POSITION))
+    //                                                 .andThen(shooter.ProcessAlgae()))
+    //                                 .onFalse(shooter.StopAlgae()
+    //                                                 .andThen(automation.ResetTheStuffs()));
+          
+    // m_DriverController.leftBumper().onTrue(automation.CleanAlgae())
+    //                                 .onFalse(automation.ResetTheStuffs());
+
+    m_CoDriverController.start().onTrue(automation.ToggleVision());
+    m_CoDriverController.y().onTrue(elevator.ZeroElevator());
+    m_CoDriverController.x().whileTrue(elevator.ApplyVoltage(0).withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+
+    m_CoDriverController.a().whileTrue(climb.setClimbVoltage(() -> m_CoDriverController.getRawAxis(2)*6));
+    m_CoDriverController.b().whileTrue(climb.setLatchVoltage(-2)).onFalse(climb.setLatchVoltage(0));
+
+    // TEMPORARY
+    m_DriverController.a().onTrue(elevator.ZeroElevator()).onFalse(elevator.ApplyVoltage(0));
+
+    commandBuilder = new CoralCommandBuilder(shooter, elevator);
+    commandBuilder.LoadAlignmentPaths(PathConstants.ALIGNMENT_PATHS);
+    commandBuilder.BuildAllL2CommandsAndDeployToSmartdashboard();
+    commandBuilder.BuildAllL3CommandsAndDeployToSmartdashboard();
+    commandBuilder.BuildAllL4CommandsAndDeployToSmartdashboard();
+
+    NamedCommands.registerCommand("LevelTwoDeploy", commandBuilder.BuildCoralStandingDeployment(LEVELS.TWO));
+    NamedCommands.registerCommand("LevelThreeDeploy", commandBuilder.BuildCoralStandingDeployment(LEVELS.THREE));
+    NamedCommands.registerCommand("IntakeCoral", shooter.IntakeCoral());
+
+    SmartDashboard.putData("Level One", commandBuilder.BuildCoralStandingDeployment(LEVELS.ONE));
+    
+    SmartDashboard.putData("Level Two", commandBuilder.BuildCoralStandingDeployment(LEVELS.TWO));
+    
+    SmartDashboard.putData("Level Three", commandBuilder.BuildCoralStandingDeployment(LEVELS.THREE));
+
+    //  SmartDashboard.putData("6R4", automation.SixLeftAlignLeelTwo());
+    // SmartDashboard.putData("6L4", automation.SixRightAlignLevelTwo());
+    // SmartDashboard.putData("5R4", automation.fiveRightAlignLevelTwo());
+    // SmartDashboard.putData("5L4", automation.fiveLeftAlignLevelTwo());
+    // SmartDashboard.putData("4R4", automation.fourRightAlignLevelTwo());
+    // SmartDashboard.putData("4L4", automation.fourLeftAlignLevelTwo());
+    // SmartDashboard.putData("3R4", automation.threeRightAlignLevelTwo());
+    // SmartDashboard.putData("3L4", automation.threeLeftAlignLevelTwo());
+    // SmartDashboard.putData("2R4", automation.twoRightAlignLevelTwo());
+    // SmartDashboard.putData("2L4", automation.twoLeftAlignLevelTwo());
+    // SmartDashboard.putData("1R4", automation.OneRightAlignLevelTwo());
+    // SmartDashboard.putData("1L4", automation.OneLeftAlignLevelTwo());
+
+    
+    PathPlannerPath farLeft4R;
+    PathPlannerPath farRight1L;
+    PathPlannerPath oneAlignment;
+    Command farLeftCommand, middleCommand, farRightCommand, specialAuto;
+    try 
+    {
+      farLeft4R = PathPlannerPath.fromPathFile("FAR_LEFT_4R");
+      farLeftCommand = AutoBuilder.followPath(farLeft4R);
+
+      farRight1L = PathPlannerPath.fromPathFile("FAR_RIGHT_1L");
+      farRightCommand = AutoBuilder.followPath(farRight1L);
+
+      oneAlignment = PathPlannerPath.fromPathFile("ONE-LEFT-ALIGN");
+      middleCommand = AutoBuilder.followPath(oneAlignment);
+
+      specialAuto = new PathPlannerAuto("SpecialAuto");
+
+
+      commandChooser.setDefaultOption("nothing", null);
+      commandChooser.addOption("Far Left Auto", farLeftCommand);
+      commandChooser.addOption("Far Right Auto", farRightCommand);
+      commandChooser.addOption("Middle Auto", middleCommand);
+      commandChooser.addOption("SpecialAuto", specialAuto);
+      SmartDashboard.putData(commandChooser);
+     } 
+     catch (Exception e) 
+     {
+       DriverStation.reportError("Failed to load autonomous chooser.", e.getStackTrace());
+       e.printStackTrace();
+     }
   }
 
   private void configureDrivetrainDebugBindings()
@@ -159,7 +275,7 @@ public class RobotContainer
         )
     );
 
-    m_DriverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
+    //m_DriverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
     m_DriverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
   }
 
@@ -168,17 +284,34 @@ public class RobotContainer
     Elevator elevator = m_Manager.getSubsystemOfType(Elevator.class).get();
     SmartDashboard.putData(elevator);
 
+    CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
+
     m_DriverController.start().onTrue(elevator.ZeroElevator());
-    m_DriverController.a().onTrue(elevator.MoveToSmartdashboardSelectedLevel());
+    m_DriverController.povLeft().onTrue(elevator.MoveToLevel(LEVELS.HOME));
     m_DriverController.povUp().onTrue(elevator.ApplyVoltage(3)).onFalse(elevator.ApplyVoltage(0));
     m_DriverController.povDown().onTrue(elevator.ApplyVoltage(-0.8)).onFalse(elevator.ApplyVoltage(0));
 
     SysIdRoutine sysIdRoutine = elevator.BuildSysIdRoutine();
 
-    m_DriverController.a().whileTrue(sysIdRoutine.dynamic(Direction.kForward));
-    m_DriverController.b().whileTrue(sysIdRoutine.dynamic(Direction.kReverse));
-    m_DriverController.y().whileTrue(sysIdRoutine.quasistatic(Direction.kForward));
-    m_DriverController.x().whileTrue(sysIdRoutine.quasistatic(Direction.kReverse));
+    m_DriverController.a().onTrue(elevator.MoveToLevel(LEVELS.ONE));
+    m_DriverController.b().onTrue(elevator.MoveToLevel(LEVELS.TWO));
+    m_DriverController.y().onTrue(elevator.MoveToLevel(LEVELS.THREE));
+    m_DriverController.x().onTrue(elevator.MoveToLevel(LEVELS.FOUR));
+
+    // m_DriverController.a().whileTrue(sysIdRoutine.dynamic(Direction.kForward));
+    // m_DriverController.b().whileTrue(sysIdRoutine.dynamic(Direction.kReverse));
+    // m_DriverController.y().whileTrue(sysIdRoutine.quasistatic(Direction.kForward));
+    // m_DriverController.x().whileTrue(sysIdRoutine.quasistatic(Direction.kReverse));
+
+    drivetrain.setDefaultCommand
+    (
+        m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get().applyRequest(() ->
+            drive.withVelocityX(-m_DriverController.getLeftY() * TunerConstants.MaxSpeed)
+                 .withVelocityY(-m_DriverController.getLeftX() * TunerConstants.MaxSpeed)
+                 .withRotationalRate(-m_DriverController.getRightX() * TunerConstants.MaxAngularRate)
+        )
+    );
+
     System.out.println("[Wolfpack] Elevator Debug bindings successfully configured.");
   }
 
@@ -187,13 +320,13 @@ public class RobotContainer
     Shooter shooter = m_Manager.getSubsystemOfType(Shooter.class).get();
     SmartDashboard.putData(shooter);
 
-    m_DriverController.a().onTrue(shooter.StowShooter());
-    m_DriverController.b().onTrue(shooter.IntakeAlgae()).onFalse(shooter.StowAndHoldAlgae());
-    m_DriverController.y().onTrue(shooter.PrepareToDeployCoral());
-    m_DriverController.x().onTrue(shooter.DeployCoral()).onFalse(shooter.StowShooter());
+    // m_DriverController.a().onTrue(shooter.StowShooter());
+    // m_DriverController.b().onTrue(shooter.IntakeAlgae()).onFalse(shooter.StowAndHoldAlgae());
+    // m_DriverController.y().onTrue(shooter.PrepareToDeployCoralLow());
+    // m_DriverController.x().onTrue(shooter.DeployCoral()).onFalse(shooter.StowShooter());
 
-    m_DriverController.povUp().onTrue(shooter.IntakeCoral()).onFalse(shooter.StowShooter());
-    m_DriverController.povDown().onTrue(shooter.ProcessAlgae()).onFalse(shooter.StowShooter());
+    // m_DriverController.povUp().onTrue(shooter.IntakeCoral()).onFalse(shooter.StowShooter());
+    // m_DriverController.povDown().onTrue(shooter.ProcessAlgae()).onFalse(shooter.StowShooter());
 
     System.out.println("[Wolfpack] Shooter Debug bindings successfully configured.");
   }
@@ -207,8 +340,37 @@ public class RobotContainer
     m_DriverController.a().onTrue(intake.IntakeRoutine()).onFalse(intake.StowIntake());
   }
 
+  private void configureClimbDebugBindings()
+  {
+    Climb climb = m_Manager.getSubsystemOfType(Climb.class).get();
+    SmartDashboard.putData(climb);
+
+   // climb.setDefaultCommand(climb.setVoltage(() -> -m_DriverController.getRawAxis(5)*10));
+  }
+
+  private void configureAutomationDebugBindings()
+  {
+    CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
+    
+    m_DriverController.start().onTrue(drivetrain.runOnce(() -> drivetrain.resetPose(new Pose2d())));
+
+    m_DriverController.a().toggleOnFalse(new PathPlannerAuto("New New Auto"));
+    m_DriverController.b().toggleOnFalse(new PathPlannerAuto("SIX-LEFT-AUTO"));
+    m_DriverController.y().toggleOnFalse(new PathPlannerAuto("SIX-RIGHT-AUTO"));
+    
+    drivetrain.setDefaultCommand
+    (
+        m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get().applyRequest(() ->
+            drive.withVelocityX(-m_DriverController.getLeftY() * TunerConstants.MaxSpeed)
+                 .withVelocityY(-m_DriverController.getLeftX() * TunerConstants.MaxSpeed)
+                 .withRotationalRate(-m_DriverController.getRightX() * TunerConstants.MaxAngularRate)
+        )
+    );
+
+  }
+
   public Command getAutonomousCommand() 
   {
-    return Commands.print("No autonomous command configured");
+    return commandChooser.getSelected();
   }
 }

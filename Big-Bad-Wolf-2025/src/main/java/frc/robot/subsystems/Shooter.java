@@ -18,7 +18,9 @@ import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.constants.Hardware;
 import frc.robot.constants.ShooterConstants;
@@ -38,6 +40,8 @@ public class Shooter extends SubsystemBase
   private final VoltageOut m_CoralVoltageRequest;
   private final MotionMagicVoltage m_WristPositionRequest;
   private final StaticBrake m_BrakeRequest;
+
+  private final Subsystem[] m_EmptySubsystemList = new Subsystem[0];
 
   public Shooter()
   {
@@ -60,101 +64,96 @@ public class Shooter extends SubsystemBase
     m_BrakeRequest = new StaticBrake();
   }
 
-  public Command PrepareToDeployCoral()
+
+  public Command PrepareToDeployCoralHigh()
   {
-    return new FunctionalCommand(() -> this.BrakeAlgae().BrakeCoral().SetWristPosition(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION),
+    return new FunctionalCommand(() -> SetWristPositionMotor(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION),
                                  () -> {}, 
                                  interrupted -> {},
-                                 MotorManager.InPosition(Hardware.SHOOTER_WRIST_MOTOR, 0.1),
+                                 () -> isInPosition(0.025),
                                  this);
   }
 
-  public Command DeployCoral()
+  public Command PrepareToDeployCoralLow()
   {
-    return this.runOnce(() -> this.SetCoralVoltage(ShooterConstants.CORAL_DEPLOYMENT_VOLTAGE));
-  }
-
-  public Command StowShooter()
-  {
-    return new FunctionalCommand(() -> this.BrakeAlgae().BrakeCoral().SetWristPosition(ShooterConstants.WRIST_STOW_POSITION),
+    return new FunctionalCommand(() -> SetWristPositionMotor(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION_LOW),
                                  () -> {}, 
                                  interrupted -> {},
-                                 MotorManager.InPosition(Hardware.SHOOTER_WRIST_MOTOR, 0.1),
+                                 () -> isInPosition(0.025),
                                  this);
   }
 
-  public Command StowAndHoldAlgae()
+  public Command WaitForWristToGoIntoPosition()
   {
-    return new FunctionalCommand(() -> this.SetAlgaeVoltage(ShooterConstants.ALGAE_HOLDING_VOLTAGE).BrakeCoral().SetWristPosition(ShooterConstants.WRIST_STOW_POSITION),
-                                 () -> {}, 
-                                 interrupted -> {},
-                                 MotorManager.InPosition(Hardware.SHOOTER_WRIST_MOTOR, 0.1),
-                                 this);
+    WaitUntilCommand waitCommand = new WaitUntilCommand(() -> isInPosition(0.025));
+    return waitCommand;
+  }
+
+  public Command PrepareToDeplyCoralHigh()
+  {
+    Command returnCommand = this.runOnce(() -> SetWristPosition(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION));
+    return returnCommand;
+  }
+
+  public Command DeployCoralHighSmiley()
+  {
+    Command returnCommand =  this.runOnce(() -> this.SetCoralVoltage(ShooterConstants.CORAL_DEPLOYMENT_VOLTAGE_HIGH));
+    returnCommand.addRequirements(this);
+    return returnCommand;
+  }
+  public Command DeployCoralLow()
+  {
+    Command returnCommand =  this.runOnce(() -> this.SetCoralVoltage(ShooterConstants.CORAL_DEPLOYMENT_VOLTAGE));
+    returnCommand.addRequirements(this);
+    return returnCommand;
+  }
+
+  public Command StowAndKillShooter()
+  {
+    return this.runOnce(() -> this.BrakeAlgae().BrakeCoral().SetWristPosition(ShooterConstants.WRIST_STOW_POSITION));
   }
 
   public Command IntakeCoral()
   {
-    return new FunctionalCommand(() -> this.BrakeAlgae().SetCoralVoltage(ShooterConstants.CORAL_INTAKE_VOLTAGE).SetWristPosition(ShooterConstants.WRIST_CORAL_INTAKE_POSITION),
+    return new FunctionalCommand(() -> this.SetCoralVoltage(ShooterConstants.CORAL_INTAKE_VOLTAGE).SetWristPositionMotor(ShooterConstants.WRIST_CORAL_INTAKE_POSITION),
                                  () -> {}, 
                                  interrupted -> this.BrakeCoral(),
                                  () -> this.CoralDetected(),
                                  this);
   }
 
-  public Command ProcessAlgae()
+  public Command StopCoral()
   {
-    return new FunctionalCommand(() -> this.BrakeAlgae().BrakeCoral().SetWristPosition(ShooterConstants.WRIST_ALGAE_PROCESSOR_DEPLOYMENT_POSITION),
-                                 () -> {}, 
-                                 interrupted -> this.SetAlgaeVoltage(ShooterConstants.ALGAE_PROCESSOR_DEPLOYMENT_VOLTAGE),
-                                 MotorManager.InPosition(Hardware.SHOOTER_WRIST_MOTOR, 0.005),
-                                 this);
+    return this.runOnce(() -> this.SetCoralVoltage(0));
+  }
+
+  public Command HoldAlgae()
+  {
+    return this.runOnce(() -> this.SetAlgaeVoltage(ShooterConstants.ALGAE_HOLDING_VOLTAGE));
   }
 
   public Command SweepAlgae()
   {
-    return SetAlgaeAndWrist(ShooterConstants.ALGAE_SWEEPING_VOLTAGE, ShooterConstants.WRIST_ALGAE_SWEEPING_POSITION);
+    return this.runOnce(() -> this.SetAlgaeVoltage(ShooterConstants.ALGAE_SWEEPING_VOLTAGE));
   }
 
-  public Command IntakeAlgae()
+  public Command ProcessAlgae()
   {
-    return SetAlgaeAndWrist(ShooterConstants.ALGAE_GROUND_INTAKING_VOLTAGE, ShooterConstants.WRIST_ALGAE_INTAKE_POSITION);
+    return this.runOnce(() -> this.SetAlgaeVoltage(ShooterConstants.ALGAE_PROCESSOR_DEPLOYMENT_VOLTAGE));
   }
 
-  public Command SetAlgaeAndWrist(double algaeVoltage, double position)
+  public Command StopAlgae()
   {
-    return new FunctionalCommand(() -> this.BrakeCoral().SetAlgaeVoltage(algaeVoltage).SetWristPosition(position),
-    () -> {}, 
-    interrupted -> {},
-    MotorManager.InPosition(Hardware.SHOOTER_WRIST_MOTOR, 0.5),
-    this);
+    return this.runOnce(() -> this.SetAlgaeVoltage(0));
   }
 
-  public Command SetCoralAndWrist(double coralVoltage, double position)
+  public Command SetWristPosition(double position)
   {
-    return new FunctionalCommand(() -> this.SetCoralVoltage(coralVoltage).BrakeAlgae().SetWristPosition(position),
-    () -> {}, 
-    interrupted -> {},
-    MotorManager.InPosition(Hardware.SHOOTER_WRIST_MOTOR, 0.5),
-    this);
-  }
-
-  public Command SetShooterWristPositon(double position)
-  {
-    return new FunctionalCommand(() -> this.SetWristPosition(position),
+    return new FunctionalCommand(() -> this.SetWristPositionMotor(position),
                                  () -> {}, 
                                  interrupted -> {},
-                                 MotorManager.InPosition(Hardware.SHOOTER_WRIST_MOTOR, 0.5),
+                                 MotorManager.InPosition(Hardware.ELEVATOR_MOTOR_LEFT, 0.005),
                                  this);
-  }
-
-  public Command SetAlgaeVoltageInstant(double voltage)
-  {
-    return this.runOnce(() -> this.SetAlgaeVoltage(voltage));
-  }
-  
-  public Command SetCoralVoltageInstant(double voltage)
-  {
-    return this.runOnce(() -> this.SetCoralVoltage(voltage));
   }
 
   // To-do: Move sysId settings to the constants file
@@ -176,7 +175,7 @@ public class Shooter extends SubsystemBase
    return this.m_SysIdRoutine;
   }
 
-  private Shooter SetWristPosition(double position)
+  private Shooter SetWristPositionMotor(double position)
   {
     MotorManager.ApplyControlRequest(m_WristPositionRequest.withPosition(position), Hardware.SHOOTER_WRIST_MOTOR);
     return this;
@@ -211,9 +210,16 @@ public class Shooter extends SubsystemBase
     return this.m_TOF.getRange() < ShooterConstants.CORAL_TOF_IN_RANGE_THRESHOLD;
   }
 
+  private boolean isInPosition(double tolerance)
+  {
+    return Math.abs(this.m_ShooterWristMotor.getPosition().getValueAsDouble() - this.m_WristPositionRequest.Position) < tolerance;
+  }
+
   @Override
   public void periodic() 
   {
-    SmartDashboard.putNumber("TOF DATA", m_TOF.getRange());
+    SmartDashboard.putNumber("Rotor Position Shooter", this.m_ShooterWristMotor.getRotorPosition().getValueAsDouble());
+    SmartDashboard.putNumber("Shooter Position Request", this.m_WristPositionRequest.Position);
+    SmartDashboard.putNumber("Shooter Closed Loop Error", m_ShooterWristMotor.getClosedLoopError().getValueAsDouble());
   }
 }
