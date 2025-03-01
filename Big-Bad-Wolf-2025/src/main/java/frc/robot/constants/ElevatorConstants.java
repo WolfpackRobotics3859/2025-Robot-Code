@@ -26,10 +26,10 @@ public class ElevatorConstants
     public static final double ELEVATOR_ZERO_POSITION = 0;
     public static final double ELEVATOR_HOME_POSITION = 30;
     public static final double ELEVATOR_LEVEL_ONE = 15;
-    public static final double ELEVATOR_LEVEL_TWO = 30;
-    public static final double ELEVATOR_LEVEL_THREE = 58.5;
+    public static final double ELEVATOR_LEVEL_TWO = 25.75;
+    public static final double ELEVATOR_LEVEL_THREE = 53.5;
     public static final double ELEVATOR_LEVEL_FOUR = 105;
-    public static final double CORAL_INTAKING_LEVEL = 1.3;
+    public static final double CORAL_INTAKING_LEVEL = 1.2;
     public static final double ALGAE_PROCESSING_POSITION = 10;
     public static final double LOW_CLEAN = 44.25;
     public static final double HIGH_CLEAN = 72.75;
@@ -38,7 +38,7 @@ public class ElevatorConstants
 
     public static final double ELEVATOR_UP_VOLTAGE = 3;
     public static final double ELEVATOR_DOWN_VOLTAGE = -1.5;
-
+ 
     public static final double HOMING_VOLTAGE = -0.5;
 
     public enum LEVELS 
@@ -80,7 +80,7 @@ public class ElevatorConstants
                                                                                              .withContinuousWrap(false);
 
     public static final CurrentLimitsConfigs LEFT_MOTOR_CURRENT_LIMIT_CONFIG = new CurrentLimitsConfigs()
-                                                                                    .withStatorCurrentLimit(100)
+                                                                                    .withStatorCurrentLimit(120)
                                                                                     .withStatorCurrentLimitEnable(true)
                                                                                     .withSupplyCurrentLimit(40)
                                                                                     .withSupplyCurrentLimitEnable(false)
@@ -93,13 +93,13 @@ public class ElevatorConstants
                                                                     .withKD(0)
                                                                     .withKG(0)
                                                                     .withKI(0)
-                                                                    .withKP(5)
+                                                                    .withKP(8)
                                                                     .withKS(0)
                                                                     .withKV(0)
                                                                     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
 
     public static final MotionMagicConfigs LEFT_MOTOR_MOTION_MAGIC_CONFIG = new MotionMagicConfigs()
-                                                                                .withMotionMagicAcceleration(50)
+                                                                                .withMotionMagicAcceleration(20)
                                                                                 .withMotionMagicCruiseVelocity(500)
                                                                                 .withMotionMagicExpo_kA(0.1)
                                                                                 .withMotionMagicExpo_kV(0.12)

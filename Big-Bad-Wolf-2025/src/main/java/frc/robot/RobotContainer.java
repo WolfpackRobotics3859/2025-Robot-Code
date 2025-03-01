@@ -6,22 +6,21 @@ package frc.robot;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
-import static edu.wpi.first.units.Units.Degrees;
-
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.constants.Global;
+import frc.robot.constants.PathConstants;
 import frc.robot.constants.ShooterConstants;
 import frc.robot.constants.ElevatorConstants.LEVELS;
 import frc.robot.constants.Global.BUILD_TYPE;
@@ -29,9 +28,9 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Shooter;
+import frc.robot.utilities.CoralCommandBuilder;
 import frc.robot.utilities.DataStuff;
 import frc.robot.utilities.SubsystemManager;
-import frc.robot.utilities.dataSelector.DataSelectorHelper;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.Intake;
@@ -57,6 +56,10 @@ public class RobotContainer
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+
+  public SendableChooser<Command> commandChooser = new SendableChooser<>();
+
+  private CoralCommandBuilder commandBuilder;
   
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() 
@@ -168,8 +171,8 @@ public class RobotContainer
         )
     );
 
-    m_DriverController.rightTrigger().whileTrue(automation.CoralPlacementRoutine())
-                                      .onFalse(automation.ResetTheStuffs());
+    //m_DriverController.rightTrigger().whileTrue(automation.CoralPlacementRoutine())
+                                //      .onFalse(automation.ResetTheStuffs());
 
     // m_DriverController.rightTrigger().onTrue(automation.HardCodePath())
     //                                 .onFalse(automation.ResetTheStuffs());
@@ -178,14 +181,14 @@ public class RobotContainer
                                                     .alongWith(shooter.IntakeCoral()))
                                     .onFalse(shooter.StopCoral());
 
-    m_DriverController.rightBumper().onTrue(elevator.MoveToLevel(LEVELS.ALGAE_PROCESS)
-                                                    .andThen(shooter.SetWristPosition(ShooterConstants.WRIST_ALGAE_PROCESSOR_DEPLOYMENT_POSITION))
-                                                    .andThen(shooter.ProcessAlgae()))
-                                    .onFalse(shooter.StopAlgae()
-                                                    .andThen(automation.ResetTheStuffs()));
+    // m_DriverController.rightBumper().onTrue(elevator.MoveToLevel(LEVELS.ALGAE_PROCESS)
+    //                                                 .andThen(shooter.SetWristPosition(ShooterConstants.WRIST_ALGAE_PROCESSOR_DEPLOYMENT_POSITION))
+    //                                                 .andThen(shooter.ProcessAlgae()))
+    //                                 .onFalse(shooter.StopAlgae()
+    //                                                 .andThen(automation.ResetTheStuffs()));
           
-    m_DriverController.leftBumper().onTrue(automation.CleanAlgae())
-                                    .onFalse(automation.ResetTheStuffs());
+    // m_DriverController.leftBumper().onTrue(automation.CleanAlgae())
+    //                                 .onFalse(automation.ResetTheStuffs());
 
     m_CoDriverController.leftBumper().onTrue(dataStuff.Right().ignoringDisable(true));
     m_CoDriverController.rightBumper().onTrue(dataStuff.Left().ignoringDisable(true));
@@ -196,20 +199,72 @@ public class RobotContainer
     m_CoDriverController.y().onTrue(elevator.ZeroElevator());
     m_CoDriverController.x().whileTrue(elevator.ApplyVoltage(0).withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
 
-    m_CoDriverController.a().whileTrue(climb.setClimbVoltage(() -> -m_CoDriverController.getRawAxis(2)*10));
+    m_CoDriverController.a().whileTrue(climb.setClimbVoltage(() -> m_CoDriverController.getRawAxis(2)*6));
     m_CoDriverController.b().whileTrue(climb.setLatchVoltage(-2)).onFalse(climb.setLatchVoltage(0));
 
     // TEMPORARY
     m_DriverController.a().onTrue(elevator.ZeroElevator()).onFalse(elevator.ApplyVoltage(0));
 
-    SmartDashboard.putData("Six LVL 4", automation.sixRightAlignLevelFour());
-    SmartDashboard.putData("Five LVL 4", automation.fiveRightAlignLevelFour());
-    SmartDashboard.putData("Four LVL 4", automation.fourRightAlignLevelFour());
-    SmartDashboard.putData("Three LVL 4", automation.threeRightAlignLevelFour());
-    SmartDashboard.putData("Two LVL 4", automation.twoRightAlignLevelFour());
-    SmartDashboard.putData("One LVL 4", automation.oneRightAlignLevelFour());
+    commandBuilder = new CoralCommandBuilder(shooter, elevator);
+    commandBuilder.LoadAlignmentPaths(PathConstants.ALIGNMENT_PATHS);
+    commandBuilder.BuildAllL2CommandsAndDeployToSmartdashboard();
+    commandBuilder.BuildAllL3CommandsAndDeployToSmartdashboard();
+    commandBuilder.BuildAllL4CommandsAndDeployToSmartdashboard();
+
+    NamedCommands.registerCommand("LevelTwoDeploy", commandBuilder.BuildCoralStandingDeployment(LEVELS.TWO));
+    NamedCommands.registerCommand("LevelThreeDeploy", commandBuilder.BuildCoralStandingDeployment(LEVELS.THREE));
+    NamedCommands.registerCommand("IntakeCoral", shooter.IntakeCoral());
+
+    SmartDashboard.putData("Level One", commandBuilder.BuildCoralStandingDeployment(LEVELS.ONE));
+    
+    SmartDashboard.putData("Level Two", commandBuilder.BuildCoralStandingDeployment(LEVELS.TWO));
+    
+    SmartDashboard.putData("Level Three", commandBuilder.BuildCoralStandingDeployment(LEVELS.THREE));
+
+    //  SmartDashboard.putData("6R4", automation.SixLeftAlignLeelTwo());
+    // SmartDashboard.putData("6L4", automation.SixRightAlignLevelTwo());
+    // SmartDashboard.putData("5R4", automation.fiveRightAlignLevelTwo());
+    // SmartDashboard.putData("5L4", automation.fiveLeftAlignLevelTwo());
+    // SmartDashboard.putData("4R4", automation.fourRightAlignLevelTwo());
+    // SmartDashboard.putData("4L4", automation.fourLeftAlignLevelTwo());
+    // SmartDashboard.putData("3R4", automation.threeRightAlignLevelTwo());
+    // SmartDashboard.putData("3L4", automation.threeLeftAlignLevelTwo());
+    // SmartDashboard.putData("2R4", automation.twoRightAlignLevelTwo());
+    // SmartDashboard.putData("2L4", automation.twoLeftAlignLevelTwo());
+    // SmartDashboard.putData("1R4", automation.OneRightAlignLevelTwo());
+    // SmartDashboard.putData("1L4", automation.OneLeftAlignLevelTwo());
+
+    
+    PathPlannerPath farLeft4R;
+    PathPlannerPath farRight1L;
+    PathPlannerPath oneAlignment;
+    Command farLeftCommand, middleCommand, farRightCommand, specialAuto;
+    try 
+    {
+      farLeft4R = PathPlannerPath.fromPathFile("FAR_LEFT_4R");
+      farLeftCommand = AutoBuilder.followPath(farLeft4R);
+
+      farRight1L = PathPlannerPath.fromPathFile("FAR_RIGHT_1L");
+      farRightCommand = AutoBuilder.followPath(farRight1L);
+
+      oneAlignment = PathPlannerPath.fromPathFile("ONE-LEFT-ALIGN");
+      middleCommand = AutoBuilder.followPath(oneAlignment);
+
+      specialAuto = new PathPlannerAuto("SpecialAuto");
 
 
+      commandChooser.setDefaultOption("nothing", null);
+      commandChooser.addOption("Far Left Auto", farLeftCommand);
+      commandChooser.addOption("Far Right Auto", farRightCommand);
+      commandChooser.addOption("Middle Auto", middleCommand);
+      commandChooser.addOption("SpecialAuto", specialAuto);
+      SmartDashboard.putData(commandChooser);
+     } 
+     catch (Exception e) 
+     {
+       DriverStation.reportError("Failed to load autonomous chooser.", e.getStackTrace());
+       e.printStackTrace();
+     }
   }
 
   private void configureDrivetrainDebugBindings()
@@ -326,6 +381,6 @@ public class RobotContainer
 
   public Command getAutonomousCommand() 
   {
-    return Commands.print("No autonomous command configured");
+    return commandChooser.getSelected();
   }
 }

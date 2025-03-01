@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.constants.Hardware;
 import frc.robot.constants.ShooterConstants;
@@ -79,6 +80,49 @@ public class Shooter extends SubsystemBase
                                  interrupted -> this.BrakeCoral(),
                                  () -> !this.CoralDetected(),
                                  this);
+  }
+
+  public Command PrepareToDeployCoralHigh()
+  {
+    return new FunctionalCommand(() -> SetWristPositionMotor(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION),
+                                 () -> {}, 
+                                 interrupted -> {},
+                                 () -> isInPosition(0.025),
+                                 this);
+  }
+
+  public Command PrepareToDeployCoralLow()
+  {
+    return new FunctionalCommand(() -> SetWristPositionMotor(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION_LOW),
+                                 () -> {}, 
+                                 interrupted -> {},
+                                 () -> isInPosition(0.025),
+                                 this);
+  }
+
+  public Command WaitForWristToGoIntoPosition()
+  {
+    WaitUntilCommand waitCommand = new WaitUntilCommand(() -> isInPosition(0.025));
+    return waitCommand;
+  }
+
+  public Command PrepareToDeplyCoralHighSmiley()
+  {
+    Command returnCommand = this.runOnce(() -> SetWristPosition(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION));
+    return returnCommand;
+  }
+
+  public Command DeployCoralHighSmiley()
+  {
+    Command returnCommand =  this.runOnce(() -> this.SetCoralVoltage(ShooterConstants.CORAL_DEPLOYMENT_VOLTAGE_HIGH));
+    returnCommand.addRequirements(this);
+    return returnCommand;
+  }
+  public Command DeployCoralLowSmiley()
+  {
+    Command returnCommand =  this.runOnce(() -> this.SetCoralVoltage(ShooterConstants.CORAL_DEPLOYMENT_VOLTAGE));
+    returnCommand.addRequirements(this);
+    return returnCommand;
   }
 
   public Command StowAndKillShooter()
@@ -183,9 +227,16 @@ public class Shooter extends SubsystemBase
     return this.m_TOF.getRange() < ShooterConstants.CORAL_TOF_IN_RANGE_THRESHOLD;
   }
 
+  private boolean isInPosition(double tolerance)
+  {
+    return Math.abs(this.m_ShooterWristMotor.getPosition().getValueAsDouble() - this.m_WristPositionRequest.Position) < tolerance;
+  }
+
   @Override
   public void periodic() 
   {
+    SmartDashboard.putNumber("Rotor Position Shooter", this.m_ShooterWristMotor.getRotorPosition().getValueAsDouble());
+    SmartDashboard.putNumber("Shooter Position Request", this.m_WristPositionRequest.Position);
     SmartDashboard.putNumber("Shooter Closed Loop Error", m_ShooterWristMotor.getClosedLoopError().getValueAsDouble());
   }
 }

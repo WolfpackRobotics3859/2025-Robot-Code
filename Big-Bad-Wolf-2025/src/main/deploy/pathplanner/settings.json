@@ -4,10 +4,11 @@
   "holonomicMode": true,
   "pathFolders": [
     "ALIGNMENT-PATHS",
+    "CLEAN DEPARTURES",
     "FACE TO INTAKE",
     "FAR LEFT STARTS",
     "FAR RIGHT STARTS",
-    "CLEAN DEPARTURES"
+    "MIDDLE STARTS"
   ],
   "autoFolders": [
     "ALIGNMENT-AUTOS"

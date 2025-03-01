@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.AutomationConstants;
 import frc.robot.constants.ElevatorConstants;
@@ -125,228 +126,155 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
                          .andThen(m_Elevator.MoveToLevel(LEVELS.HOME));
   }
 
-  public Command HardCodePath()
+  public Command SixRightAlignLevelTwo() 
+  {
+    return SixRightAlignPreparationTwo().andThen(this.m_Shooter.DeployCoralLowSmiley());
+  }
+
+  public Command SixRightAlignPreparationTwo()
+  {
+    return AutoBuilder.followPath(SIX_RIGHT_ALIGN)
+                      .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
+                      .alongWith(this.m_Shooter.PrepareToDeployCoralLow());
+  }
+
+
+  public Command OneRightAlignLevelTwo() 
+  {
+    return OneRightAlignPreparationTwo().andThen(this.m_Shooter.DeployCoralLowSmiley());
+  }
+
+  public Command OneRightAlignPreparationTwo()
+  {
+    return AutoBuilder.followPath(ONE_RIGHT_ALIGN)
+                      .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
+                      .alongWith(this.m_Shooter.PrepareToDeployCoralLow());
+  }
+
+
+  public Command twoRightAlignLevelTwo() 
+  {
+    return twoRightAlignPreparationTwo().andThen(this.m_Shooter.DeployCoralLowSmiley());
+  }
+
+  public Command twoRightAlignPreparationTwo()
+  {
+    return AutoBuilder.followPath(TWO_RIGHT_ALIGN)
+                      .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
+                      .alongWith(this.m_Shooter.PrepareToDeployCoralLow());
+  }
+
+
+  public Command threeRightAlignLevelTwo() 
+  {
+    return threeRightAlignPreparationTwo().andThen(this.m_Shooter.DeployCoralLowSmiley());
+  }
+
+  public Command threeRightAlignPreparationTwo()
+  {
+    return AutoBuilder.followPath(THREE_RIGHT_ALIGN)
+                      .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
+                      .alongWith(this.m_Shooter.PrepareToDeployCoralLow());
+  }
+
+
+  public Command fourRightAlignLevelTwo() 
+  {
+    return fourRightAlignPreparationTwo().andThen(this.m_Shooter.DeployCoralLowSmiley());
+  }
+
+  public Command fourRightAlignPreparationTwo()
+  {
+    return AutoBuilder.followPath(FOUR_RIGHT_ALIGN)
+                      .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
+                      .alongWith(this.m_Shooter.PrepareToDeployCoralLow());
+  }
+
+  public Command fiveRightAlignLevelTwo() 
+  {
+    return fiveRightAlignPreparationTwo().andThen(this.m_Shooter.DeployCoralLowSmiley());
+  }
+
+  public Command fiveRightAlignPreparationTwo()
+  {
+    return AutoBuilder.followPath(FIVE_RIGHT_ALIGN)
+                      .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
+                      .alongWith(this.m_Shooter.PrepareToDeployCoralLow());
+  }
+
+  public Command SixLeftAlignLevelTwo() 
+  {
+    return SixLeftAlignPreparationTwo().andThen(this.m_Shooter.DeployCoralLowSmiley());
+  }
+
+  public Command SixLeftAlignPreparationTwo()
+  {
+    return AutoBuilder.followPath(SIX_LEFT_ALIGN)
+                      .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
+                      .alongWith(this.m_Shooter.PrepareToDeployCoralLow());
+  }
+
+
+  public Command OneLeftAlignLevelTwo() 
+  {
+    return OneLeftAlignPreparationTwo().andThen(this.m_Shooter.DeployCoralLowSmiley());
+  }
+
+  public Command OneLeftAlignPreparationTwo()
+  {
+    return AutoBuilder.followPath(ONE_LEFT_ALIGN)
+                      .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
+                      .alongWith(this.m_Shooter.PrepareToDeployCoralLow());
+  }
+
+  public Command twoLeftAlignLevelTwo() 
+  {
+    return twoLeftAlignPreparationTwo().andThen(this.m_Shooter.DeployCoralLowSmiley());
+  }
+
+  public Command twoLeftAlignPreparationTwo()
+  {
+    return AutoBuilder.followPath(TWO_LEFT_ALIGN)
+                      .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
+                      .alongWith(this.m_Shooter.PrepareToDeployCoralLow());
+  }
+
+  public Command threeLeftAlignLevelTwo() 
+  {
+    return threeLeftAlignPreparationTwo().andThen(this.m_Shooter.DeployCoralLowSmiley());
+  }
+
+  public Command threeLeftAlignPreparationTwo()
+  {
+    return AutoBuilder.followPath(THREE_LEFT_ALIGN)
+                      .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
+                      .alongWith(this.m_Shooter.PrepareToDeployCoralLow());
+  }
+
+  public Command fourLeftAlignLevelTwo() 
+  {
+    return fourLeftAlignPreparationTwo().andThen(this.m_Shooter.DeployCoralLowSmiley());
+  }
+
+  public Command fourLeftAlignPreparationTwo()
   {
     return AutoBuilder.followPath(FOUR_LEFT_ALIGN)
-                        .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
-                        .andThen(this.m_Shooter.DeployCoralHigh());
+                      .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
+                      .alongWith(this.m_Shooter.PrepareToDeployCoralLow());
   }
 
-  public Command oneLeftAlignLevelTwo() {
-    return AutoBuilder.followPath(ONE_LEFT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
-    .andThen(this.m_Shooter.DeployCoralLow());
+  public Command fiveLeftAlignLevelTwo() 
+  {
+    return fiveLeftAlignPreparationTwo().andThen(this.m_Shooter.DeployCoralLowSmiley());
   }
 
-  public Command oneRightAlignLevelTwo() {
-    return AutoBuilder.followPath(ONE_RIGHT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
-    .andThen(this.m_Shooter.DeployCoralLow());
-  }
-
-  public Command twoLeftAlignLevelTwo() {
-    return AutoBuilder.followPath(TWO_LEFT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
-    .andThen(this.m_Shooter.DeployCoralLow());
-  }
-
-  public Command twoRightAlignLevelTwo() {
-    return AutoBuilder.followPath(TWO_RIGHT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
-    .andThen(this.m_Shooter.DeployCoralLow());
-  }
-
-  public Command threeLeftAlignLevelTwo() {
-    return AutoBuilder.followPath(THREE_LEFT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
-    .andThen(this.m_Shooter.DeployCoralLow());
-  }
-
-  public Command threeRightAlignLevelTwo() {
-    return AutoBuilder.followPath(THREE_RIGHT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
-    .andThen(this.m_Shooter.DeployCoralLow());
-  }
-
-  public Command fourLeftAlignLevelTwo() {
-    return AutoBuilder.followPath(FOUR_LEFT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
-    .andThen(this.m_Shooter.DeployCoralLow());
-  }
-
-  public Command fourRightAlignLevelTwo() {
-    return AutoBuilder.followPath(FOUR_RIGHT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
-    .andThen(this.m_Shooter.DeployCoralLow());
-  }
-
-  public Command fiveLeftAlignLevelTwo() {
+  public Command fiveLeftAlignPreparationTwo()
+  {
     return AutoBuilder.followPath(FIVE_LEFT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
-    .andThen(this.m_Shooter.DeployCoralLow());
+                      .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
+                      .alongWith(this.m_Shooter.PrepareToDeployCoralLow());
   }
 
-  public Command fiveRightAlignLevelTwo() {
-    return AutoBuilder.followPath(FIVE_RIGHT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
-    .andThen(this.m_Shooter.DeployCoralLow());
-  }
-  
-  public Command sixLeftAlignLevelTwo() {
-    return AutoBuilder.followPath(SIX_LEFT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
-    .andThen(this.m_Shooter.DeployCoralLow());
-  }
-
-  public Command sixRightAlignLevelTwo() {
-    return AutoBuilder.followPath(SIX_RIGHT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
-    .andThen(this.m_Shooter.DeployCoralLow());
-  }
-
-  public Command oneLeftAlignLevelThree() {
-    return AutoBuilder.followPath(ONE_LEFT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.THREE))
-    .andThen(this.m_Shooter.DeployCoralLow());
-  }
-
-  public Command oneRightAlignLevelThree() {
-    return AutoBuilder.followPath(ONE_RIGHT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.THREE))
-    .andThen(this.m_Shooter.DeployCoralLow());
-  }
-
-  public Command twoLeftAlignLevelThree() {
-    return AutoBuilder.followPath(TWO_LEFT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.THREE))
-    .andThen(this.m_Shooter.DeployCoralLow());
-  }
-
-  public Command twoRightAlignLevelThree() {
-    return AutoBuilder.followPath(TWO_RIGHT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.THREE))
-    .andThen(this.m_Shooter.DeployCoralLow());
-  }
-
-  public Command threeLeftAlignLevelThree() {
-    return AutoBuilder.followPath(THREE_LEFT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.THREE))
-    .andThen(this.m_Shooter.DeployCoralLow());
-  }
-
-  public Command threeRightAlignLevelThree() {
-    return AutoBuilder.followPath(THREE_RIGHT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.THREE))
-    .andThen(this.m_Shooter.DeployCoralLow());
-  }
-
-  public Command fourLeftAlignLevelThree() {
-    return AutoBuilder.followPath(FOUR_LEFT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.THREE))
-    .andThen(this.m_Shooter.DeployCoralLow());
-  }
-
-  public Command fourRightAlignLevelThree() {
-    return AutoBuilder.followPath(FOUR_RIGHT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.THREE))
-    .andThen(this.m_Shooter.DeployCoralLow());
-  }
-
-  public Command fiveLeftAlignLevelThree() {
-    return AutoBuilder.followPath(FIVE_LEFT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.THREE))
-    .andThen(this.m_Shooter.DeployCoralLow());
-  }
-
-  public Command fiveRightAlignLevelThree() {
-    return AutoBuilder.followPath(FIVE_RIGHT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.THREE))
-    .andThen(this.m_Shooter.DeployCoralLow());
-  }
-  
-  public Command sixLeftAlignLevelThree() {
-    return AutoBuilder.followPath(SIX_LEFT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.THREE))
-    .andThen(this.m_Shooter.DeployCoralLow());
-  }
-
-  public Command sixRightAlignLevelThree() {
-    return AutoBuilder.followPath(SIX_RIGHT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.THREE))
-    .andThen(this.m_Shooter.DeployCoralLow());
-  }
-
-  public Command oneLeftAlignLevelFour() {
-    return AutoBuilder.followPath(ONE_LEFT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.FOUR))
-    .andThen(this.m_Shooter.DeployCoralHigh());
-  }
-
-  public Command oneRightAlignLevelFour() {
-    return AutoBuilder.followPath(ONE_RIGHT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.FOUR))
-    .andThen(this.m_Shooter.DeployCoralHigh());
-  }
-
-  public Command twoLeftAlignLevelFour() {
-    return AutoBuilder.followPath(TWO_LEFT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.FOUR))
-    .andThen(this.m_Shooter.DeployCoralHigh());
-  }
-
-  public Command twoRightAlignLevelFour() {
-    return AutoBuilder.followPath(TWO_RIGHT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.FOUR))
-    .andThen(this.m_Shooter.DeployCoralHigh());
-  }
-
-  public Command threeLeftAlignLevelFour() {
-    return AutoBuilder.followPath(THREE_LEFT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.FOUR))
-    .andThen(this.m_Shooter.DeployCoralHigh());
-  }
-
-  public Command threeRightAlignLevelFour() {
-    return AutoBuilder.followPath(THREE_RIGHT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.FOUR))
-    .andThen(this.m_Shooter.DeployCoralHigh());
-  }
-
-  public Command fourLeftAlignLevelFour() {
-    return AutoBuilder.followPath(FOUR_LEFT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.FOUR))
-    .andThen(this.m_Shooter.DeployCoralHigh());
-  }
-
-  public Command fourRightAlignLevelFour() {
-    return AutoBuilder.followPath(FOUR_RIGHT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.FOUR))
-    .andThen(this.m_Shooter.DeployCoralHigh());
-  }
-
-  public Command fiveLeftAlignLevelFour() {
-    return AutoBuilder.followPath(FIVE_LEFT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.FOUR))
-    .andThen(this.m_Shooter.DeployCoralHigh());
-  }
-
-  public Command fiveRightAlignLevelFour() {
-    return AutoBuilder.followPath(FIVE_RIGHT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.FOUR))
-    .andThen(this.m_Shooter.DeployCoralHigh());
-  }
-  
-  public Command sixLeftAlignLevelFour() {
-    return AutoBuilder.followPath(SIX_LEFT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.FOUR))
-    .andThen(this.m_Shooter.DeployCoralHigh());
-  }
-
-  public Command sixRightAlignLevelFour() {
-    return AutoBuilder.followPath(SIX_RIGHT_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.FOUR))
-    .andThen(this.m_Shooter.DeployCoralHigh());
-  }
 
   public Command oneCleanCoral() {
     return AutoBuilder.followPath(ONE_CLEAN_ALIGN)

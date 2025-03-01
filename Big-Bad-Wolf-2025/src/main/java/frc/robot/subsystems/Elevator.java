@@ -67,10 +67,21 @@ public class Elevator extends SubsystemBase
       () -> this.SetPosition(level.getValue()),
       () -> {},
       interrupted -> {},
-      MotorManager.InPosition(Hardware.ELEVATOR_MOTOR_LEFT, 0.05),
+      () -> isInPosition(1),
       this
     );
   }
+
+  // public Command MoveToLevel(LEVELS level)
+  // {
+  //   return new FunctionalCommand(
+  //     () -> this.SetPosition(level.getValue()),
+  //     () -> {},
+  //     interrupted -> {},
+  //     MotorManager.InPosition(Hardware.ELEVATOR_MOTOR_LEFT, 0.5),
+  //     this
+  //   );
+  // }
 
   public Command ZeroElevator()
   {
@@ -128,6 +139,11 @@ public class Elevator extends SubsystemBase
       )
    );
    return this.m_SysIdRoutine;
+  }
+
+  private boolean isInPosition(double tolerance)
+  {
+    return Math.abs(this.m_ElevatorMotorLeft.getPosition().getValueAsDouble() - this.m_PositionRequest.Position) < tolerance;
   }
 
   /**
