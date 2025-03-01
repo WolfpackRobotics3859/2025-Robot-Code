@@ -1,10 +1,6 @@
 package frc.robot.utilities;
 
-import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -94,7 +90,7 @@ public class CoralCommandBuilder
                                 .alongWith(this.m_Elevator.MoveToLevel(level))
                                 .alongWith(this.m_Shooter.PrepareToDeployCoralLow());
 
-    return preparationCommand.andThen(this.m_Shooter.DeployCoralLowSmiley());
+    return preparationCommand.andThen(this.m_Shooter.DeployCoralLow());
    }
 
    public Command BuildCoralStandingDeployment(LEVELS level)
@@ -109,6 +105,6 @@ public class CoralCommandBuilder
     
     preparationCommand = this.m_Elevator.MoveToLevel(level)
                                         .alongWith(this.m_Shooter.PrepareToDeployCoralLow());    
-    return preparationCommand.andThen(this.m_Shooter.DeployCoralLowSmiley());
+    return preparationCommand.andThen(this.m_Shooter.DeployCoralLow());
    }
 }

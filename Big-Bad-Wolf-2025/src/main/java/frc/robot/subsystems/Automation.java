@@ -16,7 +16,6 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
@@ -32,14 +31,11 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.AutomationConstants;
-import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.ShooterConstants;
 import frc.robot.constants.ElevatorConstants.LEVELS;
 import frc.robot.utilities.DataSelector;
-import frc.robot.utilities.DataStuff;
 import frc.robot.utilities.SubsystemManager;
 import frc.robot.utilities.subsystemManager.SubsystemAddedEvent;
 import frc.robot.utilities.subsystemManager.SubsystemAddedListener;
@@ -126,173 +122,25 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
                          .andThen(m_Elevator.MoveToLevel(LEVELS.HOME));
   }
 
-  public Command SixRightAlignLevelTwo() 
-  {
-    return SixRightAlignPreparationTwo().andThen(this.m_Shooter.DeployCoralLowSmiley());
-  }
 
-  public Command SixRightAlignPreparationTwo()
-  {
-    return AutoBuilder.followPath(SIX_RIGHT_ALIGN)
-                      .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
-                      .alongWith(this.m_Shooter.PrepareToDeployCoralLow());
-  }
+  //FIXME: REPLACE CODE WTIH BETTER IMPLEMENTATION
+  // public Command oneCleanCoral() {
+  //   return AutoBuilder.followPath(ONE_CLEAN_ALIGN)
+  //   .alongWith(this.m_Elevator.MoveToLevel(LEVELS.HIGH_ALGAE))
+  //   .andThen(m_Shooter.SetWristPosition(ShooterConstants.WRIST_ALGAE_SWEEPING_POSITION))
+  //   .andThen(m_Shooter.SweepAlgae())
+  //   .andThen(AutoBuilder.followPath(ONE_CLEAN_DEPARTURE));
+  // }
 
-
-  public Command OneRightAlignLevelTwo() 
-  {
-    return OneRightAlignPreparationTwo().andThen(this.m_Shooter.DeployCoralLowSmiley());
-  }
-
-  public Command OneRightAlignPreparationTwo()
-  {
-    return AutoBuilder.followPath(ONE_RIGHT_ALIGN)
-                      .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
-                      .alongWith(this.m_Shooter.PrepareToDeployCoralLow());
-  }
-
-
-  public Command twoRightAlignLevelTwo() 
-  {
-    return twoRightAlignPreparationTwo().andThen(this.m_Shooter.DeployCoralLowSmiley());
-  }
-
-  public Command twoRightAlignPreparationTwo()
-  {
-    return AutoBuilder.followPath(TWO_RIGHT_ALIGN)
-                      .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
-                      .alongWith(this.m_Shooter.PrepareToDeployCoralLow());
-  }
-
-
-  public Command threeRightAlignLevelTwo() 
-  {
-    return threeRightAlignPreparationTwo().andThen(this.m_Shooter.DeployCoralLowSmiley());
-  }
-
-  public Command threeRightAlignPreparationTwo()
-  {
-    return AutoBuilder.followPath(THREE_RIGHT_ALIGN)
-                      .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
-                      .alongWith(this.m_Shooter.PrepareToDeployCoralLow());
-  }
-
-
-  public Command fourRightAlignLevelTwo() 
-  {
-    return fourRightAlignPreparationTwo().andThen(this.m_Shooter.DeployCoralLowSmiley());
-  }
-
-  public Command fourRightAlignPreparationTwo()
-  {
-    return AutoBuilder.followPath(FOUR_RIGHT_ALIGN)
-                      .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
-                      .alongWith(this.m_Shooter.PrepareToDeployCoralLow());
-  }
-
-  public Command fiveRightAlignLevelTwo() 
-  {
-    return fiveRightAlignPreparationTwo().andThen(this.m_Shooter.DeployCoralLowSmiley());
-  }
-
-  public Command fiveRightAlignPreparationTwo()
-  {
-    return AutoBuilder.followPath(FIVE_RIGHT_ALIGN)
-                      .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
-                      .alongWith(this.m_Shooter.PrepareToDeployCoralLow());
-  }
-
-  public Command SixLeftAlignLevelTwo() 
-  {
-    return SixLeftAlignPreparationTwo().andThen(this.m_Shooter.DeployCoralLowSmiley());
-  }
-
-  public Command SixLeftAlignPreparationTwo()
-  {
-    return AutoBuilder.followPath(SIX_LEFT_ALIGN)
-                      .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
-                      .alongWith(this.m_Shooter.PrepareToDeployCoralLow());
-  }
-
-
-  public Command OneLeftAlignLevelTwo() 
-  {
-    return OneLeftAlignPreparationTwo().andThen(this.m_Shooter.DeployCoralLowSmiley());
-  }
-
-  public Command OneLeftAlignPreparationTwo()
-  {
-    return AutoBuilder.followPath(ONE_LEFT_ALIGN)
-                      .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
-                      .alongWith(this.m_Shooter.PrepareToDeployCoralLow());
-  }
-
-  public Command twoLeftAlignLevelTwo() 
-  {
-    return twoLeftAlignPreparationTwo().andThen(this.m_Shooter.DeployCoralLowSmiley());
-  }
-
-  public Command twoLeftAlignPreparationTwo()
-  {
-    return AutoBuilder.followPath(TWO_LEFT_ALIGN)
-                      .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
-                      .alongWith(this.m_Shooter.PrepareToDeployCoralLow());
-  }
-
-  public Command threeLeftAlignLevelTwo() 
-  {
-    return threeLeftAlignPreparationTwo().andThen(this.m_Shooter.DeployCoralLowSmiley());
-  }
-
-  public Command threeLeftAlignPreparationTwo()
-  {
-    return AutoBuilder.followPath(THREE_LEFT_ALIGN)
-                      .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
-                      .alongWith(this.m_Shooter.PrepareToDeployCoralLow());
-  }
-
-  public Command fourLeftAlignLevelTwo() 
-  {
-    return fourLeftAlignPreparationTwo().andThen(this.m_Shooter.DeployCoralLowSmiley());
-  }
-
-  public Command fourLeftAlignPreparationTwo()
-  {
-    return AutoBuilder.followPath(FOUR_LEFT_ALIGN)
-                      .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
-                      .alongWith(this.m_Shooter.PrepareToDeployCoralLow());
-  }
-
-  public Command fiveLeftAlignLevelTwo() 
-  {
-    return fiveLeftAlignPreparationTwo().andThen(this.m_Shooter.DeployCoralLowSmiley());
-  }
-
-  public Command fiveLeftAlignPreparationTwo()
-  {
-    return AutoBuilder.followPath(FIVE_LEFT_ALIGN)
-                      .alongWith(this.m_Elevator.MoveToLevel(LEVELS.TWO))
-                      .alongWith(this.m_Shooter.PrepareToDeployCoralLow());
-  }
-
-
-  public Command oneCleanCoral() {
-    return AutoBuilder.followPath(ONE_CLEAN_ALIGN)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.HIGH_ALGAE))
-    .andThen(m_Shooter.SetWristPosition(ShooterConstants.WRIST_ALGAE_SWEEPING_POSITION))
-    .andThen(m_Shooter.SweepAlgae())
-    .andThen(AutoBuilder.followPath(ONE_CLEAN_DEPARTURE));
-  }
-
-  public Command oneCleanCoralExit() {
-    return AutoBuilder.followPath(ONE_CLEAN_DEPARTURE)
-    .alongWith(this.m_Elevator.MoveToLevel(LEVELS.HOME))
-    .alongWith(this.m_Shooter.StopAlgae());
-  }
+  // public Command oneCleanCoralExit() {
+  //   return AutoBuilder.followPath(ONE_CLEAN_DEPARTURE)
+  //   .alongWith(this.m_Elevator.MoveToLevel(LEVELS.HOME))
+  //   .alongWith(this.m_Shooter.StopAlgae());
+  // }
 
   public Command CleanAlgae()
   {
-    int selectedFace = DataStuff.GetFace();
+    int selectedFace = 1;
 
     PathPlannerPath desiredPath;
     PathPlannerPath desiredDeparturePath;
@@ -357,190 +205,6 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
                             .andThen(m_Shooter.HoldAlgae())
                             .andThen(AutoBuilder.followPath(desiredDeparturePath))
                             .andThen(m_Shooter.SetWristPosition(ShooterConstants.WRIST_STOW_POSITION));
-  }
-
-  // public Command DeployToCertainFace()
-  // {
-  //   int selectedFace = DataStuff.GetFace();
-  //   int selectedLeftOrRight = DataStuff.GetSide(); // get from data selector // left is 0
-
-
-    
-  //   switch(selectedFace)
-  //   {
-  //     case 0:
-  //       if(selectedLeftOrRight == 0)
-  //       {
-  //         desiredPath = this.ONE_LEFT_ALIGN;
-  //       }
-  //       desiredPath = this.ONE_RIGHT_ALIGN;
-  //     break;
-
-  //     case 1:
-  //       if(selectedLeftOrRight == 0)
-  //       {
-  //         desiredPath = this.TWO_LEFT_ALIGN;
-  //       }
-  //       desiredPath = this.TWO_RIGHT_ALIGN;
-  //     break;
-
-  //     case 2:
-  //       if(selectedLeftOrRight == 0)
-  //       {
-  //         desiredPath = this.THREE_LEFT_ALIGN;
-  //       }
-  //       desiredPath = this.THREE_RIGHT_ALIGN;
-  //     break;
-
-  //     case 3:
-  //       if(selectedLeftOrRight == 0)
-  //       {
-  //         desiredPath = this.FOUR_LEFT_ALIGN;
-  //       }
-  //       desiredPath = this.FOUR_RIGHT_ALIGN;
-  //     break;
-
-  //     case 4:
-  //       if(selectedLeftOrRight == 0)
-  //       {
-  //         desiredPath = this.FIVE_LEFT_ALIGN;
-  //       }
-  //       desiredPath = this.FIVE_RIGHT_ALIGN;
-  //     break;
-
-  //     case 5:
-      
-  //     default:
-  //       if(selectedLeftOrRight == 0)
-  //       {
-  //         desiredPath = this.SIX_LEFT_ALIGN;
-  //       }
-  //       desiredPath = this.SIX_RIGHT_ALIGN;
-  //     break;
-  //   }
-
-  // }
-
-
-  public Command CoralPlacementRoutine()
-  {  
-    int selectedLevel = DataStuff.GetLevel();
-    SmartDashboard.putNumber("Selected Level", selectedLevel);
-    LEVELS desiredLevel; 
-
-    switch(selectedLevel)
-    {
-      case 0:
-        desiredLevel = LEVELS.ONE;
-      break;
-
-      case 1:
-        desiredLevel = LEVELS.TWO;
-      break;
-
-      case 2:
-        desiredLevel = LEVELS.THREE;
-      break;
-
-      case 3:
-
-      default:
-        desiredLevel = LEVELS.FOUR;
-      break;
-    }
-
-    int selectedFace = DataStuff.GetFace(); // Get from DataSelector Later
-    int selectedLeftOrRight = DataStuff.GetSide(); // get from data selector // left is 0
-    PathPlannerPath desiredPath;
-
-    SmartDashboard.putNumber("Selected Face", selectedFace);
-    SmartDashboard.putNumber("Selected LR", selectedLeftOrRight);
-
-    switch(selectedFace)
-    {
-      case 0:
-        if(selectedLeftOrRight == 0)
-        {
-          desiredPath = this.ONE_LEFT_ALIGN;
-        }
-        desiredPath = this.ONE_RIGHT_ALIGN;
-      break;
-
-      case 1:
-        if(selectedLeftOrRight == 0)
-        {
-          desiredPath = this.TWO_LEFT_ALIGN;
-        }
-        desiredPath = this.TWO_RIGHT_ALIGN;
-      break;
-
-      case 2:
-        if(selectedLeftOrRight == 0)
-        {
-          desiredPath = this.THREE_LEFT_ALIGN;
-        }
-        desiredPath = this.THREE_RIGHT_ALIGN;
-      break;
-
-      case 3:
-        if(selectedLeftOrRight == 0)
-        {
-          desiredPath = this.FOUR_LEFT_ALIGN;
-        }
-        desiredPath = this.FOUR_RIGHT_ALIGN;
-      break;
-
-      case 4:
-        if(selectedLeftOrRight == 0)
-        {
-          desiredPath = this.FIVE_LEFT_ALIGN;
-        }
-        desiredPath = this.FIVE_RIGHT_ALIGN;
-      break;
-
-      case 5:
-      
-      default:
-        if(selectedLeftOrRight == 0)
-        {
-          desiredPath = this.SIX_LEFT_ALIGN;
-        }
-        desiredPath = this.SIX_RIGHT_ALIGN;
-      break;
-    }
-
-    if(this.m_IsVisionEnabled)
-    {
-      if(desiredLevel == LEVELS.FOUR)
-      {
-        return AutoBuilder.followPath(desiredPath)
-                        .andThen(this.m_Elevator.MoveToLevel(desiredLevel))
-                        .andThen(this.m_Shooter.SetWristPosition(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION))
-                        .andThen(this.m_Shooter.DeployCoralHigh());
-      }
-      else
-      {
-        return AutoBuilder.followPath(desiredPath)
-                        .andThen(this.m_Elevator.MoveToLevel(desiredLevel))
-                        .andThen(this.m_Shooter.SetWristPosition(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION_LOW))
-                        .andThen(this.m_Shooter.DeployCoralLow());
-      }
-    }
-    else
-    {
-      if(desiredLevel == LEVELS.FOUR)
-      {
-        return this.m_Elevator.MoveToLevel(desiredLevel)
-                              .andThen(this.m_Shooter.SetWristPosition(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION))
-                              .andThen(this.m_Shooter.DeployCoralHigh());
-      }
-      else
-      {
-        return this.m_Elevator.MoveToLevel(desiredLevel)
-                              .andThen(this.m_Shooter.SetWristPosition(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION_LOW))
-                              .andThen(this.m_Shooter.DeployCoralLow());
-      }
-    }
   }
 
   public Command ToggleVision()

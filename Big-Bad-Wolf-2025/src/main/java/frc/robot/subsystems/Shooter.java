@@ -64,23 +64,6 @@ public class Shooter extends SubsystemBase
     m_BrakeRequest = new StaticBrake();
   }
 
-  public Command DeployCoralLow()
-  {
-    return new FunctionalCommand(() -> this.SetCoralVoltage(ShooterConstants.CORAL_DEPLOYMENT_VOLTAGE).SetWristPositionMotor(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION_LOW),
-                                 () -> {}, 
-                                 interrupted -> this.BrakeCoral(),
-                                 () -> !this.CoralDetected(),
-                                 this);
-  }
-
-  public Command DeployCoralHigh()
-  {
-    return new FunctionalCommand(() -> this.SetCoralVoltage(ShooterConstants.CORAL_DEPLOYMENT_VOLTAGE_HIGH).SetWristPositionMotor(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION),
-                                 () -> {}, 
-                                 interrupted -> this.BrakeCoral(),
-                                 () -> !this.CoralDetected(),
-                                 this);
-  }
 
   public Command PrepareToDeployCoralHigh()
   {
@@ -106,7 +89,7 @@ public class Shooter extends SubsystemBase
     return waitCommand;
   }
 
-  public Command PrepareToDeplyCoralHighSmiley()
+  public Command PrepareToDeplyCoralHigh()
   {
     Command returnCommand = this.runOnce(() -> SetWristPosition(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION));
     return returnCommand;
@@ -118,7 +101,7 @@ public class Shooter extends SubsystemBase
     returnCommand.addRequirements(this);
     return returnCommand;
   }
-  public Command DeployCoralLowSmiley()
+  public Command DeployCoralLow()
   {
     Command returnCommand =  this.runOnce(() -> this.SetCoralVoltage(ShooterConstants.CORAL_DEPLOYMENT_VOLTAGE));
     returnCommand.addRequirements(this);

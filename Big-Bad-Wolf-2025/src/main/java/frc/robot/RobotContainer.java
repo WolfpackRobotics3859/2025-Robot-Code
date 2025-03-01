@@ -29,7 +29,6 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Shooter;
 import frc.robot.utilities.CoralCommandBuilder;
-import frc.robot.utilities.DataStuff;
 import frc.robot.utilities.SubsystemManager;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -94,7 +93,6 @@ public class RobotContainer
         m_Manager.addSubsystem(new Intake());
         m_Manager.addSubsystem(new Climb());
         m_Manager.addSubsystem(new Shooter());
-        m_Manager.addSubsystem(new DataStuff());
         m_Manager.addSubsystem(new Automation(m_Manager));
         this.configureCompetitionBindings();
       break;
@@ -156,9 +154,6 @@ public class RobotContainer
     Climb climb = m_Manager.getSubsystemOfType(Climb.class).get();
     SmartDashboard.putData(climb);
 
-    DataStuff dataStuff = m_Manager.getSubsystemOfType(DataStuff.class).get();
-    SmartDashboard.putData(dataStuff);
-
     Automation automation = m_Manager.getSubsystemOfType(Automation.class).get();
     SmartDashboard.putData(automation);
 
@@ -189,11 +184,6 @@ public class RobotContainer
           
     // m_DriverController.leftBumper().onTrue(automation.CleanAlgae())
     //                                 .onFalse(automation.ResetTheStuffs());
-
-    m_CoDriverController.leftBumper().onTrue(dataStuff.Right().ignoringDisable(true));
-    m_CoDriverController.rightBumper().onTrue(dataStuff.Left().ignoringDisable(true));
-    m_CoDriverController.povUp().onTrue(dataStuff.Down().ignoringDisable(true));
-    m_CoDriverController.povDown().onTrue(dataStuff.Up().ignoringDisable(true));
 
     m_CoDriverController.start().onTrue(automation.ToggleVision());
     m_CoDriverController.y().onTrue(elevator.ZeroElevator());
