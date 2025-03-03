@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "THREE-LEFT-ALIGN"
+            "pathName": "MIDDLE CROSS"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "ALIGNMENT-AUTOS",
+  "folder": "Cross Only",
   "choreoAuto": false
 }

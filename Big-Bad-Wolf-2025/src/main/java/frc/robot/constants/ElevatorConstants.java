@@ -29,10 +29,10 @@ public class ElevatorConstants
     public static final double ELEVATOR_LEVEL_TWO = 25.75;
     public static final double ELEVATOR_LEVEL_THREE = 53.5;
     public static final double ELEVATOR_LEVEL_FOUR = 105;
-    public static final double CORAL_INTAKING_LEVEL = 1.2;
-    public static final double ALGAE_PROCESSING_POSITION = 10;
-    public static final double LOW_CLEAN = 44.25;
-    public static final double HIGH_CLEAN = 72.75;
+    public static final double CORAL_INTAKING_LEVEL = 0.75;
+    public static final double ALGAE_PROCESSING_POSITION = 5;
+    public static final double LOW_CLEAN = 40.25;
+    public static final double HIGH_CLEAN = 60.75;
 
     // Max Height should be around 100-105
 
@@ -93,13 +93,13 @@ public class ElevatorConstants
                                                                     .withKD(0)
                                                                     .withKG(0)
                                                                     .withKI(0)
-                                                                    .withKP(8)
+                                                                    .withKP(11)
                                                                     .withKS(0)
                                                                     .withKV(0)
                                                                     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
 
     public static final MotionMagicConfigs LEFT_MOTOR_MOTION_MAGIC_CONFIG = new MotionMagicConfigs()
-                                                                                .withMotionMagicAcceleration(20)
+                                                                                .withMotionMagicAcceleration(30)
                                                                                 .withMotionMagicCruiseVelocity(500)
                                                                                 .withMotionMagicExpo_kA(0.1)
                                                                                 .withMotionMagicExpo_kV(0.12)

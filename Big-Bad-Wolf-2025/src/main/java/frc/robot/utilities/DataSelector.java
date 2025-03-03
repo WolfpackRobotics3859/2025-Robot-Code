@@ -2,7 +2,6 @@ package frc.robot.utilities;
 
 import java.util.ArrayList;
 
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -16,7 +15,7 @@ public class DataSelector extends SubsystemBase
     private int currentColumnIndex;
 
     public DataSelector(Column header)
-     {
+    {
         this.header = header;
         columns = new ArrayList<>();
     }
@@ -61,16 +60,19 @@ public class DataSelector extends SubsystemBase
         });
     }
 
-    public Command shiftColumnCategoryRight() {
+    public Command shiftColumnCategoryRight() 
+    {
         return runOnce(() -> {
-            if (header.incrementColumn()) {
+            if (header.incrementColumn()) 
+            {
                 currentColumnIndex++;
                 currentColumn = columns.get(currentColumnIndex);
             }
         });
     }
 
-    public Command toggleUpColumn() {
+    public Command toggleUpColumn()
+    {
         return runOnce(() -> {
             currentColumn.decrementColumn();
         });
@@ -82,19 +84,20 @@ public class DataSelector extends SubsystemBase
         });
     }
 
-    public Command dumpData() {
-        return runOnce(() -> {
-            // SmartDashboard.putString("Current Column Name", this.currentColumn.getName());
-            // SmartDashboard.putString("Current option", this.currentColumn.getCurrentOption().getName());
-            // SmartDashboard.putBoolean("Current option state", this.currentColumn.getCurrentOption().getState());
-            for(Column c : columns) {
+    public Command dumpData() 
+    {
+        return runOnce(() -> 
+        {
+            for(Column c : columns)
+            {
                 SmartDashboard.putString(c.getName(), c.getCurrentOption().getName());
             }
         });
     }
 
     @Override
-    public void periodic() {
+    public void periodic()
+    {
         //Intentionally Empty
     }
 }

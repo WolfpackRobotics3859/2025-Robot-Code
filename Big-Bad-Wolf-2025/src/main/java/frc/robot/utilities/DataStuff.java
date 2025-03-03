@@ -3,6 +3,7 @@ package frc.robot.utilities;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.ElevatorConstants.LEVELS;
 
 public class DataStuff extends SubsystemBase
 {
@@ -15,10 +16,11 @@ public class DataStuff extends SubsystemBase
 
     // ONE | TWO | THREE | FOUR
     private static String[] level =  new String[] {"L1", "L2", "L3", "L4"};
+    private static LEVELS[] levelValue = new LEVELS[] {LEVELS.ONE, LEVELS.TWO, LEVELS.THREE, LEVELS.FOUR};
     private static int currentLevel = 0;
 
     // F1 | F2 | F3 | F4 | F5 | F6
-    private static String[] face = new String[] {"F1", "F2", "F3", "F4", "F5", "F6"};
+    private static String[] face = new String[] {"ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX"};
     private static int currentFace = 0;
 
     public DataStuff()
@@ -26,39 +28,49 @@ public class DataStuff extends SubsystemBase
         UpdateEverything();
     }
 
-    public Command Up()
+    public Command Down()
     {
         return this.runOnce(() -> IncrementSelection());
     }
 
-    public Command Down()
+    public Command Up()
     {
         return this.runOnce(() -> DecrementSelection());
     }
 
-    public Command Left()
+    public Command Right()
     {
         return this.runOnce(() -> IncrementColumn());
     }
 
-    public Command Right()
+    public Command Left()
     {
         return this.runOnce(() -> DecrementColumn());
     }
 
-    public static int GetSide()
+    public static String GetSide()
     {
-        return currentSide;
+        return leftRight[currentSide];
     }
 
-    public static int GetLevel()
+    public static LEVELS GetLevel()
     {
-        return currentLevel;
+        return levelValue[currentLevel];
     }
 
-    public static int GetFace()
+    public static String GetFace()
     {
-        return currentFace;
+        return face[currentFace];
+    }
+
+    public static String GetCoralAlignmentPathName()
+    {
+        return GetFace() + "-" + GetSide() + "-ALIGN"; 
+    }
+
+    public static String GetCleanAlignmentPathName()
+    {
+        return GetFace() + "-CLEAN-ALIGN";
     }
 
     public static void IncrementSelection()
