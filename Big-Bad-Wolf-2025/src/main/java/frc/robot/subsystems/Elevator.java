@@ -13,7 +13,6 @@ import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANdi;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.ReverseLimitValue;
 import com.ctre.phoenix6.signals.S1StateValue;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -67,21 +66,10 @@ public class Elevator extends SubsystemBase
       () -> this.SetPosition(level.getValue()),
       () -> {},
       interrupted -> {},
-      () -> isInPosition(1),
+      () -> isInPosition(0.025),
       this
     );
   }
-
-  // public Command MoveToLevel(LEVELS level)
-  // {
-  //   return new FunctionalCommand(
-  //     () -> this.SetPosition(level.getValue()),
-  //     () -> {},
-  //     interrupted -> {},
-  //     MotorManager.InPosition(Hardware.ELEVATOR_MOTOR_LEFT, 0.5),
-  //     this
-  //   );
-  // }
 
   public Command ZeroElevator()
   {

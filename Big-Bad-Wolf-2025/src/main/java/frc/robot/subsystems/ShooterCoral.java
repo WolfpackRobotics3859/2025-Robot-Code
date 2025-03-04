@@ -44,6 +44,11 @@ public class ShooterCoral extends SubsystemBase
                                      this);
     }
 
+    public Command StopCoral()
+    {
+        return this.runOnce(() -> BrakeCoral());
+    }
+
     private void BrakeCoral()
     {
         MotorManager.ApplyControlRequest(m_Brake, Hardware.SHOOTER_CORAL_MOTOR);

@@ -1,15 +1,8 @@
 package frc.robot.utilities;
 
-import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.opencv.core.Mat.Tuple2;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.Pair;

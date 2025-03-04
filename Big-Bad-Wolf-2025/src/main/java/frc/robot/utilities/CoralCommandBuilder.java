@@ -26,8 +26,6 @@ public class CoralCommandBuilder
 
    private HashMap<String, PathPlannerPath> m_AlignmentPaths;
 
-  // private DataStuff m_DataStuff;
-
    public CoralCommandBuilder(Shooter shooter, ShooterCoral shooterCoral, Elevator elevator)
    {
     this.m_Shooter = shooter;

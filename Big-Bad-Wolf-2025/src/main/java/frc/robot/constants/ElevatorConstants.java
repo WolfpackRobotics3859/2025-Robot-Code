@@ -6,7 +6,6 @@ package frc.robot.constants;
 
 import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -14,8 +13,6 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
-import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
 /** 
@@ -104,14 +101,6 @@ public class ElevatorConstants
                                                                                 .withMotionMagicExpo_kA(0.1)
                                                                                 .withMotionMagicExpo_kV(0.12)
                                                                                 .withMotionMagicJerk(0);
-    
-    public static final HardwareLimitSwitchConfigs LEFT_MOTOR_HARDWARE_LIMIT_SWITCH_CONFIG = new HardwareLimitSwitchConfigs()
-                                                                                                 .withReverseLimitSource(ReverseLimitSourceValue.RemoteCANdiS1)
-                                                                                                 .withReverseLimitType(ReverseLimitTypeValue.NormallyClosed)
-                                                                                                 .withReverseLimitAutosetPositionValue(0)
-                                                                                                 .withReverseLimitAutosetPositionEnable(true)
-                                                                                                 .withReverseLimitEnable(false)
-                                                                                                 .withReverseLimitRemoteSensorID(Hardware.CANDI_0);
 
     public static final TalonFXConfiguration LEFT_MOTOR_CONFIG = new TalonFXConfiguration()
                                                                      .withMotorOutput(LEFT_MOTOR_OUTPUT_CONFIG)
@@ -119,7 +108,6 @@ public class ElevatorConstants
                                                                      .withCurrentLimits(LEFT_MOTOR_CURRENT_LIMIT_CONFIG)
                                                                      .withSlot0(LEFT_MOTOR_SLOT_0_CONFIG)
                                                                      .withMotionMagic(LEFT_MOTOR_MOTION_MAGIC_CONFIG);
-                                                                //     .withHardwareLimitSwitch(LEFT_MOTOR_HARDWARE_LIMIT_SWITCH_CONFIG);
 
     // RIGHT MOTOR CONFIGS
     public static final MotorOutputConfigs RIGHT_MOTOR_OUTPUT_CONFIG = new MotorOutputConfigs()
@@ -135,16 +123,8 @@ public class ElevatorConstants
                                                                                     .withSupplyCurrentLimitEnable(false)
                                                                                     .withSupplyCurrentLowerLimit(40)
                                                                                     .withSupplyCurrentLowerTime(1);
-    
-    public static final HardwareLimitSwitchConfigs RIGHT_MOTOR_HARDWARE_LIMIT_SWITCH_CONFIG = new HardwareLimitSwitchConfigs()
-                                                                                                 .withReverseLimitSource(ReverseLimitSourceValue.RemoteCANdiS1)
-                                                                                                 .withReverseLimitType(ReverseLimitTypeValue.NormallyClosed)
-                                                                                                 .withReverseLimitEnable(false)
-                                                                                                 .withReverseLimitRemoteSensorID(Hardware.CANDI_0);
-                                                                                            
 
     public static final TalonFXConfiguration RIGHT_MOTOR_CONFIG = new TalonFXConfiguration()
                                                                      .withMotorOutput(RIGHT_MOTOR_OUTPUT_CONFIG)
                                                                      .withCurrentLimits(RIGHT_MOTOR_CURRENT_LIMIT_CONFIG);
-                                                                    // .withHardwareLimitSwitch(RIGHT_MOTOR_HARDWARE_LIMIT_SWITCH_CONFIG);
 }

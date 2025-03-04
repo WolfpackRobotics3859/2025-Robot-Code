@@ -10,7 +10,6 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -20,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.constants.Global;
 import frc.robot.constants.PathConstants;
@@ -35,6 +33,7 @@ import frc.robot.subsystems.ShooterCoral;
 import frc.robot.utilities.AlgaeCommandBuilder;
 import frc.robot.utilities.CoralCommandBuilder;
 import frc.robot.utilities.DataStuff;
+import frc.robot.utilities.PackLog;
 import frc.robot.utilities.SubsystemManager;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -50,8 +49,7 @@ import frc.robot.subsystems.Climb;
  */
 public class RobotContainer 
 {
-  // Store subsystems in a public manager so other objects can easily cache them.
-  public static final SubsystemManager m_Manager = new SubsystemManager();
+  private static final SubsystemManager m_Manager = new SubsystemManager();
   
   private final CommandXboxController m_DriverController = new CommandXboxController(0);
   private final CommandXboxController m_CoDriverController = new CommandXboxController(1);
@@ -60,22 +58,16 @@ public class RobotContainer
           .withDeadband(TunerConstants.MaxSpeed * 0.05).withRotationalDeadband(TunerConstants.MaxAngularRate * 0.05) // Add a 10% deadband
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
-  private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-
-  public SendableChooser<Command> commandChooser = new SendableChooser<>();
-
   private CoralCommandBuilder commandBuilder;
   private AlgaeCommandBuilder algaeCommandBuilder;
+
+  private final PackLog m_PackLog;
   
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() 
   {
+    this.m_PackLog = new PackLog("RobotContainer");
     this.configurationChooser(Global.ACTIVE_BUILD);
-  }
-
-  public static SubsystemManager getSubsystemManager()
-  {
-    return m_Manager;
   }
 
   public void InitializeDefaultCommands()
@@ -88,10 +80,12 @@ public class RobotContainer
 
     elevator.MoveToLevel(LEVELS.HOME).schedule();
     shooter.StowShooter().schedule();
+    this.m_PackLog.Log("Default commands scheduled.");
   }
 
   private void configurationChooser(BUILD_TYPE type)
   {
+    this.m_PackLog.Log("Beginning configuration.");
     switch(type)
     {
       case COMPETITION:
@@ -144,8 +138,9 @@ public class RobotContainer
         System.out.println("Did you mean to configure nothing? :( Sad Robot Face");
       break;
     }
+
+    this.m_PackLog.Log("Configuration Complete for ACTIVE BUILD: " + type.name());
     SmartDashboard.putString("Active Build", type.name());
-    System.out.println("[Wolfpack] Current build is: " + type.name());
   }
 
   private SendableChooser<Command> m_Chooser;
@@ -179,9 +174,6 @@ public class RobotContainer
 
     commandBuilder = new CoralCommandBuilder(shooter, shooterCoral, elevator);
     commandBuilder.LoadAlignmentPaths(PathConstants.ALIGNMENT_PATHS);
-    commandBuilder.BuildAllL2CommandsAndDeployToSmartdashboard();
-    commandBuilder.BuildAllL3CommandsAndDeployToSmartdashboard();
-    commandBuilder.BuildAllL4CommandsAndDeployToSmartdashboard();
 
     algaeCommandBuilder = new AlgaeCommandBuilder(shooter, shooterAlgae, elevator);
     algaeCommandBuilder.LoadAlignmentPaths(PathConstants.CLEAN_PATHS, PathConstants.CLEAN_DEPARTURE_PATHS);
@@ -195,13 +187,15 @@ public class RobotContainer
         )
     );
 
-    m_DriverController.rightTrigger().whileTrue(new InstantCommand(() -> commandBuilder.BuildCoralDeploymentCommand(DataStuff.GetCoralAlignmentPathName(), DataStuff.GetLevel()).schedule()));
+    m_DriverController.rightTrigger().onTrue(new InstantCommand(() -> commandBuilder.BuildCoralDeploymentCommand(DataStuff.GetCoralAlignmentPathName(), DataStuff.GetLevel()).schedule()))
+                                     .onFalse(new ParallelCommandGroup(shooterCoral.StopCoral(), elevator.MoveToLevel(LEVELS.HOME), shooter.StowShooter()));
 
     m_DriverController.leftTrigger().whileTrue(new ParallelDeadlineGroup(shooterCoral.IntakeCoralRoutine(),
                                                                          elevator.MoveToLevel(LEVELS.CORAL_INTAKE),
                                                                          shooter.MoveToIntake()));
 
-    m_DriverController.leftBumper().whileTrue(new InstantCommand(() -> algaeCommandBuilder.BuildAlgaeRetrievalCommand(DataStuff.GetCleanAlignmentPathName()).schedule()));
+    m_DriverController.leftBumper().onTrue(new InstantCommand(() -> algaeCommandBuilder.BuildAlgaeRetrievalCommand(DataStuff.GetCleanAlignmentPathName()).schedule()))
+                                   .onFalse(new ParallelCommandGroup(shooterAlgae.HoldAlgae(), elevator.MoveToLevel(LEVELS.HOME), shooter.StowShooter()));
 
     m_DriverController.rightBumper().whileTrue(new ParallelCommandGroup(elevator.MoveToLevel(LEVELS.ALGAE_PROCESS), shooter.MoveToAlgaeSweep())
                                                   .andThen(shooterAlgae.DeployAlgae())
