@@ -66,7 +66,7 @@ public class Elevator extends SubsystemBase
       () -> this.SetPosition(level.getValue()),
       () -> {},
       interrupted -> {},
-      () -> isInPosition(0.025),
+      () -> isInPosition(0.05),
       this
     );
   }

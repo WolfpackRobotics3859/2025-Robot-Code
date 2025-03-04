@@ -45,6 +45,7 @@ public class AlgaeCommandBuilder
             m_Paths.put(path, new Pair<PathPlannerPath, PathPlannerPath>(loadedAlignmentPath, loadedDeparturePath));
             DataLogManager.log("Loaded Clean Path: " + path);
             DataLogManager.log("Loaded Departure Path: " + departurePaths[i]);
+            i++;
         }
         DataLogManager.log("Algae Command Builder: Alignment and departure paths successfully loaded.");
     }

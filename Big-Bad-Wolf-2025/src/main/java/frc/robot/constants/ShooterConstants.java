@@ -27,23 +27,23 @@ public class ShooterConstants
     
     // ALGAE MOTOR VOLTAGES   
     // Speed to use when cleaning the coral reef.
-    public static final double ALGAE_SWEEPING_VOLTAGE = 2.0;
+    public static final double ALGAE_SWEEPING_VOLTAGE = 4;
     // Speed to use when intaking algae from the ground.
     public static final double ALGAE_GROUND_INTAKING_VOLTAGE = -2.0;
     public static final double ALGAE_PROCESSOR_DEPLOYMENT_VOLTAGE = -8;
     // This will most likely be a variable algorithmic speed if we ever reach that level of automation.
     public static final double ALGAE_TROUGH_SHOOTING_VOLTAGE = 8;
-    public static final double ALGAE_HOLDING_VOLTAGE = 0.5;
+    public static final double ALGAE_HOLDING_VOLTAGE = 1;
 
     // WRIST POSITIONS
     public static final double WRIST_STOW_POSITION = -4.415; // -0.58
     public static final double WRIST_CORAL_DEPLOYMENT_POSITION_LOW = -3.204; // -0.58
-    public static final double WRIST_CORAL_DEPLOYMENT_POSITION = -0.55;
+    public static final double WRIST_CORAL_DEPLOYMENT_POSITION = -4;
     public static final double WRIST_CORAL_INTAKE_POSITION = -4.366; // -0.62
-    public static final double WRIST_ALGAE_INTAKE_POSITION = -0.23;
-    public static final double WRIST_ALGAE_PROCESSOR_DEPLOYMENT_POSITION = 0.38; // -0.38
-    public static final double WRIST_ALGAE_SHOOTING_POSITION = -0.11;
-    public static final double WRIST_ALGAE_SWEEPING_POSITION = -0.18;
+    public static final double WRIST_ALGAE_INTAKE_POSITION = -1.00;
+    public static final double WRIST_ALGAE_PROCESSOR_DEPLOYMENT_POSITION = -0.05; // -0.38
+    public static final double WRIST_ALGAE_SHOOTING_POSITION = -0.15;
+    public static final double WRIST_ALGAE_SWEEPING_POSITION = -0.5;
     
     // WRIST MOTOR CONFIGS
     public static final MotorOutputConfigs WRIST_MOTOR_OUTPUT_CONFIG = new MotorOutputConfigs()
@@ -69,14 +69,14 @@ public class ShooterConstants
                                                                     .withKD(0)
                                                                     .withKG(0)
                                                                     .withKI(0)
-                                                                    .withKP(13)
+                                                                    .withKP(15)
                                                                     .withKS(0)
                                                                     .withKV(0)
                                                                     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
 
     public static final MotionMagicConfigs WRIST_MOTOR_MOTION_MAGIC_CONFIG = new MotionMagicConfigs()
-                                                                                .withMotionMagicAcceleration(1)
-                                                                                .withMotionMagicCruiseVelocity(3)
+                                                                                .withMotionMagicAcceleration(40)
+                                                                                .withMotionMagicCruiseVelocity(120)
                                                                                 .withMotionMagicExpo_kA(0.1)
                                                                                 .withMotionMagicExpo_kV(0.12)
                                                                                 .withMotionMagicJerk(0);

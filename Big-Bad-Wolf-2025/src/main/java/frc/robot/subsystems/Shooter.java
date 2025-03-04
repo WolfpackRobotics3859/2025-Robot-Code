@@ -71,7 +71,7 @@ public class Shooter extends SubsystemBase
     return new FunctionalCommand(() -> this.SetWristPositionMotor(position),
                                  () -> {}, 
                                  interrupted -> {},
-                                 () -> this.isInPosition(0.025),
+                                 () -> this.isInPosition(0.04),
                                  this);
   }
 

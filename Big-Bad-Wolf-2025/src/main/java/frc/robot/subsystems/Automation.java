@@ -26,6 +26,8 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -49,6 +51,8 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
   private SwerveRequest.ApplyRobotSpeeds m_SwerveRequest;
 
   private Field2d m_Field = new Field2d();
+
+  StructPublisher<Pose2d> publisher;
 
   AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
@@ -80,15 +84,16 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
     {
       m_Subsystems.subscribeSubsystemAdded(this);
     }
+
+    publisher = NetworkTableInstance.getDefault().getStructTopic("Robot Pose", Pose2d.struct).publish();
   }
 
   @Override
   public void periodic() 
   {
     this.UpdateForwardCamera();
-    SmartDashboard.putData("Field", m_Field);
+    publisher.set(this.m_Drivetrain.getState().Pose);
     SmartDashboard.putBoolean("Forward Camera Connected", this.m_ForwardCamera.isConnected());
-    m_Field.setRobotPose(this.m_Drivetrain.getState().Pose);
   }
 
   @Override
@@ -167,7 +172,7 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
             () -> this.m_Drivetrain.getState().Speeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
             (speeds, feedforwards) -> this.m_Drivetrain.setControl(m_SwerveRequest.withSpeeds(speeds).withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesX()).withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesY())), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
             new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                    new PIDConstants(10, 0.0, 0.0), // Translation PID constants
                     new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
             ),
             config,
