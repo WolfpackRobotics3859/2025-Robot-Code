@@ -6,12 +6,15 @@ package frc.robot;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -26,6 +29,7 @@ import frc.robot.constants.ElevatorConstants.LEVELS;
 import frc.robot.constants.Global.BUILD_TYPE;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.ShooterAlgae;
@@ -129,7 +133,7 @@ public class RobotContainer
       break;
 
       case AUTOMATION_DEBUG:
-        m_Manager.addSubsystem(TunerConstants.createDrivetrain());
+        m_Manager.addSubsystem(new Drivetrain(TunerConstants.DrivetrainConstants, TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight));
         m_Manager.addSubsystem(new Automation(m_Manager));
         this.configureAutomationDebugBindings();
       break;
@@ -333,13 +337,9 @@ public class RobotContainer
 
   private void configureAutomationDebugBindings()
   {
-    CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
-    
-    m_DriverController.start().onTrue(drivetrain.runOnce(() -> drivetrain.resetPose(new Pose2d())));
+    Drivetrain drivetrain = m_Manager.getSubsystemOfType(Drivetrain.class).get();
 
-    m_DriverController.a().toggleOnFalse(new PathPlannerAuto("New New Auto"));
-    m_DriverController.b().toggleOnFalse(new PathPlannerAuto("SIX-LEFT-AUTO"));
-    m_DriverController.y().toggleOnFalse(new PathPlannerAuto("SIX-RIGHT-AUTO"));
+    m_DriverController.a().whileTrue(drivetrain.Align(new Pose2d(5.251, 5.014, new Rotation2d(Degrees.of(-120)))));
     
     drivetrain.setDefaultCommand
     (

@@ -29,7 +29,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -50,11 +49,9 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
 
   private SwerveRequest.ApplyRobotSpeeds m_SwerveRequest;
 
-  private Field2d m_Field = new Field2d();
-
-  StructPublisher<Pose2d> publisher;
-
   AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+
+  StructPublisher<Pose2d> publisher = NetworkTableInstance.getDefault().getStructTopic("Current Robot Pose", Pose2d.struct).publish();
 
   public Automation(SubsystemManager manager) 
   {
@@ -92,8 +89,8 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
   public void periodic() 
   {
     this.UpdateForwardCamera();
-    publisher.set(this.m_Drivetrain.getState().Pose);
     SmartDashboard.putBoolean("Forward Camera Connected", this.m_ForwardCamera.isConnected());
+    publisher.set(this.m_Drivetrain.getState().Pose);
   }
 
   @Override
