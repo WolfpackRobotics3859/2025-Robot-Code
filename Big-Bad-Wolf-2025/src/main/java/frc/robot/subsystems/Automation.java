@@ -28,8 +28,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.AutomationConstants;
@@ -39,6 +41,7 @@ import frc.robot.utilities.DataSelector;
 import frc.robot.utilities.SubsystemManager;
 import frc.robot.utilities.subsystemManager.SubsystemAddedEvent;
 import frc.robot.utilities.subsystemManager.SubsystemAddedListener;
+import frc.robot.Robot;
 
 public class Automation extends SubsystemBase implements SubsystemAddedListener
 {
@@ -49,6 +52,7 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
 
   private PhotonCamera m_ForwardCamera;
   private PhotonPoseEstimator m_ForwardCameraEstimator;
+  private boolean tagDetected = false;
 
   private SwerveRequest.ApplyRobotSpeeds m_SwerveRequest;
 
@@ -223,6 +227,12 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
     this.UpdateForwardCamera();
     SmartDashboard.putData("Field", m_Field);
     SmartDashboard.putBoolean("Forward Camera Connected", this.m_ForwardCamera.isConnected());
+    if (tagDetected)
+    {
+      LEDPattern.solid(Color.kGreen).applyTo(Robot.m_LEDBuffer);
+      Robot.m_LED.setData(Robot.m_LEDBuffer);
+      SmartDashboard.putBoolean("Tag Detected", tagDetected);
+    }
     m_Field.setRobotPose(this.m_Drivetrain.getState().Pose);
   }
 
@@ -345,7 +355,9 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
       {
         if(this.m_Drivetrain != null)
         {
-          Optional<EstimatedRobotPose> estimatedPose = m_ForwardCameraEstimator.update(list.get(0));
+          PhotonPipelineResult latestPipelineResult = list.get(list.size()-1); 
+          tagDetected = latestPipelineResult.hasTargets() ? true : false;
+          Optional<EstimatedRobotPose> estimatedPose = m_ForwardCameraEstimator.update(latestPipelineResult);
           if(estimatedPose.isPresent())
           {
             this.m_Drivetrain.addVisionMeasurement(estimatedPose.get().estimatedPose.toPose2d(), Utils.getCurrentTimeSeconds());
