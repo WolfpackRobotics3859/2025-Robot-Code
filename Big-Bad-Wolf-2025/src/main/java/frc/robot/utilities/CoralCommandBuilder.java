@@ -1,6 +1,10 @@
 package frc.robot.utilities;
 
+import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -12,20 +16,21 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.ElevatorConstants.LEVELS;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.ShooterCoral;
 
 public class CoralCommandBuilder
 {
    private Shooter m_Shooter;
    private Elevator m_Elevator;
+   private ShooterCoral m_ShooterCoral;
 
    private HashMap<String, PathPlannerPath> m_AlignmentPaths;
 
-  // private DataStuff m_DataStuff;
-
-   public CoralCommandBuilder(Shooter shooter, Elevator elevator)
+   public CoralCommandBuilder(Shooter shooter, ShooterCoral shooterCoral, Elevator elevator)
    {
     this.m_Shooter = shooter;
     this.m_Elevator = elevator;
+    this.m_ShooterCoral = shooterCoral;
     m_AlignmentPaths  = new HashMap<String, PathPlannerPath>();
    }
 
@@ -75,22 +80,24 @@ public class CoralCommandBuilder
     }
    }
 
-   private Command BuildCoralDeploymentCommand(String alignmentPath, LEVELS level)
+   public Command BuildCoralDeploymentCommand(String alignmentPath, LEVELS level)
    {
     Command preparationCommand;
     if(level == LEVELS.FOUR)
     {
         preparationCommand = AutoBuilder.followPath(m_AlignmentPaths.get(alignmentPath))
-                                .alongWith(this.m_Elevator.MoveToLevel(level))
-                                .alongWith(this.m_Shooter.PrepareToDeployCoralHigh());
-        return preparationCommand.andThen(this.m_Shooter.PrepareToDeployCoralHigh());
+                                        .alongWith(this.m_Elevator.MoveToLevel(level))
+                                        .alongWith(this.m_Shooter.MoveToDeployHigh());
+        return preparationCommand.andThen(this.m_ShooterCoral.DeployCoralRoutine());
     }
     
     preparationCommand = AutoBuilder.followPath(m_AlignmentPaths.get(alignmentPath))
                                 .alongWith(this.m_Elevator.MoveToLevel(level))
-                                .alongWith(this.m_Shooter.PrepareToDeployCoralLow());
+                                .alongWith(this.m_Shooter.MoveToDeployLow());
 
-    return preparationCommand.andThen(this.m_Shooter.DeployCoralLow());
+    DataLogManager.log("CoralCommandBuilder built command for level " + level.name() + " following " + alignmentPath);
+
+    return preparationCommand.andThen(this.m_ShooterCoral.DeployCoralRoutine());
    }
 
    public Command BuildCoralStandingDeployment(LEVELS level)
@@ -99,12 +106,12 @@ public class CoralCommandBuilder
     if(level == LEVELS.FOUR)
     {
         preparationCommand = this.m_Elevator.MoveToLevel(level)
-                                        .alongWith(this.m_Shooter.PrepareToDeployCoralHigh());
-        return preparationCommand.andThen(this.m_Shooter.DeployCoralHighSmiley());
+                                        .alongWith(this.m_Shooter.MoveToDeployHigh());
+        return preparationCommand.andThen(this.m_ShooterCoral.DeployCoralRoutine());
     }
     
     preparationCommand = this.m_Elevator.MoveToLevel(level)
-                                        .alongWith(this.m_Shooter.PrepareToDeployCoralLow());    
-    return preparationCommand.andThen(this.m_Shooter.DeployCoralLow());
+                                        .alongWith(this.m_Shooter.MoveToDeployLow());    
+    return preparationCommand.andThen(this.m_ShooterCoral.DeployCoralRoutine());
    }
 }

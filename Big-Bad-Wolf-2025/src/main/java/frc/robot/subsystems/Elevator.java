@@ -7,15 +7,21 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 import com.ctre.phoenix6.SignalLogger;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANdi;
+import com.ctre.phoenix6.hardware.CANdi;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.ReverseLimitValue;
 import com.ctre.phoenix6.signals.S1StateValue;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -23,11 +29,25 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.ElevatorConstants.LEVELS;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.constants.ElevatorConstants;
+import frc.robot.constants.ElevatorConstants.LEVELS;
 import frc.robot.constants.Hardware;
+import frc.robot.utilities.MotorManager;
 import frc.robot.utilities.MotorManager;
 
 public class Elevator extends SubsystemBase
 {
+  // Hardware
+  private final TalonFX m_ElevatorMotorLeft;
+  private final TalonFX m_ElevatorMotorRight;
+  private final CANdi m_CANdi;
+
+  private final VoltageOut m_VoltageRequest;
+  private final MotionMagicVoltage m_PositionRequest;
+  private final StaticBrake m_BrakeRequest;
+  
+  private SysIdRoutine m_SysIdRoutine;
   // Hardware
   private final TalonFX m_ElevatorMotorLeft;
   private final TalonFX m_ElevatorMotorRight;
@@ -46,7 +66,24 @@ public class Elevator extends SubsystemBase
   {
     MotorManager.AddMotor("ELEVATOR LEFT MOTOR", Hardware.ELEVATOR_MOTOR_LEFT);
     MotorManager.AddMotor("ELEVATOR RIGHT MOTOR", Hardware.ELEVATOR_MOTOR_RIGHT);
+    MotorManager.AddMotor("ELEVATOR LEFT MOTOR", Hardware.ELEVATOR_MOTOR_LEFT);
+    MotorManager.AddMotor("ELEVATOR RIGHT MOTOR", Hardware.ELEVATOR_MOTOR_RIGHT);
 
+    m_ElevatorMotorLeft = MotorManager.GetMotor(Hardware.ELEVATOR_MOTOR_LEFT);
+    m_ElevatorMotorRight = MotorManager.GetMotor(Hardware.ELEVATOR_MOTOR_RIGHT);
+    m_CANdi = new CANdi(Hardware.CANDI_0);
+
+    MotorManager.ApplyConfigs(ElevatorConstants.LEFT_MOTOR_CONFIG, Hardware.ELEVATOR_MOTOR_LEFT);
+    MotorManager.ApplyConfigs(ElevatorConstants.RIGHT_MOTOR_CONFIG, Hardware.ELEVATOR_MOTOR_RIGHT);
+
+    MotorManager.ApplyControlRequest(new Follower(Hardware.ELEVATOR_MOTOR_LEFT, false), Hardware.ELEVATOR_MOTOR_RIGHT);
+
+    m_VoltageRequest = new VoltageOut(0);
+    m_PositionRequest = new MotionMagicVoltage(0);
+    m_BrakeRequest = new StaticBrake();
+  }
+
+  public Command MoveToLevel(LEVELS level)
     m_ElevatorMotorLeft = MotorManager.GetMotor(Hardware.ELEVATOR_MOTOR_LEFT);
     m_ElevatorMotorRight = MotorManager.GetMotor(Hardware.ELEVATOR_MOTOR_RIGHT);
     m_CANdi = new CANdi(Hardware.CANDI_0);
@@ -67,21 +104,10 @@ public class Elevator extends SubsystemBase
       () -> this.SetPosition(level.getValue()),
       () -> {},
       interrupted -> {},
-      () -> isInPosition(1),
+      () -> isInPosition(0.05),
       this
     );
   }
-
-  // public Command MoveToLevel(LEVELS level)
-  // {
-  //   return new FunctionalCommand(
-  //     () -> this.SetPosition(level.getValue()),
-  //     () -> {},
-  //     interrupted -> {},
-  //     MotorManager.InPosition(Hardware.ELEVATOR_MOTOR_LEFT, 0.5),
-  //     this
-  //   );
-  // }
 
   public Command ZeroElevator()
   {
@@ -142,7 +168,25 @@ public class Elevator extends SubsystemBase
   }
 
   private boolean isInPosition(double tolerance)
+    this.m_SysIdRoutine = new SysIdRoutine(
+      new SysIdRoutine.Config(
+         Volts.of(0.5).per(Seconds),         // Use default ramp rate (1 V/s)
+         Volts.of(0.5), // Reduce dynamic step voltage to 4 to prevent brownout
+         null,          // Use default timeout (10 s)
+         (state) -> SignalLogger.writeString("state", state.toString()) // Log state with Phoenix SignalLogger class
+      ),
+      new SysIdRoutine.Mechanism(
+         (volts) -> m_ElevatorMotorLeft.setControl(new VoltageOut(volts.in(Volts))),
+         null,
+         this
+      )
+   );
+   return this.m_SysIdRoutine;
+  }
+
+  private boolean isInPosition(double tolerance)
   {
+    return Math.abs(this.m_ElevatorMotorLeft.getPosition().getValueAsDouble() - this.m_PositionRequest.Position) < tolerance;
     return Math.abs(this.m_ElevatorMotorLeft.getPosition().getValueAsDouble() - this.m_PositionRequest.Position) < tolerance;
   }
 
@@ -152,6 +196,12 @@ public class Elevator extends SubsystemBase
   @Override
   public void periodic()
   {
+    if(m_CANdi.isConnected() && (m_CANdi.getS1State().getValue() == S1StateValue.Low) && m_CANdi.getS1Closed().refresh().getValue())
+    {
+      this.m_ElevatorMotorLeft.setPosition(0);
+    }
+    SmartDashboard.putNumber("Elevator Position :)", this.m_ElevatorMotorLeft.getPosition().getValueAsDouble());
+    SmartDashboard.putNumber("Shooter Closed Loop Error", m_ElevatorMotorLeft.getClosedLoopError().getValueAsDouble());
     if(m_CANdi.isConnected() && (m_CANdi.getS1State().getValue() == S1StateValue.Low) && m_CANdi.getS1Closed().refresh().getValue())
     {
       this.m_ElevatorMotorLeft.setPosition(0);

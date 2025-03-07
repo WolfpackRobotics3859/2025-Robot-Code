@@ -117,10 +117,10 @@ public class MotorManager
         }
 
         System.out.println("[ERROR] No motor with id " + id +  " found in " + MotorManager.class.getName());
-/*         for (StackTraceElement ste : Thread.currentThread().getStackTrace()) 
+         for (StackTraceElement ste : Thread.currentThread().getStackTrace()) 
         {
             System.out.println(ste + "\n");
-        } */
+        }   
 
         return null;
     }
