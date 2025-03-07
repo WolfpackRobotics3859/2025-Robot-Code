@@ -25,7 +25,7 @@ public class ElevatorConstants
     public static final double ELEVATOR_LEVEL_ONE = 15;
     public static final double ELEVATOR_LEVEL_TWO = 28.0;
     public static final double ELEVATOR_LEVEL_THREE = 53.5;
-    public static final double ELEVATOR_LEVEL_FOUR = 105;
+    public static final double ELEVATOR_LEVEL_FOUR = 90;
     public static final double CORAL_INTAKING_LEVEL = 0.75;
     public static final double ALGAE_PROCESSING_POSITION = 5;
     public static final double LOW_CLEAN = 35.25;
@@ -96,8 +96,8 @@ public class ElevatorConstants
                                                                     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
 
     public static final MotionMagicConfigs LEFT_MOTOR_MOTION_MAGIC_CONFIG = new MotionMagicConfigs()
-                                                                                .withMotionMagicAcceleration(60)
-                                                                                .withMotionMagicCruiseVelocity(500)
+                                                                                .withMotionMagicAcceleration(80)
+                                                                                .withMotionMagicCruiseVelocity(600)
                                                                                 .withMotionMagicExpo_kA(0.1)
                                                                                 .withMotionMagicExpo_kV(0.12)
                                                                                 .withMotionMagicJerk(0);

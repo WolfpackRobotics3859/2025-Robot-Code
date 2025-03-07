@@ -11,7 +11,6 @@ import static edu.wpi.first.units.Units.Degrees;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -76,14 +75,14 @@ public class RobotContainer
 
   public void InitializeDefaultCommands()
   {
-    Elevator elevator = m_Manager.getSubsystemOfType(Elevator.class).get();
-    SmartDashboard.putData(elevator);
+    // Elevator elevator = m_Manager.getSubsystemOfType(Elevator.class).get();
+    // SmartDashboard.putData(elevator);
 
-    Shooter shooter = m_Manager.getSubsystemOfType(Shooter.class).get();
-    SmartDashboard.putData(shooter);
+    // Shooter shooter = m_Manager.getSubsystemOfType(Shooter.class).get();
+    // SmartDashboard.putData(shooter);
 
-    elevator.MoveToLevel(LEVELS.HOME).schedule();
-    shooter.StowShooter().schedule();
+    // elevator.MoveToLevel(LEVELS.HOME).schedule();
+    // shooter.StowShooter().schedule();
     this.m_PackLog.Log("Default commands scheduled.");
   }
 
@@ -275,8 +274,6 @@ public class RobotContainer
 
     m_DriverController.start().onTrue(elevator.ZeroElevator());
     m_DriverController.povLeft().onTrue(elevator.MoveToLevel(LEVELS.HOME));
-    m_DriverController.povUp().onTrue(elevator.ApplyVoltage(3)).onFalse(elevator.ApplyVoltage(0));
-    m_DriverController.povDown().onTrue(elevator.ApplyVoltage(-0.8)).onFalse(elevator.ApplyVoltage(0));
 
     SysIdRoutine sysIdRoutine = elevator.BuildSysIdRoutine();
 
@@ -339,7 +336,7 @@ public class RobotContainer
   {
     Drivetrain drivetrain = m_Manager.getSubsystemOfType(Drivetrain.class).get();
 
-    m_DriverController.a().whileTrue(drivetrain.Align(new Pose2d(5.251, 5.014, new Rotation2d(Degrees.of(-120)))));
+    m_DriverController.a().whileTrue(drivetrain.Align(new Pose2d(12.217, 2.932, new Rotation2d(Degrees.of(62.48)))));
     
     drivetrain.setDefaultCommand
     (

@@ -18,7 +18,8 @@ public class Drivetrain extends CommandSwerveDrivetrain
     private PackLog m_PackLog;
     private PIDController m_XController;
     private PIDController m_YController;
-    private SwerveRequest.FieldCentricFacingAngle m_SwerveRequest;
+    private PIDController m_RotationController;
+    private SwerveRequest.FieldCentric m_SwerveRequest;
 
     public Drivetrain(SwerveDrivetrainConstants constants, SwerveModuleConstants<?, ?, ?>... modules)
     {
@@ -33,20 +34,22 @@ public class Drivetrain extends CommandSwerveDrivetrain
 
         this.m_XController.setSetpoint(desiredPose.getX());
         this.m_YController.setSetpoint(desiredPose.getY());
-
-        this.m_SwerveRequest.TargetDirection = desiredPose.getRotation();
+        this.m_RotationController.setSetpoint(desiredPose.getRotation().getDegrees());
 
         return new FunctionalCommand(() -> {}, 
                                      () -> UpdateRequest(), 
-                                     interrupted -> {}, 
+                                     interrupted -> {
+                                                        m_PackLog.Log("Alignment command finished.");
+                                                    }, 
                                      () -> IsAlignmentComplete(), 
                                      this);
     }
 
     private void UpdateRequest()
     {
-        this.m_SwerveRequest.VelocityX = this.GetXOutput();
-        this.m_SwerveRequest.VelocityY = this.GetYOutput();
+        this.m_SwerveRequest.VelocityX = -this.GetXOutput();
+        this.m_SwerveRequest.VelocityY = -this.GetYOutput();
+        this.m_SwerveRequest.RotationalRate = this.GetRotationOutput();
         this.setControl(m_SwerveRequest);
     }
 
@@ -60,6 +63,11 @@ public class Drivetrain extends CommandSwerveDrivetrain
         return MathUtil.clamp(this.m_YController.calculate(this.getState().Pose.getY()), -TunerConstants.MaxSpeed, TunerConstants.MaxSpeed);
     }
 
+    private double GetRotationOutput()
+    {
+        return MathUtil.clamp(this.m_RotationController.calculate(this.getState().Pose.getRotation().getDegrees()), -TunerConstants.MaxAngularRate, TunerConstants.MaxAngularRate);
+    }
+
     private boolean IsAlignmentComplete()
     {
         return this.m_XController.atSetpoint() && this.m_YController.atSetpoint();
@@ -69,19 +77,27 @@ public class Drivetrain extends CommandSwerveDrivetrain
     {
         this.m_PackLog = new PackLog("Drivetrain");
         this.m_PackLog.Log("Beginning configuration.");
-        this.m_XController = new PIDController(5, 0, 0);
-        this.m_XController.setTolerance(5, 10);
-        this.m_XController.setIntegratorRange(-1,1);
-        this.m_XController.setIZone(10);
+        this.m_XController = new PIDController(25, 0.1,0.025);
+        this.m_XController.setTolerance(0.01, 0.05);
+        this.m_XController.setIntegratorRange(-TunerConstants.MaxSpeed * 0.1,TunerConstants.MaxSpeed * 0.1);
+        this.m_XController.setIZone(1);
         SmartDashboard.putData(this.m_XController);
 
-        this.m_YController = new PIDController (5, 0 ,0);
-        this.m_YController.setTolerance(5, 10);
-        this.m_YController.setIntegratorRange(-1,1);
-        this.m_YController.setIZone(10);
+        this.m_YController = new PIDController (25, 0.1 ,0.025);
+        this.m_YController.setTolerance(0.01, 0.1);
+        this.m_YController.setIntegratorRange(-TunerConstants.MaxSpeed * 0.1,TunerConstants.MaxSpeed * 0.1);
+        this.m_YController.setIZone(1);
         SmartDashboard.putData(this.m_YController);
 
-        this.m_SwerveRequest = new SwerveRequest.FieldCentricFacingAngle();
+        this.m_RotationController = new PIDController (0.25, 0.5 ,0);
+        this.m_RotationController.setTolerance(1, 1);
+        this.m_RotationController.setIntegratorRange(-TunerConstants.MaxAngularRate * 0.1,TunerConstants.MaxAngularRate * 0.1);
+        this.m_RotationController.setIZone(10);
+        this.m_RotationController.enableContinuousInput(-180, 180);
+        SmartDashboard.putData(this.m_RotationController);
+
+        this.m_SwerveRequest = new SwerveRequest.FieldCentric();
+
         this.m_PackLog.Log("End configuration.");
     }
 

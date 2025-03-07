@@ -51,7 +51,7 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
 
   AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
-  StructPublisher<Pose2d> publisher = NetworkTableInstance.getDefault().getStructTopic("Current Robot Pose", Pose2d.struct).publish();
+  StructPublisher<Pose2d> publisher = NetworkTableInstance.getDefault().getStructTopic("Robot Pose", Pose2d.struct).publish();
 
   public Automation(SubsystemManager manager) 
   {
@@ -83,6 +83,7 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
     }
 
     publisher = NetworkTableInstance.getDefault().getStructTopic("Robot Pose", Pose2d.struct).publish();
+    this.ConfigureCameras();
   }
 
   @Override
@@ -144,7 +145,6 @@ public class Automation extends SubsystemBase implements SubsystemAddedListener
 
   private void Configure()
   {
-    this.ConfigureCameras();
     this.ConfigureAutobuilder(); // autobuilder should be configured last?
 
     System.out.println("AUTOMATION CONFIGURATION COMPLETE.");
