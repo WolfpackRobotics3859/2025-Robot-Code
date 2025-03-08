@@ -4,9 +4,6 @@
 
 package frc.robot.subsystems;
 
-import java.util.function.DoubleSupplier;
-
-import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VoltageOut;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -25,23 +22,25 @@ public class Climb extends SubsystemBase
    */
   public Climb() 
   {
-    MotorManager.AddMotor("CLIMB MOTOR MAIN", Hardware.CLIMB_WRIST_MOTOR_MAIN);
-    MotorManager.AddMotor("CLIMB MOTOR FOLLOWER", Hardware.CLIMB_WRIST_MOTOR_FOLLOWER);
+    MotorManager.AddMotor("CLIMB WRIST MOTOR", Hardware.CLIMB_WRIST_MOTOR);
+    MotorManager.AddMotor("CLIMB ROLLER MOTOR", Hardware.CLIMB_ROLLER_MOTOR);
     MotorManager.AddMotor("FUNNEL LATCH MOTOR", Hardware.CORAL_FUNNEL_MOTOR);
 
-    MotorManager.ApplyConfigs(ClimbConstants.CLIMB_WRIST_MAIN_CONFIGURATION, Hardware.CLIMB_WRIST_MOTOR_MAIN);
-    MotorManager.ApplyConfigs(ClimbConstants.CLIMB_WRIST_FOLLOWER_CONFIGURATION, Hardware.CLIMB_WRIST_MOTOR_FOLLOWER);
+    MotorManager.ApplyConfigs(ClimbConstants.CLIMB_WRIST_CONFIGURATION, Hardware.CLIMB_WRIST_MOTOR);
+    MotorManager.ApplyConfigs(ClimbConstants.CLIMB_ROLLER_CONFIGURATION, Hardware.CLIMB_ROLLER_MOTOR);
     MotorManager.ApplyConfigs(ClimbConstants.FUNNEL_LATCH_MOTOR_CONFIGURATION, Hardware.CORAL_FUNNEL_MOTOR);
-
-    Follower climbFollowRequest = new Follower(Hardware.CLIMB_WRIST_MOTOR_MAIN, false); 
-    MotorManager.ApplyControlRequest(climbFollowRequest, Hardware.CLIMB_WRIST_MOTOR_FOLLOWER);
 
     m_VoltageRequest = new VoltageOut(0);
   }
 
-  public Command setClimbVoltage(DoubleSupplier voltageSupplier)
+  public Command setClimbVoltage(double voltage)
   {
-    return this.run(() -> MotorManager.ApplyControlRequest(m_VoltageRequest.withOutput(voltageSupplier.getAsDouble()), Hardware.CLIMB_WRIST_MOTOR_MAIN));
+    return this.run(() -> MotorManager.ApplyControlRequest(m_VoltageRequest.withOutput(voltage), Hardware.CLIMB_WRIST_MOTOR));
+  }
+
+  public Command setRollerVoltage(double voltage)
+  {
+    return this.run(() -> MotorManager.ApplyControlRequest(m_VoltageRequest.withOutput(voltage), Hardware.CLIMB_ROLLER_MOTOR));
   }
 
   public Command setLatchVoltage(double voltage)

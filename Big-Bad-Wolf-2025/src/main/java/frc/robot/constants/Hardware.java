@@ -24,7 +24,7 @@ public class Hardware
     public static final int SHOOTER_WRIST_CANCODER = 0;
 
     //CLIMB
-    public static final int CLIMB_WRIST_MOTOR_MAIN = 8;
-    public static final int CLIMB_WRIST_MOTOR_FOLLOWER = 9;
+    public static final int CLIMB_WRIST_MOTOR = 8;
+    public static final int CLIMB_ROLLER_MOTOR = 9;
     public static final int CORAL_FUNNEL_MOTOR = 10;
 }
