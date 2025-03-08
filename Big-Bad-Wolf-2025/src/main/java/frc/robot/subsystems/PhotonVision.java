@@ -59,7 +59,15 @@ public class PhotonVision extends SubsystemBase implements SubsystemAddedListene
   public PhotonVision(SubsystemManager manager)
   {
     this.m_Subsystems = manager;
-    this.m_Drivetrain = this.m_Subsystems.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
+    if (this.m_Subsystems.getSubsystemOfType(CommandSwerveDrivetrain.class).isPresent())
+    {
+      this.m_Drivetrain = this.m_Subsystems.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
+    }
+    else
+    {
+      this.m_Subsystems.subscribeSubsystemAdded(this);
+    }
+  
     // this.m_Drivetrain = p_Drivetrain;
    
     enabledCameras = new ArrayList<>();
