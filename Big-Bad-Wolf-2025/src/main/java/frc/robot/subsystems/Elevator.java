@@ -48,16 +48,6 @@ public class Elevator extends SubsystemBase
   private final StaticBrake m_BrakeRequest;
   
   private SysIdRoutine m_SysIdRoutine;
-  // Hardware
-  private final TalonFX m_ElevatorMotorLeft;
-  private final TalonFX m_ElevatorMotorRight;
-  private final CANdi m_CANdi;
-
-  private final VoltageOut m_VoltageRequest;
-  private final MotionMagicVoltage m_PositionRequest;
-  private final StaticBrake m_BrakeRequest;
-  
-  private SysIdRoutine m_SysIdRoutine;
 
   /**
    * Constructor which runs anything in it upon initialization and creates a new object.
@@ -69,21 +59,6 @@ public class Elevator extends SubsystemBase
     MotorManager.AddMotor("ELEVATOR LEFT MOTOR", Hardware.ELEVATOR_MOTOR_LEFT);
     MotorManager.AddMotor("ELEVATOR RIGHT MOTOR", Hardware.ELEVATOR_MOTOR_RIGHT);
 
-    m_ElevatorMotorLeft = MotorManager.GetMotor(Hardware.ELEVATOR_MOTOR_LEFT);
-    m_ElevatorMotorRight = MotorManager.GetMotor(Hardware.ELEVATOR_MOTOR_RIGHT);
-    m_CANdi = new CANdi(Hardware.CANDI_0);
-
-    MotorManager.ApplyConfigs(ElevatorConstants.LEFT_MOTOR_CONFIG, Hardware.ELEVATOR_MOTOR_LEFT);
-    MotorManager.ApplyConfigs(ElevatorConstants.RIGHT_MOTOR_CONFIG, Hardware.ELEVATOR_MOTOR_RIGHT);
-
-    MotorManager.ApplyControlRequest(new Follower(Hardware.ELEVATOR_MOTOR_LEFT, false), Hardware.ELEVATOR_MOTOR_RIGHT);
-
-    m_VoltageRequest = new VoltageOut(0);
-    m_PositionRequest = new MotionMagicVoltage(0);
-    m_BrakeRequest = new StaticBrake();
-  }
-
-  public Command MoveToLevel(LEVELS level)
     m_ElevatorMotorLeft = MotorManager.GetMotor(Hardware.ELEVATOR_MOTOR_LEFT);
     m_ElevatorMotorRight = MotorManager.GetMotor(Hardware.ELEVATOR_MOTOR_RIGHT);
     m_CANdi = new CANdi(Hardware.CANDI_0);
@@ -168,25 +143,7 @@ public class Elevator extends SubsystemBase
   }
 
   private boolean isInPosition(double tolerance)
-    this.m_SysIdRoutine = new SysIdRoutine(
-      new SysIdRoutine.Config(
-         Volts.of(0.5).per(Seconds),         // Use default ramp rate (1 V/s)
-         Volts.of(0.5), // Reduce dynamic step voltage to 4 to prevent brownout
-         null,          // Use default timeout (10 s)
-         (state) -> SignalLogger.writeString("state", state.toString()) // Log state with Phoenix SignalLogger class
-      ),
-      new SysIdRoutine.Mechanism(
-         (volts) -> m_ElevatorMotorLeft.setControl(new VoltageOut(volts.in(Volts))),
-         null,
-         this
-      )
-   );
-   return this.m_SysIdRoutine;
-  }
-
-  private boolean isInPosition(double tolerance)
   {
-    return Math.abs(this.m_ElevatorMotorLeft.getPosition().getValueAsDouble() - this.m_PositionRequest.Position) < tolerance;
     return Math.abs(this.m_ElevatorMotorLeft.getPosition().getValueAsDouble() - this.m_PositionRequest.Position) < tolerance;
   }
 
