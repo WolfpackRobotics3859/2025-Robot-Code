@@ -1,10 +1,6 @@
 package frc.robot.utilities;
 
-import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
