@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.constants.Global;
 import frc.robot.constants.PathConstants;
+import frc.robot.constants.ClimbConstants;
 import frc.robot.constants.ElevatorConstants.LEVELS;
 import frc.robot.constants.Global.BUILD_TYPE;
 import frc.robot.generated.TunerConstants;
@@ -216,8 +217,12 @@ public class RobotContainer
 
     m_CoDriverController.y().onTrue(elevator.ZeroElevator());
 
- //   m_CoDriverController.a().whileTrue(climb.setClimbVoltage(() -> m_CoDriverController.getRawAxis(2)*6));
- //   m_CoDriverController.b().whileTrue(climb.setLatchVoltage(-2)).onFalse(climb.setLatchVoltage(0));
+
+    //climb wrist
+    m_CoDriverController.x().whileTrue(climb.setClimbVoltage(ClimbConstants.CLIMB_WRIST_VOLTAGE)).onFalse(climb.setClimbVoltage(0));
+    //climb wheels
+    m_CoDriverController.b().whileTrue(climb.setRollerVoltage(ClimbConstants.CLIMB_ROLLER_VOLTAGE)).onFalse(climb.setRollerVoltage(0));
+    //m_CoDriverController.b().whileTrue(climb.setLatchVoltage(-2)).onFalse(climb.setLatchVoltage(0));
 
 
     NamedCommands.registerCommand("PrepareForCoralTwoDeploy", new ParallelCommandGroup(elevator.MoveToLevel(LEVELS.TWO), shooter.MoveToDeployLow()));
