@@ -2,12 +2,10 @@ package frc.robot.constants;
 
 import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -81,17 +79,12 @@ public class ShooterConstants
                                                                                 .withMotionMagicExpo_kV(0.12)
                                                                                 .withMotionMagicJerk(0);
     
-    public static final FeedbackConfigs WRIST_MOTOR_FEEDBACK_CONFIGS = new FeedbackConfigs()
-                                                                           .withFeedbackRemoteSensorID(Hardware.SHOOTER_WRIST_CANCODER)
-                                                                           .withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder);
-
     public static final TalonFXConfiguration WRIST_MOTOR_CONFIG = new TalonFXConfiguration()
                                                                      .withMotorOutput(WRIST_MOTOR_OUTPUT_CONFIG)
                                                                      .withClosedLoopGeneral(WRIST_MOTOR_CLOSED_LOOP_GENERAL_CONFIG)
                                                                      .withCurrentLimits(WRIST_MOTOR_CURRENT_LIMIT_CONFIG)
                                                                      .withSlot0(WRIST_MOTOR_SLOT_0_CONFIG)
                                                                      .withMotionMagic(WRIST_MOTOR_MOTION_MAGIC_CONFIG);
-                                                                    // .withFeedback(WRIST_MOTOR_FEEDBACK_CONFIGS);
 
     // SHOOTER ALGAE MOTOR CONFIGS
     public static final MotorOutputConfigs SHOOTER_ALGAE_MOTOR_OUTPUT_CONFIG = new MotorOutputConfigs()

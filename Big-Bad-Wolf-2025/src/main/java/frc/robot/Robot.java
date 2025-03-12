@@ -88,8 +88,6 @@ public class Robot extends TimedRobot
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    m_robotContainer.InitializeDefaultCommands();
-    m_robotContainer.InitializeDefaultCommands();
   }
 
   @Override

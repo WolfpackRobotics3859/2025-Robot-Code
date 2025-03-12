@@ -42,7 +42,6 @@ import frc.robot.utilities.SubsystemManager;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Automation;
 import frc.robot.subsystems.Climb;
 
 /**
@@ -102,7 +101,6 @@ public class RobotContainer
         m_Manager.addSubsystem(new Climb());
         m_Manager.addSubsystem(new Shooter());
         m_Manager.addSubsystem(new DataStuff());
-        m_Manager.addSubsystem(new Automation(m_Manager));
         this.configureCompetitionBindings();
       break;
 
@@ -133,10 +131,9 @@ public class RobotContainer
         this.configureClimbDebugBindings();
       break;
 
-      case AUTOMATION_DEBUG:
+      case ELEVATOR_SHOOTER_DEBUG:
         m_Manager.addSubsystem(new Drivetrain(TunerConstants.DrivetrainConstants, TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight));
-        m_Manager.addSubsystem(new Automation(m_Manager));
-        this.configureAutomationDebugBindings();
+        this.configureElevatorShooterDebugBindings();
       break;
       
       default:
@@ -167,9 +164,6 @@ public class RobotContainer
 
     DataStuff dataStuff = m_Manager.getSubsystemOfType(DataStuff.class).get();
     SmartDashboard.putData(dataStuff);
-
-    Automation automation = m_Manager.getSubsystemOfType(Automation.class).get();
-    SmartDashboard.putData(automation);
 
     ShooterCoral shooterCoral = m_Manager.getSubsystemOfType(ShooterCoral.class).get();
     SmartDashboard.putData(shooterCoral);
@@ -345,11 +339,9 @@ public class RobotContainer
    // climb.setDefaultCommand(climb.setVoltage(() -> -m_DriverController.getRawAxis(5)*10));
   }
 
-  private void configureAutomationDebugBindings()
+  private void configureElevatorShooterDebugBindings()
   {
     Drivetrain drivetrain = m_Manager.getSubsystemOfType(Drivetrain.class).get();
-
-    m_DriverController.a().whileTrue(drivetrain.Align(new Pose2d(12.217, 2.932, new Rotation2d(Degrees.of(62.48)))));
     
     drivetrain.setDefaultCommand
     (

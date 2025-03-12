@@ -102,7 +102,7 @@ public class ElevatorConstants
                                                                                 .withMotionMagicExpo_kV(0.12)
                                                                                 .withMotionMagicJerk(0);
 
-    public static final TalonFXConfiguration LEFT_MOTOR_CONFIG = new TalonFXConfiguration()
+    public static final TalonFXConfiguration ELEVATOR_MOTOR_CONFIG = new TalonFXConfiguration()
                                                                      .withMotorOutput(LEFT_MOTOR_OUTPUT_CONFIG)
                                                                      .withClosedLoopGeneral(LEFT_MOTOR_CLOSED_LOOP_GENERAL_CONFIG)
                                                                      .withCurrentLimits(LEFT_MOTOR_CURRENT_LIMIT_CONFIG)
