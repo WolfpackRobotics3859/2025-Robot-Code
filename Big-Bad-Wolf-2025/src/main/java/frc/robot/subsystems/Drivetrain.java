@@ -1,25 +1,43 @@
 package frc.robot.subsystems;
 
+import java.util.function.Supplier;
+
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import frc.robot.constants.CameraConstants;
 import frc.robot.generated.TunerConstants;
+import frc.robot.utilities.CameraManager;
 import frc.robot.utilities.PackLog;
 
 public class Drivetrain extends CommandSwerveDrivetrain 
 {
     private PackLog m_PackLog;
+
+    private CameraManager m_CameraManager;
+
     private PIDController m_XController;
     private PIDController m_YController;
     private PIDController m_RotationController;
-    private SwerveRequest.FieldCentric m_SwerveRequest;
+
+    private SwerveRequest.FieldCentric m_SwerveRequestField;
+    private SwerveRequest.RobotCentric m_SwerveRequestRobot;
+    private SwerveRequest.ApplyRobotSpeeds m_SwerveRequestSpeeds;
 
     public Drivetrain(SwerveDrivetrainConstants constants, SwerveModuleConstants<?, ?, ?>... modules)
     {
@@ -27,16 +45,23 @@ public class Drivetrain extends CommandSwerveDrivetrain
         this.ConfigureDrivetrain();
     }
 
-    public Command Align(Pose2d desiredPose)
+    @Override
+    public void periodic() 
     {
-        this.m_XController.reset();
-        this.m_YController.reset();
+        super.periodic();
+        this.m_CameraManager.UpdateCameras(this::addVisionMeasurement);
+    }
 
-        this.m_XController.setSetpoint(desiredPose.getX());
-        this.m_YController.setSetpoint(desiredPose.getY());
-        this.m_RotationController.setSetpoint(desiredPose.getRotation().getDegrees());
-
-        return new FunctionalCommand(() -> {}, 
+    public Command Align(Supplier<Pose2d> desiredPose)
+    {
+        return new FunctionalCommand(() -> 
+                                        {
+                                            this.m_XController.reset();
+                                            this.m_YController.reset();
+                                            this.m_XController.setSetpoint(desiredPose.get().getX());
+                                            this.m_YController.setSetpoint(desiredPose.get().getY());
+                                            this.m_RotationController.setSetpoint(desiredPose.get().getRotation().getDegrees());
+                                        }, 
                                      () -> UpdateRequest(), 
                                      interrupted -> {
                                                         m_PackLog.Log("Alignment command finished.");
@@ -45,12 +70,36 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                      this);
     }
 
+    public Command PathfindToPose(Pose2d goalPose)
+    {
+        // Create the constraints to use while pathfinding
+        PathConstraints constraints = new PathConstraints(
+            3.0, 4.0,
+            Units.degreesToRadians(540), Units.degreesToRadians(720));
+
+        // Since AutoBuilder is configured, we can use it to build pathfinding commands
+        return AutoBuilder.pathfindToPose(
+            goalPose,
+            constraints,
+            0.0 // Goal end velocity in meters/sec
+        );
+    }
+
+    public Command PathfindThenFollowPath(PathPlannerPath path)
+    {
+        PathConstraints constraints = new PathConstraints(
+        3.0, 4.0,
+        Units.degreesToRadians(540), Units.degreesToRadians(720));
+
+        return AutoBuilder.pathfindThenFollowPath(path, constraints);
+    }
+
     private void UpdateRequest()
     {
-        this.m_SwerveRequest.VelocityX = -this.GetXOutput();
-        this.m_SwerveRequest.VelocityY = -this.GetYOutput();
-        this.m_SwerveRequest.RotationalRate = this.GetRotationOutput();
-        this.setControl(m_SwerveRequest);
+        this.m_SwerveRequestField.VelocityX = -this.GetXOutput();
+        this.m_SwerveRequestField.VelocityY = -this.GetYOutput();
+        this.m_SwerveRequestField.RotationalRate = this.GetRotationOutput();
+        this.setControl(m_SwerveRequestField);
     }
 
     private double GetXOutput()
@@ -76,6 +125,21 @@ public class Drivetrain extends CommandSwerveDrivetrain
     private void ConfigureDrivetrain()
     {
         this.m_PackLog = new PackLog("Drivetrain");
+        this.ConfigureAutobuilder();
+        this.ConfigurePIDControllers();
+
+        this.m_CameraManager = new CameraManager();
+        this.m_CameraManager.InitializeCameras(CameraConstants.CAMERA_PIPELINES, CameraConstants.ROBOT_TO_CAM_TRANFORMS);
+
+        this.m_SwerveRequestField = new SwerveRequest.FieldCentric();
+        this.m_SwerveRequestRobot = new SwerveRequest.RobotCentric();
+        this.m_SwerveRequestSpeeds = new SwerveRequest.ApplyRobotSpeeds();
+
+        this.m_PackLog.Log("End configuration.");
+    }
+
+    private void ConfigurePIDControllers()
+    {
         this.m_PackLog.Log("Beginning configuration.");
         this.m_XController = new PIDController(25, 0.1,0.025);
         this.m_XController.setTolerance(0.01, 0.05);
@@ -95,10 +159,40 @@ public class Drivetrain extends CommandSwerveDrivetrain
         this.m_RotationController.setIZone(10);
         this.m_RotationController.enableContinuousInput(-180, 180);
         SmartDashboard.putData(this.m_RotationController);
-
-        this.m_SwerveRequest = new SwerveRequest.FieldCentric();
-
-        this.m_PackLog.Log("End configuration.");
     }
 
+    private void ConfigureAutobuilder()
+    {
+        RobotConfig config;
+        try
+        {
+        config = RobotConfig.fromGUISettings();
+        } 
+        catch (Exception e) 
+        {
+        e.printStackTrace();
+        return;
+        }
+
+        AutoBuilder.configure(
+                () -> this.getState().Pose, // Robot pose supplier
+                (pose) -> this.resetPose(pose), // Method to reset odometry (will be called if your auto has a starting pose)
+                () -> this.getState().Speeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+                (speeds, feedforwards) -> this.setControl(m_SwerveRequestSpeeds.withSpeeds(speeds).withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesX()).withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesY())), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+                new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
+                        new PIDConstants(10, 0.0, 0.0), // Translation PID constants
+                        new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+                ),
+                config,
+                () -> {
+                var alliance = DriverStation.getAlliance();
+                if (alliance.isPresent())
+                {
+                    return alliance.get() == DriverStation.Alliance.Red;
+                }
+                return false;
+                },
+                this
+        );
+    }
 }

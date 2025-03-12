@@ -1,6 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.constants;
 
@@ -8,9 +5,9 @@ package frc.robot.constants;
 public class Hardware
 {
     //ELEVATOR
-    public static final int ELEVATOR_MOTOR_LEFT = 1;
-    public static final int ELEVATOR_MOTOR_RIGHT = 2;
+    public static final int ELEVATOR_MOTOR = 1;
     public static final int CANDI_0 = 0;
+    public static final int ELEVATOR_TOF = 0;
 
     //ALGAE INTAKE
     public static final int INTAKE_ROLLER_MOTOR = 3;
@@ -20,7 +17,7 @@ public class Hardware
     public static final int SHOOTER_WRIST_MOTOR = 5;
     public static final int SHOOTER_ALGAE_MOTOR = 6;
     public static final int SHOOTER_CORAL_MOTOR = 7;
-    public static final int CORAL_TOF_SENSOR = 0;
+    public static final int CORAL_TOF_SENSOR = 1;
     public static final int SHOOTER_WRIST_CANCODER = 0;
 
     //CLIMB

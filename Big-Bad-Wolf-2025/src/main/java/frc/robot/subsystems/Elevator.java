@@ -1,13 +1,11 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 import com.ctre.phoenix6.SignalLogger;
-import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -15,6 +13,8 @@ import com.ctre.phoenix6.hardware.CANdi;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.S1StateValue;
 
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -28,13 +28,16 @@ import frc.robot.utilities.MotorManager;
 public class Elevator extends SubsystemBase
 {
   // Hardware
-  private final TalonFX m_ElevatorMotorLeft;
-  private final TalonFX m_ElevatorMotorRight;
+  private final TalonFX m_ElevatorMotor;
   private final CANdi m_CANdi;
 
   private final VoltageOut m_VoltageRequest;
   private final MotionMagicVoltage m_PositionRequest;
   private final StaticBrake m_BrakeRequest;
+  private final CoastOut m_CoastRequest;
+
+  private final StatusSignal<AngularVelocity> m_ElevatorRPS;
+  private final StatusSignal<Angle> m_ElevatorPosition;
   
   private SysIdRoutine m_SysIdRoutine;
 
@@ -43,29 +46,46 @@ public class Elevator extends SubsystemBase
    */
   public Elevator()
   {
-    MotorManager.AddMotor("ELEVATOR LEFT MOTOR", Hardware.ELEVATOR_MOTOR_LEFT);
-    MotorManager.AddMotor("ELEVATOR RIGHT MOTOR", Hardware.ELEVATOR_MOTOR_RIGHT);
-    MotorManager.AddMotor("ELEVATOR LEFT MOTOR", Hardware.ELEVATOR_MOTOR_LEFT);
-    MotorManager.AddMotor("ELEVATOR RIGHT MOTOR", Hardware.ELEVATOR_MOTOR_RIGHT);
+    MotorManager.AddMotor("ELEVATOR LEFT MOTOR", Hardware.ELEVATOR_MOTOR);
 
-    m_ElevatorMotorLeft = MotorManager.GetMotor(Hardware.ELEVATOR_MOTOR_LEFT);
-    m_ElevatorMotorRight = MotorManager.GetMotor(Hardware.ELEVATOR_MOTOR_RIGHT);
+    m_ElevatorMotor = MotorManager.GetMotor(Hardware.ELEVATOR_MOTOR);
+    MotorManager.ApplyConfigs(ElevatorConstants.ELEVATOR_MOTOR_CONFIG, Hardware.ELEVATOR_MOTOR);
+
+    this.m_ElevatorRPS = this.m_ElevatorMotor.getVelocity();
+    this.m_ElevatorPosition = this.m_ElevatorMotor.getPosition();
+
     m_CANdi = new CANdi(Hardware.CANDI_0);
-
-    MotorManager.ApplyConfigs(ElevatorConstants.LEFT_MOTOR_CONFIG, Hardware.ELEVATOR_MOTOR_LEFT);
-    MotorManager.ApplyConfigs(ElevatorConstants.RIGHT_MOTOR_CONFIG, Hardware.ELEVATOR_MOTOR_RIGHT);
-
-    MotorManager.ApplyControlRequest(new Follower(Hardware.ELEVATOR_MOTOR_LEFT, false), Hardware.ELEVATOR_MOTOR_RIGHT);
 
     m_VoltageRequest = new VoltageOut(0);
     m_PositionRequest = new MotionMagicVoltage(0);
     m_BrakeRequest = new StaticBrake();
+    m_CoastRequest = new CoastOut();
+  }
+
+  /**
+   * This method will be called once per scheduler run
+   */
+  @Override
+  public void periodic()
+  {
+    if(m_CANdi.isConnected() && (m_CANdi.getS1State().getValue() == S1StateValue.Low) && m_CANdi.getS1Closed().refresh().getValue())
+    {
+      this.m_ElevatorMotor.setPosition(0);
+    }
+    SmartDashboard.putNumber("Elevator Position :)", this.m_ElevatorMotor.getPosition().getValueAsDouble());
+    SmartDashboard.putNumber("Shooter Closed Loop Error", m_ElevatorMotor.getClosedLoopError().getValueAsDouble());
+    if(m_CANdi.isConnected() && (m_CANdi.getS1State().getValue() == S1StateValue.Low) && m_CANdi.getS1Closed().refresh().getValue())
+    {
+      this.m_ElevatorMotor.setPosition(0);
+    }
+    SmartDashboard.putNumber("Elevator Position :)", this.m_ElevatorMotor.getPosition().getValueAsDouble());
+    SmartDashboard.putNumber("Shooter Closed Loop Error", m_ElevatorMotor.getClosedLoopError().getValueAsDouble());
   }
 
   public Command MoveToLevel(LEVELS level)
   {
     return new FunctionalCommand(
-      () -> this.SetPosition(level.getValue()),
+      () -> this.ApplyPosition(level.getValue()),
       () -> {},
       interrupted -> {},
       () -> isInPosition(0.05),
@@ -78,32 +98,48 @@ public class Elevator extends SubsystemBase
     return new FunctionalCommand(
       () -> this.SetVoltage(ElevatorConstants.HOMING_VOLTAGE),
       () -> {},
-      interrupted -> this.SetPosition(0),
+      interrupted -> this.ApplyPosition(0),
       () -> m_CANdi.isConnected() && (m_CANdi.getS1State().getValue() == S1StateValue.Low) && m_CANdi.getS1Closed().getValue(),
       this
     );
   }
 
-  public Command ApplyVoltage(double voltage)
+  public Command SetVoltage(double voltage)
   {
-    return this.runOnce(() -> this.SetVoltage(voltage));
+    return this.runOnce(() -> this.ApplyVoltage(voltage));
   }
 
-  private Elevator SetVoltage(double voltage)
+  public Command SetBrake()
   {
-    MotorManager.ApplyControlRequest(m_VoltageRequest.withOutput(voltage), Hardware.ELEVATOR_MOTOR_LEFT);
+    return this.runOnce(() -> this.ApplyBrake());
+  }
+
+  public Command SetCoast()
+  {
+    return this.runOnce(() -> this.ApplyCoast());
+  }
+
+  private Elevator ApplyVoltage(double voltage)
+  {
+    MotorManager.ApplyControlRequest(m_VoltageRequest.withOutput(voltage), Hardware.ELEVATOR_MOTOR);
     return this;
   }
 
-  private Elevator SetPosition(double position)
+  private Elevator ApplyPosition(double position)
   {
-    MotorManager.ApplyControlRequest(m_PositionRequest.withPosition(position), Hardware.ELEVATOR_MOTOR_LEFT);
+    MotorManager.ApplyControlRequest(m_PositionRequest.withPosition(position), Hardware.ELEVATOR_MOTOR);
     return this;
   }
 
-  private Elevator BrakeElevator()
+  private Elevator ApplyBrake()
   {
-    MotorManager.ApplyControlRequest(m_BrakeRequest, Hardware.ELEVATOR_MOTOR_LEFT);
+    MotorManager.ApplyControlRequest(m_BrakeRequest, Hardware.ELEVATOR_MOTOR);
+    return this;
+  }
+
+  private Elevator ApplyCoast()
+  {
+    MotorManager.ApplyControlRequest(m_CoastRequest, Hardware.ELEVATOR_MOTOR);
     return this;
   }
 
@@ -117,13 +153,13 @@ public class Elevator extends SubsystemBase
   {
     this.m_SysIdRoutine = new SysIdRoutine(
       new SysIdRoutine.Config(
-         Volts.of(0.5).per(Seconds),         // Use default ramp rate (1 V/s)
-         Volts.of(0.5), // Reduce dynamic step voltage to 4 to prevent brownout
+         Volts.of(0.5).per(Seconds),  // Ramp Rate in Volts / Seconds
+         Volts.of(2), // Dynamic Step Voltage
          null,          // Use default timeout (10 s)
          (state) -> SignalLogger.writeString("state", state.toString()) // Log state with Phoenix SignalLogger class
       ),
       new SysIdRoutine.Mechanism(
-         (volts) -> m_ElevatorMotorLeft.setControl(new VoltageOut(volts.in(Volts))),
+         (volts) -> m_ElevatorMotor.setControl(new VoltageOut(volts.in(Volts))),
          null,
          this
       )
@@ -133,26 +169,24 @@ public class Elevator extends SubsystemBase
 
   private boolean isInPosition(double tolerance)
   {
-    return Math.abs(this.m_ElevatorMotorLeft.getPosition().getValueAsDouble() - this.m_PositionRequest.Position) < tolerance;
+    return Math.abs(this.m_ElevatorMotor.getPosition().getValueAsDouble() - this.m_PositionRequest.Position) < tolerance;
   }
 
-  /**
-   * This method will be called once per scheduler run
-   */
-  @Override
-  public void periodic()
+  private boolean newIsInPosition(double positionTolerance, double derivativeTolerance)
   {
-    if(m_CANdi.isConnected() && (m_CANdi.getS1State().getValue() == S1StateValue.Low) && m_CANdi.getS1Closed().refresh().getValue())
+    StatusSignal.refreshAll(this.m_ElevatorRPS, this.m_ElevatorPosition);
+    if((Math.abs(this.m_ElevatorRPS.getValueAsDouble()) > derivativeTolerance) || (Math.abs(this.m_ElevatorPosition.getValueAsDouble()) > positionTolerance))
     {
-      this.m_ElevatorMotorLeft.setPosition(0);
+      return false;
     }
-    SmartDashboard.putNumber("Elevator Position :)", this.m_ElevatorMotorLeft.getPosition().getValueAsDouble());
-    SmartDashboard.putNumber("Shooter Closed Loop Error", m_ElevatorMotorLeft.getClosedLoopError().getValueAsDouble());
-    if(m_CANdi.isConnected() && (m_CANdi.getS1State().getValue() == S1StateValue.Low) && m_CANdi.getS1Closed().refresh().getValue())
-    {
-      this.m_ElevatorMotorLeft.setPosition(0);
-    }
-    SmartDashboard.putNumber("Elevator Position :)", this.m_ElevatorMotorLeft.getPosition().getValueAsDouble());
-    SmartDashboard.putNumber("Shooter Closed Loop Error", m_ElevatorMotorLeft.getClosedLoopError().getValueAsDouble());
+    return true;
   }
+
+  private void BuildToolbox()
+  {
+    SmartDashboard.putData("Static Brake Elevator", this.SetBrake().ignoringDisable(true));
+    SmartDashboard.putData("Coast Elevator", this.SetCoast().ignoringDisable(true));
+    SmartDashboard.putData("Zero Elevator (Hall Effect)", this.ZeroElevator());
+  }
+
 }

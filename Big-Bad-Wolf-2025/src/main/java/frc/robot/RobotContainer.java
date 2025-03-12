@@ -132,12 +132,6 @@ public class RobotContainer
         m_Manager.addSubsystem(new Climb());
         this.configureClimbDebugBindings();
       break;
-
-      case AUTOMATION_DEBUG:
-        m_Manager.addSubsystem(new Drivetrain(TunerConstants.DrivetrainConstants, TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight));
-        m_Manager.addSubsystem(new Automation(m_Manager));
-        this.configureAutomationDebugBindings();
-      break;
       
       default:
         System.out.println("Did you mean to configure nothing? :( Sad Robot Face");
@@ -343,23 +337,6 @@ public class RobotContainer
     SmartDashboard.putData(climb);
 
    // climb.setDefaultCommand(climb.setVoltage(() -> -m_DriverController.getRawAxis(5)*10));
-  }
-
-  private void configureAutomationDebugBindings()
-  {
-    Drivetrain drivetrain = m_Manager.getSubsystemOfType(Drivetrain.class).get();
-
-    m_DriverController.a().whileTrue(drivetrain.Align(new Pose2d(12.217, 2.932, new Rotation2d(Degrees.of(62.48)))));
-    
-    drivetrain.setDefaultCommand
-    (
-        m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get().applyRequest(() ->
-            drive.withVelocityX(-m_DriverController.getLeftY() * TunerConstants.MaxSpeed)
-                 .withVelocityY(-m_DriverController.getLeftX() * TunerConstants.MaxSpeed)
-                 .withRotationalRate(-m_DriverController.getRightX() * TunerConstants.MaxAngularRate)
-        )
-    );
-
   }
 
   public Command getAutonomousCommand() 

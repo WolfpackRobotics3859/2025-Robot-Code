@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.constants;
 
 import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
@@ -102,7 +98,7 @@ public class ElevatorConstants
                                                                                 .withMotionMagicExpo_kV(0.12)
                                                                                 .withMotionMagicJerk(0);
 
-    public static final TalonFXConfiguration LEFT_MOTOR_CONFIG = new TalonFXConfiguration()
+    public static final TalonFXConfiguration ELEVATOR_MOTOR_CONFIG = new TalonFXConfiguration()
                                                                      .withMotorOutput(LEFT_MOTOR_OUTPUT_CONFIG)
                                                                      .withClosedLoopGeneral(LEFT_MOTOR_CLOSED_LOOP_GENERAL_CONFIG)
                                                                      .withCurrentLimits(LEFT_MOTOR_CURRENT_LIMIT_CONFIG)
