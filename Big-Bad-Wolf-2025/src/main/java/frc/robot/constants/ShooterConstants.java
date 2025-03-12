@@ -47,7 +47,7 @@ public class ShooterConstants
     
     // WRIST MOTOR CONFIGS
     public static final MotorOutputConfigs WRIST_MOTOR_OUTPUT_CONFIG = new MotorOutputConfigs()
-                                                                          .withInverted(InvertedValue.Clockwise_Positive)
+                                                                          .withInverted(InvertedValue.CounterClockwise_Positive) // Inverted from mechanical changes
                                                                           .withNeutralMode(NeutralModeValue.Brake)
                                                                           .withPeakForwardDutyCycle(1)
                                                                           .withPeakReverseDutyCycle(-1);
