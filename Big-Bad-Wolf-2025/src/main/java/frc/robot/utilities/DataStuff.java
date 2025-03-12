@@ -3,6 +3,7 @@ package frc.robot.utilities;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.ClimbConstants.CLIMB;
 import frc.robot.constants.ElevatorConstants.LEVELS;
 
 public class DataStuff extends SubsystemBase
@@ -22,6 +23,11 @@ public class DataStuff extends SubsystemBase
     // F1 | F2 | F3 | F4 | F5 | F6
     private static String[] face = new String[] {"ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX"};
     private static int currentFace = 0;
+
+    // CLIMB OPTION
+    private static String[] climb = new String[] {"CLIMBING", "UNWIND", "STILL"};
+    private static CLIMB[] climbValue = new CLIMB[] {CLIMB.CLIMBING, CLIMB.UNWIND, CLIMB.STILL};
+    private static int currentClimb = 0;
 
     public DataStuff()
     {
@@ -61,6 +67,11 @@ public class DataStuff extends SubsystemBase
     public static String GetFace()
     {
         return face[currentFace];
+    }
+
+    public static CLIMB getClimb()
+    {
+        return climbValue[currentClimb];
     }
 
     public static String GetCoralAlignmentPathName()
@@ -109,9 +120,13 @@ public class DataStuff extends SubsystemBase
         {
             IncrementLevel();
         }
-        else
+        else if (currentColumn == 2)
         {
             IncrementFace();
+        }
+        else 
+        {
+            IncrementClimb();
         }
     }
 
@@ -125,9 +140,13 @@ public class DataStuff extends SubsystemBase
         {
             DecrementLevel();
         }
-        else
+        else if (currentColumn == 2)
         {
             DecrementFace();
+        }
+        else 
+        {
+            DecrementClimb();
         }
     }
 
@@ -338,6 +357,55 @@ public class DataStuff extends SubsystemBase
         }
         SmartDashboard.putNumber("CURRENT FACE: ", currentFace);
     }
+    private static void IncrementClimb()
+    {
+        if(currentClimb == 2)
+        {
+            currentClimb = 0;
+        }
+        else
+        {
+            currentClimb += 1;
+        }
+        UpdateClimbSmartDashboard();
+    }
+
+    private static void DecrementClimb()
+    {
+        if(currentClimb == 0)
+        {
+            currentClimb = 1;
+        }
+        else
+        {
+            currentClimb -= 1;
+        }
+        UpdateClimbSmartDashboard();
+    }
+
+    private static void UpdateClimbSmartDashboard()
+    {
+        if(currentClimb == 0)
+        {
+            SmartDashboard.putBoolean(climb[0], true);
+            SmartDashboard.putBoolean(climb[1], false);
+            SmartDashboard.putBoolean(climb[2], false);
+        }
+        else if(currentClimb == 1)
+        {
+            SmartDashboard.putBoolean(climb[0], false);
+            SmartDashboard.putBoolean(climb[1], true);
+            SmartDashboard.putBoolean(climb[2], false);
+        }
+        else 
+        {
+            SmartDashboard.putBoolean(climb[0], false);
+            SmartDashboard.putBoolean(climb[1], false);
+            SmartDashboard.putBoolean(climb[2], true);
+        }
+        SmartDashboard.putNumber("SELECTED CLIMB: ", currentClimb);
+    }
+        
 
 
     private void UpdateEverything()
@@ -346,6 +414,7 @@ public class DataStuff extends SubsystemBase
         UpdateFaceSmartdashboard();
         UpdateLevelSmartDashboard();
         UpdateSideSmartDashboard();
+        UpdateClimbSmartDashboard();
     }
 
 }

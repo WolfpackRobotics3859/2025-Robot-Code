@@ -219,7 +219,7 @@ public class RobotContainer
 
 
     //climb wrist
-    m_CoDriverController.x().whileTrue(climb.setClimbVoltage(ClimbConstants.CLIMB_WRIST_VOLTAGE)).onFalse(climb.setClimbVoltage(0));
+    m_CoDriverController.x().whileTrue(climb.setClimbVoltage(DataStuff.getClimb())).onFalse(climb.setClimbVoltage(ClimbConstants.CLIMB.STILL));
     //climb wheels
     m_CoDriverController.b().whileTrue(climb.setRollerVoltage(ClimbConstants.CLIMB_ROLLER_VOLTAGE)).onFalse(climb.setRollerVoltage(0));
     //m_CoDriverController.b().whileTrue(climb.setLatchVoltage(-2)).onFalse(climb.setLatchVoltage(0));

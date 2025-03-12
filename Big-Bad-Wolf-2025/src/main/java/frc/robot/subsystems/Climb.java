@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.controls.VoltageOut;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.constants.ClimbConstants.CLIMB;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.ClimbConstants;
 import frc.robot.constants.Hardware;
@@ -33,10 +34,11 @@ public class Climb extends SubsystemBase
     m_VoltageRequest = new VoltageOut(0);
   }
 
-  public Command setClimbVoltage(double voltage)
+  public Command setClimbVoltage(CLIMB climbVoltage)
   {
-    return this.run(() -> MotorManager.ApplyControlRequest(m_VoltageRequest.withOutput(voltage), Hardware.CLIMB_WRIST_MOTOR));
+    return this.run(() -> MotorManager.ApplyControlRequest(m_VoltageRequest.withOutput(climbVoltage.getValue()), Hardware.CLIMB_WRIST_MOTOR));
   }
+
 
   public Command setRollerVoltage(double voltage)
   {

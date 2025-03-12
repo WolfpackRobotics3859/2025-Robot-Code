@@ -7,6 +7,7 @@ public class DataSelectorHelper
     .addFirstOption("LeftORRight", true)
     .addOption("Levels")
     .addOption("Face")
+    .addOption("Climb")
     .build();
 
 
@@ -32,5 +33,12 @@ public class DataSelectorHelper
     .addOption("reef4")
     .addOption("reef5")
     .addOption("reef6")
+    .build();
+
+    public static final Column CLIMB_COLUMN = new Column.ColumnBuilder()
+    .addColumnName("climbSelection")
+    .addFirstOption("climb", true)
+    .addOption("unwind")
+    .addOption("stilll")
     .build();
 }

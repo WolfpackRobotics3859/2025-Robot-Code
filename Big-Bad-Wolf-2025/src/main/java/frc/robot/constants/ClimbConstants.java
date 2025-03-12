@@ -12,7 +12,27 @@ import com.ctre.phoenix6.signals.InvertedValue;
 public class ClimbConstants 
 {
     public static final double CLIMB_WRIST_VOLTAGE = 2;
+    public static final double CLIMB_UNWIND_VOLTAGE = -0.5;
     public static final double CLIMB_ROLLER_VOLTAGE = 2;
+
+    public enum CLIMB
+    {
+        CLIMBING(CLIMB_WRIST_VOLTAGE),
+        UNWIND(CLIMB_UNWIND_VOLTAGE),
+        STILL(0);
+
+        private double climbValue;
+
+        CLIMB(double climbValue)
+        {
+            this.climbValue = climbValue;
+        }
+
+        public double getValue()
+        {
+            return climbValue;
+        }
+    }
 
     public static final MotorOutputConfigs CLIMB_WRIST_MOTOR_OUTPUT = new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive);
     public static final MotorOutputConfigs CLIMB_ROLLER_MOTOR_OUTPUT = new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive);
