@@ -19,27 +19,36 @@ public class ShooterConstants
     public static final double CORAL_TOF_IN_RANGE_THRESHOLD = 70;
 
     // CORAL MOTOR VOLTAGE
-    public static final double CORAL_INTAKE_VOLTAGE = 3;
-    public static final double CORAL_DEPLOYMENT_VOLTAGE = 10;
-    public static final double CORAL_DEPLOYMENT_VOLTAGE_HIGH = 8;
+    public static final double CORAL_INTAKE_VOLTAGE = 2;
+    public static final double CORAL_DEPLOYMENT_VOLTAGE = 6;
+    public static final double CORAL_DEPLOYMENT_VOLTAGE_HIGH = 6;
     
     // ALGAE MOTOR VOLTAGES   
     // Speed to use when cleaning the coral reef.
     public static final double ALGAE_SWEEPING_VOLTAGE = 4;
     // Speed to use when intaking algae from the ground.
     public static final double ALGAE_GROUND_INTAKING_VOLTAGE = -2.0;
-    public static final double ALGAE_PROCESSOR_DEPLOYMENT_VOLTAGE = -8;
+    public static final double ALGAE_PROCESSOR_DEPLOYMENT_VOLTAGE = -6.0;
     // This will most likely be a variable algorithmic speed if we ever reach that level of automation.
     public static final double ALGAE_TROUGH_SHOOTING_VOLTAGE = 8;
     public static final double ALGAE_HOLDING_VOLTAGE = 1;
 
     // WRIST POSITIONS
-    public static final double WRIST_STOW_POSITION = -4.415; // -0.58
-    public static final double WRIST_CORAL_DEPLOYMENT_POSITION_LOW = -3.204; // -0.58
-    public static final double WRIST_CORAL_DEPLOYMENT_POSITION = -4;
-    public static final double WRIST_CORAL_INTAKE_POSITION = -4.366; // -0.62
-    public static final double WRIST_ALGAE_INTAKE_POSITION = -1.00;
-    public static final double WRIST_ALGAE_PROCESSOR_DEPLOYMENT_POSITION = -0.05; // -0.38
+    // public static final double WRIST_STOW_POSITION = -1.46; // -0.58
+    // public static final double WRIST_CORAL_DEPLOYMENT_POSITION_LOW = -1.7; // -0.58
+    // public static final double WRIST_CORAL_DEPLOYMENT_POSITION = -1.23;
+    // public static final double WRIST_CORAL_INTAKE_POSITION = -0.4; // -0.62
+    // public static final double WRIST_ALGAE_INTAKE_POSITION = -11.0;
+    // public static final double WRIST_ALGAE_PROCESSOR_DEPLOYMENT_POSITION = -11; // -0.38
+    // public static final double WRIST_ALGAE_SHOOTING_POSITION = -0.15;
+    // public static final double WRIST_ALGAE_SWEEPING_POSITION = -0.5;
+
+    public static final double WRIST_STOW_POSITION = -1.46; // -0.58
+    public static final double WRIST_CORAL_DEPLOYMENT_POSITION_LOW = -3.5; // -0.58
+    public static final double WRIST_CORAL_DEPLOYMENT_POSITION = -1.23;
+    public static final double WRIST_CORAL_INTAKE_POSITION = -0.4; // -0.62
+    public static final double WRIST_ALGAE_INTAKE_POSITION = -11.0;
+    public static final double WRIST_ALGAE_PROCESSOR_DEPLOYMENT_POSITION = -11; // -0.38
     public static final double WRIST_ALGAE_SHOOTING_POSITION = -0.15;
     public static final double WRIST_ALGAE_SWEEPING_POSITION = -0.5;
     
@@ -73,8 +82,8 @@ public class ShooterConstants
                                                                     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
 
     public static final MotionMagicConfigs WRIST_MOTOR_MOTION_MAGIC_CONFIG = new MotionMagicConfigs()
-                                                                                .withMotionMagicAcceleration(40)
-                                                                                .withMotionMagicCruiseVelocity(120)
+                                                                                .withMotionMagicAcceleration(80)
+                                                                                .withMotionMagicCruiseVelocity(300)
                                                                                 .withMotionMagicExpo_kA(0.1)
                                                                                 .withMotionMagicExpo_kV(0.12)
                                                                                 .withMotionMagicJerk(0);
@@ -107,7 +116,7 @@ public class ShooterConstants
 
     // SHOOTER CORAL MOTOR CONFIGS
     public static final MotorOutputConfigs SHOOTER_CORAL_MOTOR_OUTPUT_CONFIG = new MotorOutputConfigs()
-                                                                          .withInverted(InvertedValue.CounterClockwise_Positive)
+                                                                          .withInverted(InvertedValue.Clockwise_Positive)
                                                                           .withNeutralMode(NeutralModeValue.Brake)
                                                                           .withPeakForwardDutyCycle(1)
                                                                           .withPeakReverseDutyCycle(-1);

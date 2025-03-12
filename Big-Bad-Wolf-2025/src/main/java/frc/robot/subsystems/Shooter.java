@@ -6,7 +6,9 @@ package frc.robot.subsystems;
 
 
 import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
@@ -27,18 +29,25 @@ public class Shooter extends SubsystemBase
   private final TalonFX m_ShooterWristMotor;
   private SysIdRoutine m_SysIdRoutine;
   private final MotionMagicVoltage m_WristPositionRequest;
+  private final StaticBrake m_BrakeRequest;
+  private final CoastOut m_CoastRequest;
 
   public Shooter()
   {
     MotorManager.AddMotor("SHOOTER WRIST MOTOR", Hardware.SHOOTER_WRIST_MOTOR);
     m_ShooterWristMotor = MotorManager.GetMotor(Hardware.SHOOTER_WRIST_MOTOR);
     MotorManager.ApplyConfigs(ShooterConstants.WRIST_MOTOR_CONFIG, Hardware.SHOOTER_WRIST_MOTOR);
+
     m_WristPositionRequest = new MotionMagicVoltage(0);
+    m_BrakeRequest = new StaticBrake();
+    m_CoastRequest = new CoastOut();
+
+    this.BuildToolbox();
   }
 
   public Command StowShooter()
   {
-    return this.runOnce(() -> SetWristPositionMotor(ShooterConstants.WRIST_STOW_POSITION));
+    return this.runOnce(() -> ApplyPosition(ShooterConstants.WRIST_STOW_POSITION));
   }
 
   public Command MoveToDeployHigh()
@@ -66,9 +75,31 @@ public class Shooter extends SubsystemBase
     return MoveToCommandBuilder(ShooterConstants.WRIST_ALGAE_SWEEPING_POSITION);
   }
 
+  public Command GoToManualPosition()
+  {
+    SmartDashboard.putNumber("Manual Shooter Position", 0.0);
+    return this.runOnce(() -> this.ApplySmartDashboardPosition());
+  }
+
+  public Command SetBrake()
+  {
+    return this.runOnce(() -> this.ApplyBrake());
+  }
+
+  public Command SetCoast()
+  {
+    return this.runOnce(() -> this.ApplyCoast());
+  }
+
+  private Shooter ApplySmartDashboardPosition()
+  {
+    this.ApplyPosition(SmartDashboard.getNumber("Manual Shooter Position", 0));
+    return this;
+  }
+
   private Command MoveToCommandBuilder(double position)
   {
-    return new FunctionalCommand(() -> this.SetWristPositionMotor(position),
+    return new FunctionalCommand(() -> this.ApplyPosition(position),
                                  () -> {}, 
                                  interrupted -> {},
                                  () -> this.isInPosition(0.04),
@@ -95,9 +126,22 @@ public class Shooter extends SubsystemBase
    return this.m_SysIdRoutine;
   }
 
-  private void SetWristPositionMotor(double position)
+  private Shooter ApplyPosition(double position)
   {
-    MotorManager.ApplyControlRequest(m_WristPositionRequest.withPosition(position), Hardware.SHOOTER_WRIST_MOTOR);
+    MotorManager.ApplyControlRequest(this.m_WristPositionRequest.withPosition(position), Hardware.SHOOTER_WRIST_MOTOR);
+    return this;
+  }
+
+  private Shooter ApplyBrake()
+  {
+    MotorManager.ApplyControlRequest(this.m_BrakeRequest, Hardware.SHOOTER_WRIST_MOTOR);
+    return this;
+  }
+
+  private Shooter ApplyCoast()
+  {
+    MotorManager.ApplyControlRequest(this.m_CoastRequest, Hardware.SHOOTER_WRIST_MOTOR);
+    return this;
   }
 
   private boolean isInPosition(double tolerance)
@@ -109,6 +153,11 @@ public class Shooter extends SubsystemBase
   public void periodic() 
   {
     SmartDashboard.putNumber("SHOOTER POSITION", this.m_ShooterWristMotor.getPosition().getValueAsDouble());
-    // Intentionally Empty
+  }
+
+  private void BuildToolbox()
+  {
+    SmartDashboard.putData("Static Brake Shooter", this.SetBrake().ignoringDisable(true));
+    SmartDashboard.putData("Coast Shooter", this.SetCoast().ignoringDisable(true));
   }
 }

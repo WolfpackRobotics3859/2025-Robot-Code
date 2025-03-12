@@ -6,6 +6,9 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
+
+import java.util.function.Supplier;
+
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.CoastOut;
@@ -59,6 +62,8 @@ public class Elevator extends SubsystemBase
     m_PositionRequest = new MotionMagicVoltage(0);
     m_BrakeRequest = new StaticBrake();
     m_CoastRequest = new CoastOut();
+
+    this.BuildToolbox();
   }
 
   @Override
@@ -115,6 +120,18 @@ public class Elevator extends SubsystemBase
     return this.runOnce(() -> this.ApplyCoast());
   }
 
+  public Command GoToManualPosition()
+  {
+    SmartDashboard.putNumber("Manual Elevator Position", 0.0);
+    return this.runOnce(() -> this.ApplySmartDashboardPosition());
+  }
+
+  private Elevator ApplySmartDashboardPosition()
+  {
+    this.ApplyPosition(SmartDashboard.getNumber("Manual Elevator Position", 0));
+    return this;
+  }
+
   private Elevator ApplyVoltage(double voltage)
   {
     MotorManager.ApplyControlRequest(m_VoltageRequest.withOutput(voltage), Hardware.ELEVATOR_MOTOR);
@@ -149,8 +166,8 @@ public class Elevator extends SubsystemBase
   {
     this.m_SysIdRoutine = new SysIdRoutine(
       new SysIdRoutine.Config(
-         Volts.of(0.5).per(Seconds),  // Ramp Rate in Volts / Seconds
-         Volts.of(2), // Dynamic Step Voltage
+         Volts.of(0.25).per(Seconds),  // Ramp Rate in Volts / Seconds
+         Volts.of(1), // Dynamic Step Voltage
          null,          // Use default timeout (10 s)
          (state) -> SignalLogger.writeString("state", state.toString()) // Log state with Phoenix SignalLogger class
       ),
@@ -175,6 +192,7 @@ public class Elevator extends SubsystemBase
     {
       return false;
     }
+
     return true;
   }
 

@@ -8,6 +8,8 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
 import static edu.wpi.first.units.Units.Degrees;
 
+import java.lang.System.Logger.Level;
+
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -41,7 +43,6 @@ import frc.robot.utilities.PackLog;
 import frc.robot.utilities.SubsystemManager;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Climb;
 
 /**
@@ -97,7 +98,6 @@ public class RobotContainer
         m_Manager.addSubsystem(new ShooterCoral());
         m_Manager.addSubsystem(new ShooterAlgae());
         m_Manager.addSubsystem(new Elevator());
-        m_Manager.addSubsystem(new Intake());
         m_Manager.addSubsystem(new Climb());
         m_Manager.addSubsystem(new Shooter());
         m_Manager.addSubsystem(new DataStuff());
@@ -121,11 +121,6 @@ public class RobotContainer
         this.configureShooterDebugBindings();
       break;
 
-      case INTAKE_DEBUG:
-        m_Manager.addSubsystem(new Intake());
-        this.configureIntakeDebugBindings();
-      break;
-
       case CLIMB_DEBUG:
         m_Manager.addSubsystem(new Climb());
         this.configureClimbDebugBindings();
@@ -133,6 +128,9 @@ public class RobotContainer
 
       case ELEVATOR_SHOOTER_DEBUG:
         m_Manager.addSubsystem(new Drivetrain(TunerConstants.DrivetrainConstants, TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight));
+        m_Manager.addSubsystem(new Elevator());
+        m_Manager.addSubsystem(new Shooter());
+        m_Manager.addSubsystem(new ShooterCoral());
         this.configureElevatorShooterDebugBindings();
       break;
       
@@ -155,9 +153,6 @@ public class RobotContainer
 
     Shooter shooter = m_Manager.getSubsystemOfType(Shooter.class).get();
     SmartDashboard.putData(shooter);
-
-    Intake intake = m_Manager.getSubsystemOfType(Intake.class).get();
-    SmartDashboard.putData(intake);
 
     Climb climb = m_Manager.getSubsystemOfType(Climb.class).get();
     SmartDashboard.putData(climb);
@@ -252,11 +247,6 @@ public class RobotContainer
     m_DriverController.y().whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
     m_DriverController.x().whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-    m_DriverController.a().whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-    m_DriverController.b().whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-    m_DriverController.y().whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-    m_DriverController.x().whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-
     drivetrain.setDefaultCommand
     (
         m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get().applyRequest(() ->
@@ -266,8 +256,6 @@ public class RobotContainer
         )
     );
 
-    //m_DriverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
-    m_DriverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
     //m_DriverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
     m_DriverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
   }
@@ -280,7 +268,6 @@ public class RobotContainer
     CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
 
     m_DriverController.start().onTrue(elevator.ZeroElevator());
-    m_DriverController.povLeft().onTrue(elevator.MoveToLevel(LEVELS.HOME));
 
     SysIdRoutine sysIdRoutine = elevator.BuildSysIdRoutine();
 
@@ -289,10 +276,10 @@ public class RobotContainer
     m_DriverController.y().onTrue(elevator.MoveToLevel(LEVELS.THREE));
     m_DriverController.x().onTrue(elevator.MoveToLevel(LEVELS.FOUR));
 
-    // m_DriverController.a().whileTrue(sysIdRoutine.dynamic(Direction.kForward));
-    // m_DriverController.b().whileTrue(sysIdRoutine.dynamic(Direction.kReverse));
-    // m_DriverController.y().whileTrue(sysIdRoutine.quasistatic(Direction.kForward));
-    // m_DriverController.x().whileTrue(sysIdRoutine.quasistatic(Direction.kReverse));
+    m_DriverController.povUp().whileTrue(sysIdRoutine.dynamic(Direction.kForward));
+    m_DriverController.povRight().whileTrue(sysIdRoutine.dynamic(Direction.kReverse));
+    m_DriverController.povDown().whileTrue(sysIdRoutine.quasistatic(Direction.kForward));
+    m_DriverController.povLeft().whileTrue(sysIdRoutine.quasistatic(Direction.kReverse));
 
     drivetrain.setDefaultCommand
     (
@@ -311,24 +298,19 @@ public class RobotContainer
     Shooter shooter = m_Manager.getSubsystemOfType(Shooter.class).get();
     SmartDashboard.putData(shooter);
 
-    // m_DriverController.a().onTrue(shooter.StowShooter());
-    // m_DriverController.b().onTrue(shooter.IntakeAlgae()).onFalse(shooter.StowAndHoldAlgae());
-    // m_DriverController.y().onTrue(shooter.PrepareToDeployCoralLow());
-    // m_DriverController.x().onTrue(shooter.DeployCoral()).onFalse(shooter.StowShooter());
+    SysIdRoutine sysIdRoutine = shooter.BuildSysIdRoutine();
 
-    // m_DriverController.povUp().onTrue(shooter.IntakeCoral()).onFalse(shooter.StowShooter());
-    // m_DriverController.povDown().onTrue(shooter.ProcessAlgae()).onFalse(shooter.StowShooter());
+    m_DriverController.povUp().whileTrue(sysIdRoutine.dynamic(Direction.kForward));
+    m_DriverController.povRight().whileTrue(sysIdRoutine.dynamic(Direction.kReverse));
+    m_DriverController.povDown().whileTrue(sysIdRoutine.quasistatic(Direction.kForward));
+    m_DriverController.povLeft().whileTrue(sysIdRoutine.quasistatic(Direction.kReverse));
+
+    m_DriverController.a().onTrue(shooter.StowShooter());
+    m_DriverController.b().onTrue(shooter.MoveToProcess());
+    m_DriverController.y().onTrue(shooter.MoveToDeployHigh());
+    m_DriverController.x().onTrue(shooter.MoveToDeployLow()); 
 
     System.out.println("[Wolfpack] Shooter Debug bindings successfully configured.");
-  }
-
-  private void configureIntakeDebugBindings()
-  {
-    Intake intake = m_Manager.getSubsystemOfType(Intake.class).get();
-    SmartDashboard.putData(intake);
-
-
-    m_DriverController.a().onTrue(intake.IntakeRoutine()).onFalse(intake.StowIntake());
   }
 
   private void configureClimbDebugBindings()
@@ -342,6 +324,15 @@ public class RobotContainer
   private void configureElevatorShooterDebugBindings()
   {
     Drivetrain drivetrain = m_Manager.getSubsystemOfType(Drivetrain.class).get();
+
+    Elevator elevator = m_Manager.getSubsystemOfType(Elevator.class).get();
+    SmartDashboard.putData(elevator);
+
+    Shooter shooter = m_Manager.getSubsystemOfType(Shooter.class).get();
+    SmartDashboard.putData(shooter);
+
+    ShooterCoral shooterCoral = m_Manager.getSubsystemOfType(ShooterCoral.class).get();
+    SmartDashboard.putData(shooterCoral);
     
     drivetrain.setDefaultCommand
     (
@@ -352,7 +343,21 @@ public class RobotContainer
         )
     );
 
-  }
+    m_DriverController.a().onTrue(new ParallelCommandGroup(shooter.MoveToDeployLow(), elevator.MoveToLevel(LEVELS.TWO)))
+                          .onFalse(new ParallelCommandGroup(shooter.StowShooter(), elevator.MoveToLevel(LEVELS.HOME)));
+
+    m_DriverController.b().onTrue(new ParallelCommandGroup(shooter.MoveToDeployLow(), elevator.MoveToLevel(LEVELS.THREE)))
+                          .onFalse(new ParallelCommandGroup(shooter.StowShooter(), elevator.MoveToLevel(LEVELS.HOME)));
+    
+    m_DriverController.y().onTrue(new ParallelCommandGroup(shooter.MoveToDeployHigh(), elevator.MoveToLevel(LEVELS.FOUR)))
+                          .onFalse(new ParallelCommandGroup(shooter.StowShooter(), elevator.MoveToLevel(LEVELS.HOME)));
+
+    m_DriverController.rightBumper().onTrue(shooterCoral.DeployCoralRoutine()).onFalse(shooterCoral.StopCoral());
+
+    m_DriverController.leftTrigger().whileTrue(new ParallelDeadlineGroup(shooterCoral.IntakeCoralRoutine(),
+                                              elevator.MoveToLevel(LEVELS.CORAL_INTAKE),
+                                              shooter.MoveToIntake()));
+                                            }
 
   public Command getAutonomousCommand() 
   {

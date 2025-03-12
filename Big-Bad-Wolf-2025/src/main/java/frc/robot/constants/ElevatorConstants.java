@@ -20,13 +20,24 @@ import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
  */
 public class ElevatorConstants 
 {
+    // public static final double ELEVATOR_ZERO_POSITION = 0;
+    // public static final double ELEVATOR_HOME_POSITION = 30;
+    // public static final double ELEVATOR_LEVEL_ONE = 15;
+    // public static final double ELEVATOR_LEVEL_TWO = 35.5;
+    // public static final double ELEVATOR_LEVEL_THREE = 66.0;
+    // public static final double ELEVATOR_LEVEL_FOUR = 102.9;
+    // public static final double CORAL_INTAKING_LEVEL = 0.75;
+    // public static final double ALGAE_PROCESSING_POSITION = 5;
+    // public static final double LOW_CLEAN = 35.25;
+    // public static final double HIGH_CLEAN = 55.75;
+    
     public static final double ELEVATOR_ZERO_POSITION = 0;
     public static final double ELEVATOR_HOME_POSITION = 30;
     public static final double ELEVATOR_LEVEL_ONE = 15;
-    public static final double ELEVATOR_LEVEL_TWO = 28.0;
-    public static final double ELEVATOR_LEVEL_THREE = 53.5;
-    public static final double ELEVATOR_LEVEL_FOUR = 90;
-    public static final double CORAL_INTAKING_LEVEL = 0.75;
+    public static final double ELEVATOR_LEVEL_TWO = 50.0;  // 50
+    public static final double ELEVATOR_LEVEL_THREE = 78.0;  // 78
+    public static final double ELEVATOR_LEVEL_FOUR = 105.0;
+    public static final double CORAL_INTAKING_LEVEL = 2;
     public static final double ALGAE_PROCESSING_POSITION = 5;
     public static final double LOW_CLEAN = 35.25;
     public static final double HIGH_CLEAN = 55.75;
@@ -86,20 +97,20 @@ public class ElevatorConstants
 
     public static final Slot0Configs LEFT_MOTOR_SLOT_0_CONFIG = new Slot0Configs()
                                                                     .withGravityType(GravityTypeValue.Elevator_Static)
-                                                                    .withKA(0)
+                                                                    .withKA(0.014085)
                                                                     .withKD(0)
-                                                                    .withKG(0)
+                                                                    .withKG(0.2532)
                                                                     .withKI(0)
                                                                     .withKP(15)
-                                                                    .withKS(0)
-                                                                    .withKV(0)
+                                                                    .withKS(0.10171)
+                                                                    .withKV(0.11636)
                                                                     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
 
     public static final MotionMagicConfigs LEFT_MOTOR_MOTION_MAGIC_CONFIG = new MotionMagicConfigs()
-                                                                                .withMotionMagicAcceleration(80)
-                                                                                .withMotionMagicCruiseVelocity(600)
-                                                                                .withMotionMagicExpo_kA(0.1)
-                                                                                .withMotionMagicExpo_kV(0.12)
+                                                                                .withMotionMagicAcceleration(175)
+                                                                                .withMotionMagicCruiseVelocity(800)
+                                                                                .withMotionMagicExpo_kA(0.014085)
+                                                                                .withMotionMagicExpo_kV(0.11636)
                                                                                 .withMotionMagicJerk(0);
 
     public static final TalonFXConfiguration ELEVATOR_MOTOR_CONFIG = new TalonFXConfiguration()
@@ -108,23 +119,4 @@ public class ElevatorConstants
                                                                      .withCurrentLimits(LEFT_MOTOR_CURRENT_LIMIT_CONFIG)
                                                                      .withSlot0(LEFT_MOTOR_SLOT_0_CONFIG)
                                                                      .withMotionMagic(LEFT_MOTOR_MOTION_MAGIC_CONFIG);
-
-    // RIGHT MOTOR CONFIGS
-    public static final MotorOutputConfigs RIGHT_MOTOR_OUTPUT_CONFIG = new MotorOutputConfigs()
-                                                                          .withInverted(InvertedValue.Clockwise_Positive)
-                                                                          .withNeutralMode(NeutralModeValue.Brake)
-                                                                          .withPeakForwardDutyCycle(1)
-                                                                          .withPeakReverseDutyCycle(-1);
-
-    public static final CurrentLimitsConfigs RIGHT_MOTOR_CURRENT_LIMIT_CONFIG = new CurrentLimitsConfigs()
-                                                                                    .withStatorCurrentLimit(100)
-                                                                                    .withStatorCurrentLimitEnable(true)
-                                                                                    .withSupplyCurrentLimit(40)
-                                                                                    .withSupplyCurrentLimitEnable(false)
-                                                                                    .withSupplyCurrentLowerLimit(40)
-                                                                                    .withSupplyCurrentLowerTime(1);
-
-    public static final TalonFXConfiguration RIGHT_MOTOR_CONFIG = new TalonFXConfiguration()
-                                                                     .withMotorOutput(RIGHT_MOTOR_OUTPUT_CONFIG)
-                                                                     .withCurrentLimits(RIGHT_MOTOR_CURRENT_LIMIT_CONFIG);
 }
