@@ -39,6 +39,7 @@ import frc.robot.subsystems.ShooterCoral;
 import frc.robot.utilities.AlgaeCommandBuilder;
 import frc.robot.utilities.CoralCommandBuilder;
 import frc.robot.utilities.DataStuff;
+import frc.robot.utilities.FieldCalibrator;
 import frc.robot.utilities.PackLog;
 import frc.robot.utilities.SubsystemManager;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -103,6 +104,11 @@ public class RobotContainer
         m_Manager.addSubsystem(new DataStuff());
         this.configureCompetitionBindings();
       break;
+
+      case FIELD_CALIBRATION:
+        m_Manager.addSubsystem(TunerConstants.createDrivetrain());
+        this.configureFieldCalibrationBindings();
+        break;
 
       case DRIVETRAIN_DEBUG:
         m_Manager.addSubsystem(TunerConstants.createDrivetrain());
@@ -237,6 +243,21 @@ public class RobotContainer
        e.printStackTrace();
      }
   }
+
+  /**
+   * Method is used to get exact coordinates for different targets on the field. Align robot with spot you want to remember in the correct orientation, and press 
+   * "A" on the driver controller. This prints out the current X, Y, and rotation of the bot for the user to note for getting accurate position data.
+   */
+  private void configureFieldCalibrationBindings()
+  {
+    CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
+    FieldCalibrator fieldCalibrator = new FieldCalibrator(drivetrain);
+    m_DriverController.a().onTrue(new InstantCommand(() -> 
+    {
+      System.out.printf("Current X: %f, Current Y: %f, Current Rotation: %s \n",fieldCalibrator.getPose2d().getX(), fieldCalibrator.getPose2d().getY(), fieldCalibrator.getPose2d().getRotation());
+    }).ignoringDisable(true));
+  }
+
 
   private void configureDrivetrainDebugBindings()
   {
