@@ -26,7 +26,13 @@
         {
           "type": "named",
           "data": {
-            "name": "PrepareForCoralThreeDeploy"
+            "name": "LevelThreeDeploy"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Align5L"
           }
         },
         {
@@ -76,7 +82,13 @@
         {
           "type": "named",
           "data": {
-            "name": "DeployCoral"
+            "name": "Align5R"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Align5R"
           }
         },
         {
@@ -120,13 +132,19 @@
         {
           "type": "named",
           "data": {
+            "name": "Align5R"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "DeployCoral"
           }
         }
       ]
     }
   },
-  "resetOdom": false,
+  "resetOdom": true,
   "folder": null,
   "choreoAuto": false
 }

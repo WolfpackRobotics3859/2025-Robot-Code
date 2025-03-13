@@ -184,9 +184,10 @@ public class RobotContainer
 
     m_DriverController.leftTrigger().whileTrue(new ParallelDeadlineGroup(shooterCoral.IntakeCoralRoutine(),
                                                                          elevator.MoveToLevel(LEVELS.CORAL_INTAKE),
-                                                                         shooter.MoveToIntake()));
+                                                                         shooter.MoveToIntake()))
+                                    .onFalse(shooter.StowShooter().andThen(elevator.MoveToLevel(LEVELS.HOME)));
 
-    m_DriverController.a().onTrue(new WaitCommand(0.25).andThen(shooterCoral.DeployCoralRoutine()))
+    m_DriverController.a().onTrue(new WaitCommand(0.1).andThen(shooterCoral.DeployCoralRoutine()))
                           .onFalse(shooterCoral.StopCoral());
 
     m_CoDriverController.leftBumper().onTrue(dataStuff.Left().ignoringDisable(true));
@@ -205,6 +206,13 @@ public class RobotContainer
     NamedCommands.registerCommand("CoralThreeDeploy", new ParallelCommandGroup(elevator.MoveToLevel(LEVELS.THREE), shooter.MoveToDeployLow()));
     NamedCommands.registerCommand("CoralFourDeploy", new ParallelCommandGroup(elevator.MoveToLevel(LEVELS.FOUR), shooter.MoveToDeployHigh()));
     NamedCommands.registerCommand("DeployCoral", shooterCoral.DeployCoralRoutine());
+
+    NamedCommands.registerCommand("Align4L", new ParallelDeadlineGroup(new WaitCommand(0.75), drivetrain.AlignToFace(0, 4)));
+    NamedCommands.registerCommand("Align4R", new ParallelDeadlineGroup(new WaitCommand(0.75), drivetrain.AlignToFace(1, 4)));
+    NamedCommands.registerCommand("Align5L", new ParallelDeadlineGroup(new WaitCommand(0.75), drivetrain.AlignToFace(0, 5)));
+    NamedCommands.registerCommand("Align5R", new ParallelDeadlineGroup(new WaitCommand(0.75), drivetrain.AlignToFace(1, 5)));
+    NamedCommands.registerCommand("Align6L", new ParallelDeadlineGroup(new WaitCommand(0.75), drivetrain.AlignToFace(0, 6)));
+    NamedCommands.registerCommand("Align6R", new ParallelDeadlineGroup(new WaitCommand(0.75), drivetrain.AlignToFace(1, 6)));
 
     NamedCommands.registerCommand("ShooterLowPosition", new ParallelCommandGroup(shooter.MoveToDeployLow(), elevator.MoveToLevel(LEVELS.ZERO)));
 
@@ -293,9 +301,9 @@ public class RobotContainer
     //m_CoDriverController.b().whileTrue(climb.setLatchVoltage(-2)).onFalse(climb.setLatchVoltage(0));
 
 
-    NamedCommands.registerCommand("PrepareForCoralTwoDeploy", new ParallelCommandGroup(elevator.MoveToLevel(LEVELS.TWO), shooter.MoveToDeployLow()));
+    NamedCommands.registerCommand("CoralTwoDeploy", new ParallelCommandGroup(elevator.MoveToLevel(LEVELS.TWO), shooter.MoveToDeployLow()));
     NamedCommands.registerCommand("StartIntake", new ParallelDeadlineGroup(shooterCoral.IntakeCoralRoutine(), elevator.MoveToLevel(LEVELS.CORAL_INTAKE), shooter.MoveToIntake()));
-    NamedCommands.registerCommand("DeployCoralLow", shooterCoral.DeployCoralRoutine());
+    NamedCommands.registerCommand("DeployCoral", shooterCoral.DeployCoralRoutine());
 
     NamedCommands.registerCommand("LevelThreeDeploy", commandBuilder.BuildCoralStandingDeployment(LEVELS.THREE));
 

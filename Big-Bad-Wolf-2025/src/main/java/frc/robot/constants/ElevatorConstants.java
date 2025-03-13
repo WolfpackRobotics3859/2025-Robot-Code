@@ -32,8 +32,8 @@ public class ElevatorConstants
     public static final double HIGH_CLEAN = 55.75;
 
     // Maximum allowable magnitude deviation from setpoint when determining the end of the movement command.
-    public static final double POSITION_ERROR_TOLERANCE = 0.5;
-    public static final double POSITION_DERIVATIVE_TOLERANCE = 0.01;
+    public static final double POSITION_ERROR_TOLERANCE = 1;
+    public static final double POSITION_DERIVATIVE_TOLERANCE = 0.05;
 
     // Max Height should be around 100-105
 

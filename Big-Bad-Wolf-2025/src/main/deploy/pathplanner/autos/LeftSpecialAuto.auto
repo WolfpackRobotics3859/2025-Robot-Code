@@ -26,6 +26,12 @@
         {
           "type": "named",
           "data": {
+            "name": "Align4L"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "DeployCoral"
           }
         },
@@ -65,6 +71,12 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Align4R"
           }
         },
         {
@@ -114,13 +126,19 @@
         {
           "type": "named",
           "data": {
+            "name": "Align6R"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "DeployCoral"
           }
         }
       ]
     }
   },
-  "resetOdom": false,
+  "resetOdom": true,
   "folder": null,
   "choreoAuto": false
 }

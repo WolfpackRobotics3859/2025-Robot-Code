@@ -17,6 +17,7 @@ import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -125,7 +126,8 @@ public class Shooter extends SubsystemBase
     return new FunctionalCommand(() -> this.ApplyPosition(position),
                                  () -> {}, 
                                  interrupted -> {},
-                                 () -> this.isReady(ShooterConstants.WRIST_POSITION_ERROR_TOLERANCE, ShooterConstants.WRIST_POSITION_DERIVATIVE_TOLERANCE),
+                                 () -> true,
+                   //              () -> this.isReady(ShooterConstants.WRIST_POSITION_ERROR_TOLERANCE, ShooterConstants.WRIST_POSITION_DERIVATIVE_TOLERANCE),
                                  this);
   }
 
@@ -179,6 +181,7 @@ public class Shooter extends SubsystemBase
     {
       return false;
     }
+    DataLogManager.log("shooter ready.");
 
     return true;
   }

@@ -43,8 +43,8 @@ public class ShooterConstants
     public static final double WRIST_ALGAE_SWEEPING_POSITION = -0.5;
 
     // Maximum allowable magnitude deviation from setpoint when determining the end of the movement command.
-    public static final double WRIST_POSITION_ERROR_TOLERANCE = 0.1;
-    public static final double WRIST_POSITION_DERIVATIVE_TOLERANCE = 0.01;
+    public static final double WRIST_POSITION_ERROR_TOLERANCE = 0.5;
+    public static final double WRIST_POSITION_DERIVATIVE_TOLERANCE = 0.05;
     
     // WRIST MOTOR CONFIGS
     public static final MotorOutputConfigs WRIST_MOTOR_OUTPUT_CONFIG = new MotorOutputConfigs()

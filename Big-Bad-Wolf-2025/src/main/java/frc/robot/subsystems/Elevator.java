@@ -19,6 +19,7 @@ import com.ctre.phoenix6.signals.S1StateValue;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -197,6 +198,8 @@ public class Elevator extends SubsystemBase
     {
       return false;
     }
+
+    DataLogManager.log("elevator ready.");
 
     return true;
   }

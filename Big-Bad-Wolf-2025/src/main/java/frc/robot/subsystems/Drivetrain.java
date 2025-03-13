@@ -1,7 +1,16 @@
 package frc.robot.subsystems;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 
+import org.photonvision.EstimatedRobotPose;
+import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.targeting.PhotonPipelineResult;
+
+import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
@@ -13,10 +22,14 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -48,18 +61,51 @@ public class Drivetrain extends CommandSwerveDrivetrain
         .withDeadband(TunerConstants.MaxSpeed * 0.05).withRotationalDeadband(TunerConstants.MaxAngularRate * 0.05) // Add a 10% deadband
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
+    private PhotonCamera m_ForwardCamera;
+    private PhotonPoseEstimator m_ForwardCameraEstimator;
+
+    AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+
+    StructPublisher<Pose2d> publisher = NetworkTableInstance.getDefault().getStructTopic("Robot Pose", Pose2d.struct).publish();
+
     public Drivetrain(SwerveDrivetrainConstants constants, SwerveModuleConstants<?, ?, ?>... modules)
     {
         super(constants, modules);    
         this.ConfigureDrivetrain();
+        this.ConfigureCameras();
     }
 
     @Override
     public void periodic() 
     {
         super.periodic();
-        this.m_CameraManager.UpdateCameras(this::addVisionMeasurement);
+       // this.m_CameraManager.UpdateCameras(this::addVisionMeasurement);
+        this.UpdateForwardCamera();
+    SmartDashboard.putBoolean("Forward Camera Connected", this.m_ForwardCamera.isConnected());
+    publisher.set(this.getState().Pose);
     }
+
+      private void ConfigureCameras()
+  {
+    this.m_ForwardCamera = new PhotonCamera("FORWARD_CAM");
+    this.m_ForwardCameraEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, CameraConstants.ROBOT_TO_CAM_TRANFORMS[0]);
+  }
+
+  private void UpdateForwardCamera()
+  {
+    if(m_ForwardCamera.isConnected())
+    {
+      List<PhotonPipelineResult> list = m_ForwardCamera.getAllUnreadResults();
+      if(!list.isEmpty())
+      {
+          Optional<EstimatedRobotPose> estimatedPose = m_ForwardCameraEstimator.update(list.get(0));
+          if(estimatedPose.isPresent())
+          {
+            this.addVisionMeasurement(estimatedPose.get().estimatedPose.toPose2d(), Utils.getCurrentTimeSeconds());
+          }  
+      }
+    }
+  }
 
     public Command AlignCoral()
     {
@@ -87,6 +133,46 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                             Pose2d goalPose = this.GetGoalCoralPose();
                                             this.m_XController.reset();
                                             this.m_YController.reset();
+                                            this.m_XController.setSetpoint(goalPose.getX());
+                                            this.m_YController.setSetpoint(goalPose.getY());
+                                            this.m_RotationController.setSetpoint(goalPose.getRotation().getDegrees());
+                                        }, 
+                                     () -> UpdateRequest(), 
+                                     interrupted -> {}, 
+                                     () -> false, 
+                                     this);
+    }
+
+    public Command AlignToFace(int side, int face)
+    {
+        return new FunctionalCommand(() -> 
+                                        {
+                                            this.m_XController.reset();
+                                            this.m_YController.reset();
+                                            Pose2d goalPose;
+                                            if(alliance == Alliance.Blue)
+                                            {
+                                                if(side == 0)
+                                                {
+                                                    goalPose = DrivetrainConstants.BLUE_LEFT_ALIGNMENTS[face - 1];
+                                                }
+                                                else
+                                                {
+                                                    goalPose = DrivetrainConstants.BLUE_RIGHT_ALIGNMENTS[face - 1];
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if(side == 0)
+                                                {
+                                                    goalPose = DrivetrainConstants.RED_LEFT_ALIGNMENTS[face - 1];
+                                                }
+                                                else
+                                                {
+                                                    goalPose = DrivetrainConstants.RED_RIGHT_ALIGNMENTS[face -1];
+                                                }
+                                            }
+                                            
                                             this.m_XController.setSetpoint(goalPose.getX());
                                             this.m_YController.setSetpoint(goalPose.getY());
                                             this.m_RotationController.setSetpoint(goalPose.getRotation().getDegrees());
@@ -178,10 +264,20 @@ public class Drivetrain extends CommandSwerveDrivetrain
 
     private void UpdateRequest()
     {
-        this.m_SwerveRequestField.VelocityX = -this.GetXOutput();
-        this.m_SwerveRequestField.VelocityY = -this.GetYOutput();
-        this.m_SwerveRequestField.RotationalRate = this.GetRotationOutput();
-        this.setControl(m_SwerveRequestField);
+        if(alliance == Alliance.Red)
+        {
+            this.m_SwerveRequestField.VelocityX = -this.GetXOutput();
+            this.m_SwerveRequestField.VelocityY = -this.GetYOutput();
+            this.m_SwerveRequestField.RotationalRate = this.GetRotationOutput();
+            this.setControl(m_SwerveRequestField);
+        }
+        else
+        {
+            this.m_SwerveRequestField.VelocityX = this.GetXOutput();
+            this.m_SwerveRequestField.VelocityY = this.GetYOutput();
+            this.m_SwerveRequestField.RotationalRate = this.GetRotationOutput();
+            this.setControl(m_SwerveRequestField);
+        }
     }
 
     private double GetXOutput()
@@ -223,19 +319,19 @@ public class Drivetrain extends CommandSwerveDrivetrain
     private void ConfigurePIDControllers()
     {
         this.m_PackLog.Log("Beginning configuration.");
-        this.m_XController = new PIDController(25, 0.1,0.025);
+        this.m_XController = new PIDController(20, 0.0,0.025);
         this.m_XController.setTolerance(0.01, 0.025);
         this.m_XController.setIntegratorRange(-TunerConstants.MaxSpeed * 0.1,TunerConstants.MaxSpeed * 0.1);
         this.m_XController.setIZone(1);
         SmartDashboard.putData(this.m_XController);
 
-        this.m_YController = new PIDController (25, 0.1 ,0.025);
+        this.m_YController = new PIDController (20, 0.0 ,0.025);
         this.m_YController.setTolerance(0.01, 0.025);
         this.m_YController.setIntegratorRange(-TunerConstants.MaxSpeed * 0.1,TunerConstants.MaxSpeed * 0.1);
         this.m_YController.setIZone(1);
         SmartDashboard.putData(this.m_YController);
 
-        this.m_RotationController = new PIDController (0.25, 0.5 ,0);
+        this.m_RotationController = new PIDController (0.25, 0 ,0);
         this.m_RotationController.setTolerance(1, 1);
         this.m_RotationController.setIntegratorRange(-TunerConstants.MaxAngularRate * 0.1,TunerConstants.MaxAngularRate * 0.1);
         this.m_RotationController.setIZone(10);
