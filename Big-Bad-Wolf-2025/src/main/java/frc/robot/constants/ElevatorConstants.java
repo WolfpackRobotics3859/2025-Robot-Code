@@ -20,17 +20,6 @@ import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
  */
 public class ElevatorConstants 
 {
-    // public static final double ELEVATOR_ZERO_POSITION = 0;
-    // public static final double ELEVATOR_HOME_POSITION = 30;
-    // public static final double ELEVATOR_LEVEL_ONE = 15;
-    // public static final double ELEVATOR_LEVEL_TWO = 35.5;
-    // public static final double ELEVATOR_LEVEL_THREE = 66.0;
-    // public static final double ELEVATOR_LEVEL_FOUR = 102.9;
-    // public static final double CORAL_INTAKING_LEVEL = 0.75;
-    // public static final double ALGAE_PROCESSING_POSITION = 5;
-    // public static final double LOW_CLEAN = 35.25;
-    // public static final double HIGH_CLEAN = 55.75;
-    
     public static final double ELEVATOR_ZERO_POSITION = 0;
     public static final double ELEVATOR_HOME_POSITION = 30;
     public static final double ELEVATOR_LEVEL_ONE = 15;
@@ -41,6 +30,10 @@ public class ElevatorConstants
     public static final double ALGAE_PROCESSING_POSITION = 5;
     public static final double LOW_CLEAN = 35.25;
     public static final double HIGH_CLEAN = 55.75;
+
+    // Maximum allowable magnitude deviation from setpoint when determining the end of the movement command.
+    public static final double POSITION_ERROR_TOLERANCE = 0.5;
+    public static final double POSITION_DERIVATIVE_TOLERANCE = 0.01;
 
     // Max Height should be around 100-105
 

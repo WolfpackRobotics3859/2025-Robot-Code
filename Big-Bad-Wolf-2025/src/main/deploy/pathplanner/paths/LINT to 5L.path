@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.5723360655737704,
-        "y": 6.140829918032787
+        "x": 1.4265368852459013,
+        "y": 7.183760245901639
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.856278924480421,
-        "y": 5.563953832964041
+        "x": 1.8741286235153471,
+        "y": 6.90422129377024
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "LINT"
     },
     {
       "anchor": {
@@ -20,8 +20,8 @@
         "y": 5.25373975409836
       },
       "prevControl": {
-        "x": 3.631756163451324,
-        "y": 5.850296574716585
+        "x": 2.9506302622202467,
+        "y": 5.975642772588064
       },
       "nextControl": null,
       "isLocked": false,
@@ -29,7 +29,21 @@
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.8608736942070284,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 3.0,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -45,10 +59,10 @@
     "rotation": -59.99999999999999
   },
   "reversed": false,
-  "folder": "ALIGNMENT-PATHS",
+  "folder": "LINT TO X",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -59.99999999999999
+    "rotation": -53.56914187983765
   },
   "useDefaultConstraints": true
 }

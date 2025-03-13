@@ -4,8 +4,8 @@
 
 package frc.robot.subsystems;
 
-
 import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.StaticBrake;
@@ -15,13 +15,17 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.constants.ElevatorConstants.LEVELS;
 import frc.robot.constants.Hardware;
 import frc.robot.constants.ShooterConstants;
+import frc.robot.utilities.DataStuff;
 import frc.robot.utilities.MotorManager;
 
 public class Shooter extends SubsystemBase 
@@ -32,17 +36,36 @@ public class Shooter extends SubsystemBase
   private final StaticBrake m_BrakeRequest;
   private final CoastOut m_CoastRequest;
 
+  private final StatusSignal<AngularVelocity> m_WristRPS;
+  private final StatusSignal<Angle> m_WristPosition;
+
   public Shooter()
   {
     MotorManager.AddMotor("SHOOTER WRIST MOTOR", Hardware.SHOOTER_WRIST_MOTOR);
-    m_ShooterWristMotor = MotorManager.GetMotor(Hardware.SHOOTER_WRIST_MOTOR);
+    this.m_ShooterWristMotor = MotorManager.GetMotor(Hardware.SHOOTER_WRIST_MOTOR);
     MotorManager.ApplyConfigs(ShooterConstants.WRIST_MOTOR_CONFIG, Hardware.SHOOTER_WRIST_MOTOR);
 
-    m_WristPositionRequest = new MotionMagicVoltage(0);
-    m_BrakeRequest = new StaticBrake();
-    m_CoastRequest = new CoastOut();
+    this.m_WristPositionRequest = new MotionMagicVoltage(0);
+    this.m_BrakeRequest = new StaticBrake();
+    this.m_CoastRequest = new CoastOut();
+
+    this.m_WristRPS = this.m_ShooterWristMotor.getVelocity();
+    this.m_WristPosition = this.m_ShooterWristMotor.getPosition();
 
     this.BuildToolbox();
+  }
+
+  public Command MoveToSelectedShot()
+  {
+    return this.runOnce(() -> 
+    {
+      LEVELS level = DataStuff.GetLevel();
+      if(level == LEVELS.FOUR)
+      {
+        this.ApplyPosition(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION);
+      }
+      this.ApplyPosition(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION_LOW);
+    });
   }
 
   public Command StowShooter()
@@ -102,7 +125,7 @@ public class Shooter extends SubsystemBase
     return new FunctionalCommand(() -> this.ApplyPosition(position),
                                  () -> {}, 
                                  interrupted -> {},
-                                 () -> this.isInPosition(0.04),
+                                 () -> this.isReady(ShooterConstants.WRIST_POSITION_ERROR_TOLERANCE, ShooterConstants.WRIST_POSITION_DERIVATIVE_TOLERANCE),
                                  this);
   }
 
@@ -147,6 +170,17 @@ public class Shooter extends SubsystemBase
   private boolean isInPosition(double tolerance)
   {
     return Math.abs(this.m_ShooterWristMotor.getPosition().getValueAsDouble() - this.m_WristPositionRequest.Position) < tolerance;
+  }
+
+  private boolean isReady(double positionTolerance, double derivativeTolerance)
+  {
+    StatusSignal.refreshAll(this.m_WristRPS, this.m_WristPosition);
+    if((Math.abs(this.m_WristPosition.getValueAsDouble()) > derivativeTolerance) || (Math.abs(this.m_WristPosition.getValueAsDouble() - this.m_WristPositionRequest.Position) > positionTolerance))
+    {
+      return false;
+    }
+
+    return true;
   }
 
   @Override

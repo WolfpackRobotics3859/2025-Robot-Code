@@ -30,6 +30,8 @@ import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
  */
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem 
 {
+    public Alliance alliance = Alliance.Blue;
+
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
@@ -242,6 +244,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                         ? kRedAlliancePerspectiveRotation
                         : kBlueAlliancePerspectiveRotation
                 );
+                this.alliance = allianceColor;
                 m_hasAppliedOperatorPerspective = true;
             });
         }

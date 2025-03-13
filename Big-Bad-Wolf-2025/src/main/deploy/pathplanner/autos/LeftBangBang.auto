@@ -11,7 +11,57 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "LCOMM to 4L"
+                  "pathName": "LCOMM to 5L"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ShooterLowPosition"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "PrepareForCoralThreeDeploy"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "DeployCoral"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "L5 to LINT"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "StartIntake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "LINT to 5L"
                 }
               },
               {
@@ -36,7 +86,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "L4 to LINT"
+                  "pathName": "L5 to LINT"
                 }
               },
               {
@@ -55,51 +105,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "LINT to 4R"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "CoralTwoDeploy"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "DeployCoral"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "R4 to LINT"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "StartIntake"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "LINT TO 6R"
+                  "pathName": "LINT to 5R"
                 }
               },
               {

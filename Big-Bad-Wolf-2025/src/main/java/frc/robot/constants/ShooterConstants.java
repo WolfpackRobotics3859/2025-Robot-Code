@@ -33,16 +33,6 @@ public class ShooterConstants
     public static final double ALGAE_TROUGH_SHOOTING_VOLTAGE = 8;
     public static final double ALGAE_HOLDING_VOLTAGE = 1;
 
-    // WRIST POSITIONS
-    // public static final double WRIST_STOW_POSITION = -1.46; // -0.58
-    // public static final double WRIST_CORAL_DEPLOYMENT_POSITION_LOW = -1.7; // -0.58
-    // public static final double WRIST_CORAL_DEPLOYMENT_POSITION = -1.23;
-    // public static final double WRIST_CORAL_INTAKE_POSITION = -0.4; // -0.62
-    // public static final double WRIST_ALGAE_INTAKE_POSITION = -11.0;
-    // public static final double WRIST_ALGAE_PROCESSOR_DEPLOYMENT_POSITION = -11; // -0.38
-    // public static final double WRIST_ALGAE_SHOOTING_POSITION = -0.15;
-    // public static final double WRIST_ALGAE_SWEEPING_POSITION = -0.5;
-
     public static final double WRIST_STOW_POSITION = -1.46; // -0.58
     public static final double WRIST_CORAL_DEPLOYMENT_POSITION_LOW = -3.5; // -0.58
     public static final double WRIST_CORAL_DEPLOYMENT_POSITION = -1.23;
@@ -51,6 +41,10 @@ public class ShooterConstants
     public static final double WRIST_ALGAE_PROCESSOR_DEPLOYMENT_POSITION = -11; // -0.38
     public static final double WRIST_ALGAE_SHOOTING_POSITION = -0.15;
     public static final double WRIST_ALGAE_SWEEPING_POSITION = -0.5;
+
+    // Maximum allowable magnitude deviation from setpoint when determining the end of the movement command.
+    public static final double WRIST_POSITION_ERROR_TOLERANCE = 0.1;
+    public static final double WRIST_POSITION_DERIVATIVE_TOLERANCE = 0.01;
     
     // WRIST MOTOR CONFIGS
     public static final MotorOutputConfigs WRIST_MOTOR_OUTPUT_CONFIG = new MotorOutputConfigs()

@@ -7,8 +7,6 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
-import java.util.function.Supplier;
-
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.CoastOut;
@@ -29,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.ElevatorConstants.LEVELS;
 import frc.robot.constants.Hardware;
+import frc.robot.utilities.DataStuff;
 import frc.robot.utilities.MotorManager;
 
 public class Elevator extends SubsystemBase
@@ -69,18 +68,23 @@ public class Elevator extends SubsystemBase
   @Override
   public void periodic()
   {
-    if(m_CANdi.isConnected() && (m_CANdi.getS1State().getValue() == S1StateValue.Low) && m_CANdi.getS1Closed().refresh().getValue())
-    {
-      this.m_ElevatorMotor.setPosition(0);
-    }
-    SmartDashboard.putNumber("Elevator Position :)", this.m_ElevatorMotor.getPosition().getValueAsDouble());
-    SmartDashboard.putNumber("Shooter Closed Loop Error", m_ElevatorMotor.getClosedLoopError().getValueAsDouble());
-    if(m_CANdi.isConnected() && (m_CANdi.getS1State().getValue() == S1StateValue.Low) && m_CANdi.getS1Closed().refresh().getValue())
-    {
-      this.m_ElevatorMotor.setPosition(0);
-    }
-    SmartDashboard.putNumber("Elevator Position :)", this.m_ElevatorMotor.getPosition().getValueAsDouble());
-    SmartDashboard.putNumber("Shooter Closed Loop Error", m_ElevatorMotor.getClosedLoopError().getValueAsDouble());
+    // if(m_CANdi.isConnected() && (m_CANdi.getS1State().getValue() == S1StateValue.Low) && m_CANdi.getS1Closed().refresh().getValue())
+    // {
+    //   this.m_ElevatorMotor.setPosition(0);
+    // }
+    // SmartDashboard.putNumber("Elevator Position :)", this.m_ElevatorMotor.getPosition().getValueAsDouble());
+    // SmartDashboard.putNumber("Shooter Closed Loop Error", m_ElevatorMotor.getClosedLoopError().getValueAsDouble());
+  }
+
+  public Command MoveToSelectorLevel()
+  {
+    return new FunctionalCommand(
+      () -> this.ApplyPosition(DataStuff.GetLevel().getValue()),
+      () -> {},
+      interrupted -> {},
+      () -> this.isReady(ElevatorConstants.POSITION_ERROR_TOLERANCE, ElevatorConstants.POSITION_DERIVATIVE_TOLERANCE),
+      this
+    );
   }
 
   public Command MoveToLevel(LEVELS level)
@@ -89,7 +93,7 @@ public class Elevator extends SubsystemBase
       () -> this.ApplyPosition(level.getValue()),
       () -> {},
       interrupted -> {},
-      () -> isInPosition(0.05),
+      () -> this.isReady(ElevatorConstants.POSITION_ERROR_TOLERANCE, ElevatorConstants.POSITION_DERIVATIVE_TOLERANCE),
       this
     );
   }
@@ -102,7 +106,8 @@ public class Elevator extends SubsystemBase
       interrupted -> this.ApplyPosition(0),
       () -> m_CANdi.isConnected() && (m_CANdi.getS1State().getValue() == S1StateValue.Low) && m_CANdi.getS1Closed().getValue(),
       this
-    );
+   
+      );
   }
 
   public Command SetVoltage(double voltage)
@@ -185,10 +190,10 @@ public class Elevator extends SubsystemBase
     return Math.abs(this.m_ElevatorMotor.getPosition().getValueAsDouble() - this.m_PositionRequest.Position) < tolerance;
   }
 
-  private boolean newIsInPosition(double positionTolerance, double derivativeTolerance)
+  private boolean isReady(double positionTolerance, double derivativeTolerance)
   {
     StatusSignal.refreshAll(this.m_ElevatorRPS, this.m_ElevatorPosition);
-    if((Math.abs(this.m_ElevatorRPS.getValueAsDouble()) > derivativeTolerance) || (Math.abs(this.m_ElevatorPosition.getValueAsDouble()) > positionTolerance))
+    if((Math.abs(this.m_ElevatorRPS.getValueAsDouble()) > derivativeTolerance) || (Math.abs(this.m_ElevatorPosition.getValueAsDouble() - this.m_PositionRequest.Position) > positionTolerance))
     {
       return false;
     }

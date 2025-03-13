@@ -6,16 +6,10 @@ package frc.robot;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
-import static edu.wpi.first.units.Units.Degrees;
-
-import java.lang.System.Logger.Level;
-
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -23,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.constants.Global;
 import frc.robot.constants.PathConstants;
@@ -94,15 +89,26 @@ public class RobotContainer
     switch(type)
     {
       case COMPETITION:
-        m_Manager.addSubsystem(TunerConstants.createDrivetrain());
+        m_Manager.addSubsystem(new Drivetrain(TunerConstants.DrivetrainConstants, TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight));
         m_Manager.addSubsystem(new ShooterCoral());
         m_Manager.addSubsystem(new ShooterAlgae());
         m_Manager.addSubsystem(new Elevator());
         m_Manager.addSubsystem(new Climb());
         m_Manager.addSubsystem(new Shooter());
         m_Manager.addSubsystem(new DataStuff());
-        this.configureCompetitionBindings();
+        this.configureCompetitionBindingsV2();
       break;
+
+      case COMPETITION_NO_VISION:
+        m_Manager.addSubsystem(new Drivetrain(TunerConstants.DrivetrainConstants, TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight));
+        m_Manager.addSubsystem(new ShooterCoral());
+        m_Manager.addSubsystem(new ShooterAlgae());
+        m_Manager.addSubsystem(new Elevator());
+        m_Manager.addSubsystem(new Climb());
+        m_Manager.addSubsystem(new Shooter());
+        m_Manager.addSubsystem(new DataStuff());
+        this.configureCompetitionNoVisionBindings();
+      break; 
 
       case DRIVETRAIN_DEBUG:
         m_Manager.addSubsystem(TunerConstants.createDrivetrain());
@@ -144,9 +150,82 @@ public class RobotContainer
   }
 
   private SendableChooser<Command> m_Chooser;
+  private void configureCompetitionBindingsV2()
+  {
+    Drivetrain drivetrain = m_Manager.getSubsystemOfType(Drivetrain.class).get();
+
+    Elevator elevator = m_Manager.getSubsystemOfType(Elevator.class).get();
+    SmartDashboard.putData(elevator);
+
+    Shooter shooter = m_Manager.getSubsystemOfType(Shooter.class).get();
+    SmartDashboard.putData(shooter);
+
+    Climb climb = m_Manager.getSubsystemOfType(Climb.class).get();
+    SmartDashboard.putData(climb);
+
+    DataStuff dataStuff = m_Manager.getSubsystemOfType(DataStuff.class).get();
+    SmartDashboard.putData(dataStuff);
+
+    ShooterCoral shooterCoral = m_Manager.getSubsystemOfType(ShooterCoral.class).get();
+    SmartDashboard.putData(shooterCoral);
+
+    ShooterAlgae shooterAlgae = m_Manager.getSubsystemOfType(ShooterAlgae.class).get();
+    SmartDashboard.putData(shooterAlgae);
+
+    drivetrain.setDefaultCommand
+    (
+        drivetrain.DefaultDrive(() -> m_DriverController.getLeftY(), () -> m_DriverController.getLeftX(), () -> m_DriverController.getRightX())
+    );
+
+    shooterAlgae.setDefaultCommand(shooterAlgae.HoldAlgae());
+
+    m_DriverController.rightTrigger().onTrue(new ParallelCommandGroup(drivetrain.AlignCoralNoEnd(), shooter.MoveToSelectedShot(), elevator.MoveToSelectorLevel()))
+                                     .onFalse(shooter.StowShooter().andThen(elevator.MoveToLevel(LEVELS.HOME)));
+
+    m_DriverController.leftTrigger().whileTrue(new ParallelDeadlineGroup(shooterCoral.IntakeCoralRoutine(),
+                                                                         elevator.MoveToLevel(LEVELS.CORAL_INTAKE),
+                                                                         shooter.MoveToIntake()));
+
+    m_DriverController.a().onTrue(new WaitCommand(0.25).andThen(shooterCoral.DeployCoralRoutine()))
+                          .onFalse(shooterCoral.StopCoral());
+
+    m_CoDriverController.leftBumper().onTrue(dataStuff.Left().ignoringDisable(true));
+    m_CoDriverController.rightBumper().onTrue(dataStuff.Right().ignoringDisable(true));
+    m_CoDriverController.povUp().onTrue(dataStuff.Up().ignoringDisable(true));
+    m_CoDriverController.povDown().onTrue(dataStuff.Down().ignoringDisable(true));
+
+    //climb wrist
+    //m_CoDriverController.x().whileTrue(climb.setClimbVoltage(ClimbConstants.CLIMB_WRIST_VOLTAGE)).onFalse(climb.setClimbVoltage(0));
+    //climb wheels
+    //m_CoDriverController.b().whileTrue(climb.setRollerVoltage(ClimbConstants.CLIMB_ROLLER_VOLTAGE)).onFalse(climb.setRollerVoltage(0));
+    //m_CoDriverController.b().whileTrue(climb.setLatchVoltage(-2)).onFalse(climb.setLatchVoltage(0));
+
+    NamedCommands.registerCommand("ElevatorHome", elevator.MoveToLevel(LEVELS.HOME));
+    NamedCommands.registerCommand("CoralTwoDeploy", new ParallelCommandGroup(elevator.MoveToLevel(LEVELS.TWO), shooter.MoveToDeployLow()));
+    NamedCommands.registerCommand("CoralThreeDeploy", new ParallelCommandGroup(elevator.MoveToLevel(LEVELS.THREE), shooter.MoveToDeployLow()));
+    NamedCommands.registerCommand("CoralFourDeploy", new ParallelCommandGroup(elevator.MoveToLevel(LEVELS.FOUR), shooter.MoveToDeployHigh()));
+    NamedCommands.registerCommand("DeployCoral", shooterCoral.DeployCoralRoutine());
+
+    NamedCommands.registerCommand("ShooterLowPosition", new ParallelCommandGroup(shooter.MoveToDeployLow(), elevator.MoveToLevel(LEVELS.ZERO)));
+
+    NamedCommands.registerCommand("StartIntake", new ParallelDeadlineGroup(shooterCoral.IntakeCoralRoutine(), elevator.MoveToLevel(LEVELS.CORAL_INTAKE), shooter.MoveToIntake()));
+    
+    try 
+    {
+      m_Chooser = AutoBuilder.buildAutoChooser();
+      SmartDashboard.putData(m_Chooser);
+     } 
+     catch (Exception e) 
+     {
+       DriverStation.reportError("Failed to load autonomous chooser.", e.getStackTrace());
+       e.printStackTrace();
+     }
+  }
+
+
   private void configureCompetitionBindings()
   {
-    CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
+    Drivetrain drivetrain = m_Manager.getSubsystemOfType(Drivetrain.class).get();
 
     Elevator elevator = m_Manager.getSubsystemOfType(Elevator.class).get();
     SmartDashboard.putData(elevator);
@@ -236,6 +315,11 @@ public class RobotContainer
        DriverStation.reportError("Failed to load autonomous chooser.", e.getStackTrace());
        e.printStackTrace();
      }
+  }
+
+  private void configureCompetitionNoVisionBindings()
+  {
+    // Empty for now
   }
 
   private void configureDrivetrainDebugBindings()

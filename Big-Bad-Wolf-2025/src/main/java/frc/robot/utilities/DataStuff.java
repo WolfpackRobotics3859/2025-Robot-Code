@@ -48,6 +48,24 @@ public class DataStuff extends SubsystemBase
         return this.runOnce(() -> DecrementColumn());
     }
 
+    /**
+     * LEFT OR RIGHT
+     * @return 0 for left, 1 for right
+     */
+    public static int GetCurrentSide()
+    {
+        return currentSide;
+    }
+
+    /**
+     * FACES
+     * @return 0 indexed
+     */
+    public static int GetCurrentFace()
+    {
+        return currentFace;
+    }
+
     public static String GetSide()
     {
         return leftRight[currentSide];
