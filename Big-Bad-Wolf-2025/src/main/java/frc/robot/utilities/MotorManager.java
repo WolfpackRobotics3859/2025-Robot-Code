@@ -26,18 +26,18 @@ public class MotorManager
             if(pair.getFirst() == name)
             {
                 System.out.println("[ERROR] Attempted to add a motor with duplicate name.");
-                for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+/*                 for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
                     System.out.println(ste + "\n");
-                }
+                } */
                 return false;
             }
 
             if(pair.getSecond().getDeviceID() == id)
             {
                 System.out.println("[ERROR] Attempted to add a motor with duplicate id.");
-                for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+  /*               for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
                     System.out.println(ste + "\n");
-                }
+                } */
                 return false;
             }
         }
@@ -63,9 +63,9 @@ public class MotorManager
         }
 
         System.out.println("[ERROR] No motor with name " + name +  " found in " + MotorManager.class.getName());
-        for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+/*         for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
             System.out.println(ste + "\n");
-        }
+        } */
 
         return null;
     }
@@ -81,9 +81,9 @@ public class MotorManager
         }
 
         System.out.println("[ERROR] No motor with id " + id +  " found in " + MotorManager.class.getName());
-        for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+/*         for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
             System.out.println(ste + "\n");
-        }
+        } */
 
         return null;
     }
@@ -99,9 +99,9 @@ public class MotorManager
         }
 
         System.out.println("[ERROR] No motor with name " + name +  " found in " + MotorManager.class.getName());
-        for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+/*         for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
             System.out.println(ste + "\n");
-        }
+        } */
 
         return 404;
     }
@@ -117,10 +117,10 @@ public class MotorManager
         }
 
         System.out.println("[ERROR] No motor with id " + id +  " found in " + MotorManager.class.getName());
-        for (StackTraceElement ste : Thread.currentThread().getStackTrace()) 
+         for (StackTraceElement ste : Thread.currentThread().getStackTrace()) 
         {
             System.out.println(ste + "\n");
-        }
+        }   
 
         return null;
     }
@@ -136,10 +136,10 @@ public class MotorManager
         }
 
         System.out.println("[ERROR] Failed to find the name of the given motor.");
-        for (StackTraceElement ste : Thread.currentThread().getStackTrace()) 
+/*         for (StackTraceElement ste : Thread.currentThread().getStackTrace()) 
         {
             System.out.println(ste + "\n");
-        }
+        } */
 
         return null;
     }
@@ -230,9 +230,10 @@ public class MotorManager
         if(!motor.getConfigurator().apply(config).isOK())
         {
             System.out.println("[ERROR] Motor configuration failed.");
-            for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+/*             for (StackTraceElement ste : Thread.currentThread().getStackTrace()) 
+            {
                 System.out.println(ste + "\n");
-            }
+            } */
             return false;
         }
 

@@ -7,10 +7,8 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.playingwithfusion.TimeOfFlight;
 
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -27,135 +25,56 @@ import frc.robot.utilities.MotorManager;
 public class Shooter extends SubsystemBase 
 {
   private final TalonFX m_ShooterWristMotor;
-  private final TalonFX m_ShooterAlgaeMotor;
-  private final TalonFX m_ShooterCoralMotor;
-
-  private final TimeOfFlight m_TOF;
-
   private SysIdRoutine m_SysIdRoutine;
-
-  private final VoltageOut m_AlgaeVoltageRequest;
-  private final VoltageOut m_CoralVoltageRequest;
   private final MotionMagicVoltage m_WristPositionRequest;
-  private final StaticBrake m_BrakeRequest;
 
   public Shooter()
   {
     MotorManager.AddMotor("SHOOTER WRIST MOTOR", Hardware.SHOOTER_WRIST_MOTOR);
-    MotorManager.AddMotor("SHOOTER ALGAE MOTOR", Hardware.SHOOTER_ALGAE_MOTOR);
-    MotorManager.AddMotor("SHOOTER CORAL MOTOR", Hardware.SHOOTER_CORAL_MOTOR);
-
     m_ShooterWristMotor = MotorManager.GetMotor(Hardware.SHOOTER_WRIST_MOTOR);
-    m_ShooterAlgaeMotor = MotorManager.GetMotor(Hardware.SHOOTER_ALGAE_MOTOR);
-    m_ShooterCoralMotor = MotorManager.GetMotor(Hardware.SHOOTER_CORAL_MOTOR);
-    m_TOF = new TimeOfFlight(Hardware.CORAL_TOF_SENSOR);
-
     MotorManager.ApplyConfigs(ShooterConstants.WRIST_MOTOR_CONFIG, Hardware.SHOOTER_WRIST_MOTOR);
-    MotorManager.ApplyConfigs(ShooterConstants.SHOOTER_ALGAE_MOTOR_CONFIG, Hardware.SHOOTER_ALGAE_MOTOR);
-    MotorManager.ApplyConfigs(ShooterConstants.SHOOTER_CORAL_MOTOR_CONFIG, Hardware.SHOOTER_CORAL_MOTOR);
-
-    m_AlgaeVoltageRequest = new VoltageOut(0);
-    m_CoralVoltageRequest = new VoltageOut(0);
     m_WristPositionRequest = new MotionMagicVoltage(0);
-    m_BrakeRequest = new StaticBrake();
-  }
-
-  public Command PrepareToDeployCoral()
-  {
-    return new FunctionalCommand(() -> this.BrakeAlgae().BrakeCoral().SetWristPosition(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION),
-                                 () -> {}, 
-                                 interrupted -> {},
-                                 MotorManager.InPosition(Hardware.SHOOTER_WRIST_MOTOR, 0.1),
-                                 this);
-  }
-
-  public Command DeployCoral()
-  {
-    return this.runOnce(() -> this.SetCoralVoltage(ShooterConstants.CORAL_DEPLOYMENT_VOLTAGE));
   }
 
   public Command StowShooter()
   {
-    return new FunctionalCommand(() -> this.BrakeAlgae().BrakeCoral().SetWristPosition(ShooterConstants.WRIST_STOW_POSITION),
+    return this.runOnce(() -> SetWristPositionMotor(ShooterConstants.WRIST_STOW_POSITION));
+  }
+
+  public Command MoveToDeployHigh()
+  {
+    return MoveToCommandBuilder(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION);
+  }
+
+  public Command MoveToDeployLow()
+  {
+    return MoveToCommandBuilder(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION_LOW);
+  }
+
+  public Command MoveToIntake()
+  {
+    return MoveToCommandBuilder(ShooterConstants.WRIST_CORAL_INTAKE_POSITION);
+  }
+
+  public Command MoveToProcess()
+  {
+    return MoveToCommandBuilder(ShooterConstants.WRIST_ALGAE_PROCESSOR_DEPLOYMENT_POSITION);
+  }
+
+  public Command MoveToAlgaeSweep()
+  {
+    return MoveToCommandBuilder(ShooterConstants.WRIST_ALGAE_SWEEPING_POSITION);
+  }
+
+  private Command MoveToCommandBuilder(double position)
+  {
+    return new FunctionalCommand(() -> this.SetWristPositionMotor(position),
                                  () -> {}, 
                                  interrupted -> {},
-                                 MotorManager.InPosition(Hardware.SHOOTER_WRIST_MOTOR, 0.1),
+                                 () -> this.isInPosition(0.04),
                                  this);
   }
 
-  public Command StowAndHoldAlgae()
-  {
-    return new FunctionalCommand(() -> this.SetAlgaeVoltage(ShooterConstants.ALGAE_HOLDING_VOLTAGE).BrakeCoral().SetWristPosition(ShooterConstants.WRIST_STOW_POSITION),
-                                 () -> {}, 
-                                 interrupted -> {},
-                                 MotorManager.InPosition(Hardware.SHOOTER_WRIST_MOTOR, 0.1),
-                                 this);
-  }
-
-  public Command IntakeCoral()
-  {
-    return new FunctionalCommand(() -> this.BrakeAlgae().SetCoralVoltage(ShooterConstants.CORAL_INTAKE_VOLTAGE).SetWristPosition(ShooterConstants.WRIST_CORAL_INTAKE_POSITION),
-                                 () -> {}, 
-                                 interrupted -> this.BrakeCoral(),
-                                 () -> this.CoralDetected(),
-                                 this);
-  }
-
-  public Command ProcessAlgae()
-  {
-    return new FunctionalCommand(() -> this.BrakeAlgae().BrakeCoral().SetWristPosition(ShooterConstants.WRIST_ALGAE_PROCESSOR_DEPLOYMENT_POSITION),
-                                 () -> {}, 
-                                 interrupted -> this.SetAlgaeVoltage(ShooterConstants.ALGAE_PROCESSOR_DEPLOYMENT_VOLTAGE),
-                                 MotorManager.InPosition(Hardware.SHOOTER_WRIST_MOTOR, 0.005),
-                                 this);
-  }
-
-  public Command SweepAlgae()
-  {
-    return SetAlgaeAndWrist(ShooterConstants.ALGAE_SWEEPING_VOLTAGE, ShooterConstants.WRIST_ALGAE_SWEEPING_POSITION);
-  }
-
-  public Command IntakeAlgae()
-  {
-    return SetAlgaeAndWrist(ShooterConstants.ALGAE_GROUND_INTAKING_VOLTAGE, ShooterConstants.WRIST_ALGAE_INTAKE_POSITION);
-  }
-
-  public Command SetAlgaeAndWrist(double algaeVoltage, double position)
-  {
-    return new FunctionalCommand(() -> this.BrakeCoral().SetAlgaeVoltage(algaeVoltage).SetWristPosition(position),
-    () -> {}, 
-    interrupted -> {},
-    MotorManager.InPosition(Hardware.SHOOTER_WRIST_MOTOR, 0.5),
-    this);
-  }
-
-  public Command SetCoralAndWrist(double coralVoltage, double position)
-  {
-    return new FunctionalCommand(() -> this.SetCoralVoltage(coralVoltage).BrakeAlgae().SetWristPosition(position),
-    () -> {}, 
-    interrupted -> {},
-    MotorManager.InPosition(Hardware.SHOOTER_WRIST_MOTOR, 0.5),
-    this);
-  }
-
-  public Command SetShooterWristPositon(double position)
-  {
-    return new FunctionalCommand(() -> this.SetWristPosition(position),
-                                 () -> {}, 
-                                 interrupted -> {},
-                                 MotorManager.InPosition(Hardware.SHOOTER_WRIST_MOTOR, 0.5),
-                                 this);
-  }
-
-  public Command SetAlgaeVoltageInstant(double voltage)
-  {
-    return this.runOnce(() -> this.SetAlgaeVoltage(voltage));
-  }
-  
-  public Command SetCoralVoltageInstant(double voltage)
-  {
-    return this.runOnce(() -> this.SetCoralVoltage(voltage));
-  }
 
   // To-do: Move sysId settings to the constants file
   public SysIdRoutine BuildSysIdRoutine()
@@ -176,44 +95,20 @@ public class Shooter extends SubsystemBase
    return this.m_SysIdRoutine;
   }
 
-  private Shooter SetWristPosition(double position)
+  private void SetWristPositionMotor(double position)
   {
     MotorManager.ApplyControlRequest(m_WristPositionRequest.withPosition(position), Hardware.SHOOTER_WRIST_MOTOR);
-    return this;
   }
 
-  private Shooter SetAlgaeVoltage(double voltage)
+  private boolean isInPosition(double tolerance)
   {
-    MotorManager.ApplyControlRequest(m_AlgaeVoltageRequest.withOutput(voltage), Hardware.SHOOTER_ALGAE_MOTOR);
-    return this;
-  }
-
-  private Shooter SetCoralVoltage(double voltage)
-  {
-    MotorManager.ApplyControlRequest(m_CoralVoltageRequest.withOutput(voltage), Hardware.SHOOTER_CORAL_MOTOR);
-    return this;
-  }
-
-  private Shooter BrakeAlgae()
-  {
-    MotorManager.ApplyControlRequest(m_BrakeRequest, Hardware.SHOOTER_ALGAE_MOTOR);
-    return this;
-  }
-
-  private Shooter BrakeCoral()
-  {
-    MotorManager.ApplyControlRequest(m_BrakeRequest, Hardware.SHOOTER_CORAL_MOTOR);
-    return this;
-  }
-
-  private boolean CoralDetected()
-  {
-    return this.m_TOF.getRange() < ShooterConstants.CORAL_TOF_IN_RANGE_THRESHOLD;
+    return Math.abs(this.m_ShooterWristMotor.getPosition().getValueAsDouble() - this.m_WristPositionRequest.Position) < tolerance;
   }
 
   @Override
   public void periodic() 
   {
-    SmartDashboard.putNumber("TOF DATA", m_TOF.getRange());
+    SmartDashboard.putNumber("SHOOTER POSITION", this.m_ShooterWristMotor.getPosition().getValueAsDouble());
+    // Intentionally Empty
   }
 }

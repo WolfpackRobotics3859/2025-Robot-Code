@@ -6,7 +6,6 @@ package frc.robot.constants;
 
 import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -14,8 +13,6 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
-import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
 /** 
@@ -24,25 +21,35 @@ import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 public class ElevatorConstants 
 {
     public static final double ELEVATOR_ZERO_POSITION = 0;
-    public static final double ELEVATOR_LEVEL_ONE = 0;
-    public static final double ELEVATOR_LEVEL_TWO = 26;
-    public static final double ELEVATOR_LEVEL_THREE = 38;
-    public static final double ELEVATOR_LEVEL_FOUR = 60;
-    public static final double CORAL_INTAKING_LEVEL = 28;
+    public static final double ELEVATOR_HOME_POSITION = 30;
+    public static final double ELEVATOR_LEVEL_ONE = 15;
+    public static final double ELEVATOR_LEVEL_TWO = 28.0;
+    public static final double ELEVATOR_LEVEL_THREE = 53.5;
+    public static final double ELEVATOR_LEVEL_FOUR = 105;
+    public static final double CORAL_INTAKING_LEVEL = 0.75;
+    public static final double ALGAE_PROCESSING_POSITION = 5;
+    public static final double LOW_CLEAN = 35.25;
+    public static final double HIGH_CLEAN = 55.75;
+
+    // Max Height should be around 100-105
 
     public static final double ELEVATOR_UP_VOLTAGE = 3;
     public static final double ELEVATOR_DOWN_VOLTAGE = -1.5;
-
+ 
     public static final double HOMING_VOLTAGE = -0.5;
 
     public enum LEVELS 
     {
-        HOME(ELEVATOR_ZERO_POSITION),
+        ZERO(ELEVATOR_ZERO_POSITION),
+        HOME(ELEVATOR_HOME_POSITION),
         ONE(ELEVATOR_LEVEL_ONE),
         TWO(ELEVATOR_LEVEL_TWO),
         THREE(ELEVATOR_LEVEL_THREE),
         FOUR(ELEVATOR_LEVEL_FOUR),
-        CORAL_INTAKE(CORAL_INTAKING_LEVEL);
+        CORAL_INTAKE(CORAL_INTAKING_LEVEL),
+        LOW_ALGAE(LOW_CLEAN),
+        HIGH_ALGAE(HIGH_CLEAN),
+        ALGAE_PROCESS(ALGAE_PROCESSING_POSITION);
 
         private double levelValue;
 
@@ -61,7 +68,7 @@ public class ElevatorConstants
 
     // LEFT MOTOR CONFIGS
     public static final MotorOutputConfigs LEFT_MOTOR_OUTPUT_CONFIG = new MotorOutputConfigs()
-                                                                          .withInverted(InvertedValue.CounterClockwise_Positive)
+                                                                          .withInverted(InvertedValue.Clockwise_Positive)
                                                                           .withNeutralMode(NeutralModeValue.Brake)
                                                                           .withPeakForwardDutyCycle(1)
                                                                           .withPeakReverseDutyCycle(-1);
@@ -70,7 +77,7 @@ public class ElevatorConstants
                                                                                              .withContinuousWrap(false);
 
     public static final CurrentLimitsConfigs LEFT_MOTOR_CURRENT_LIMIT_CONFIG = new CurrentLimitsConfigs()
-                                                                                    .withStatorCurrentLimit(100)
+                                                                                    .withStatorCurrentLimit(120)
                                                                                     .withStatorCurrentLimitEnable(true)
                                                                                     .withSupplyCurrentLimit(40)
                                                                                     .withSupplyCurrentLimitEnable(false)
@@ -89,27 +96,18 @@ public class ElevatorConstants
                                                                     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
 
     public static final MotionMagicConfigs LEFT_MOTOR_MOTION_MAGIC_CONFIG = new MotionMagicConfigs()
-                                                                                .withMotionMagicAcceleration(20)
-                                                                                .withMotionMagicCruiseVelocity(40)
+                                                                                .withMotionMagicAcceleration(60)
+                                                                                .withMotionMagicCruiseVelocity(500)
                                                                                 .withMotionMagicExpo_kA(0.1)
                                                                                 .withMotionMagicExpo_kV(0.12)
                                                                                 .withMotionMagicJerk(0);
-    
-    public static final HardwareLimitSwitchConfigs LEFT_MOTOR_HARDWARE_LIMIT_SWITCH_CONFIG = new HardwareLimitSwitchConfigs()
-                                                                                                 .withReverseLimitSource(ReverseLimitSourceValue.RemoteCANdiS1)
-                                                                                                 .withReverseLimitType(ReverseLimitTypeValue.NormallyOpen)
-                                                                                                 .withReverseLimitAutosetPositionValue(0)
-                                                                                                 .withReverseLimitAutosetPositionEnable(true)
-                                                                                                 .withReverseLimitEnable(true)
-                                                                                                 .withReverseLimitRemoteSensorID(Hardware.CANDI_0);
 
     public static final TalonFXConfiguration LEFT_MOTOR_CONFIG = new TalonFXConfiguration()
                                                                      .withMotorOutput(LEFT_MOTOR_OUTPUT_CONFIG)
                                                                      .withClosedLoopGeneral(LEFT_MOTOR_CLOSED_LOOP_GENERAL_CONFIG)
                                                                      .withCurrentLimits(LEFT_MOTOR_CURRENT_LIMIT_CONFIG)
                                                                      .withSlot0(LEFT_MOTOR_SLOT_0_CONFIG)
-                                                                     .withMotionMagic(LEFT_MOTOR_MOTION_MAGIC_CONFIG)
-                                                                     .withHardwareLimitSwitch(LEFT_MOTOR_HARDWARE_LIMIT_SWITCH_CONFIG);
+                                                                     .withMotionMagic(LEFT_MOTOR_MOTION_MAGIC_CONFIG);
 
     // RIGHT MOTOR CONFIGS
     public static final MotorOutputConfigs RIGHT_MOTOR_OUTPUT_CONFIG = new MotorOutputConfigs()
@@ -125,15 +123,8 @@ public class ElevatorConstants
                                                                                     .withSupplyCurrentLimitEnable(false)
                                                                                     .withSupplyCurrentLowerLimit(40)
                                                                                     .withSupplyCurrentLowerTime(1);
-    
-    public static final HardwareLimitSwitchConfigs RIGHT_MOTOR_HARDWARE_LIMIT_SWITCH_CONFIG = new HardwareLimitSwitchConfigs()
-                                                                                                 .withReverseLimitSource(ReverseLimitSourceValue.RemoteCANdiS1)
-                                                                                                 .withReverseLimitType(ReverseLimitTypeValue.NormallyOpen)
-                                                                                                 .withReverseLimitEnable(true)
-                                                                                                 .withReverseLimitRemoteSensorID(Hardware.CANDI_0);
 
     public static final TalonFXConfiguration RIGHT_MOTOR_CONFIG = new TalonFXConfiguration()
                                                                      .withMotorOutput(RIGHT_MOTOR_OUTPUT_CONFIG)
-                                                                     .withCurrentLimits(RIGHT_MOTOR_CURRENT_LIMIT_CONFIG)
-                                                                     .withHardwareLimitSwitch(RIGHT_MOTOR_HARDWARE_LIMIT_SWITCH_CONFIG);
+                                                                     .withCurrentLimits(RIGHT_MOTOR_CURRENT_LIMIT_CONFIG);
 }

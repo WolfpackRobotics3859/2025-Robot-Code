@@ -10,9 +10,11 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.utilities.PackLog;
 
 public class Robot extends TimedRobot 
 {
+  private PackLog m_PackLog;
   private Command m_autonomousCommand;
 
   private final RobotContainer m_robotContainer;
@@ -20,6 +22,8 @@ public class Robot extends TimedRobot
   public Robot() 
   {
     DataLogManager.start();
+    m_PackLog = new PackLog("Robot");
+    
     m_robotContainer = new RobotContainer();
     // Set the logger to log to the first flashdrive plugged in
     SignalLogger.setPath("/media/sda1/");
@@ -34,23 +38,27 @@ public class Robot extends TimedRobot
   @Override
   public void disabledInit() 
   {
-    // Explicitly stop logging
-    // If the user does not call stop(), then it's possible to lose the last few seconds of data
+    this.m_PackLog.Log("Entering DISABLED mode.");
     SignalLogger.stop();
   }
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() 
+  {
+    // Intentionally Empty
+  }
 
   @Override
   public void disabledExit() 
   {
-    // Explicitly start the logger
+    this.m_PackLog.Log("Exiting DISABLED mode.");
     SignalLogger.start();
   }
 
   @Override
-  public void autonomousInit() {
+  public void autonomousInit() 
+  {
+    this.m_PackLog.Log("Entering AUTONOMOUS mode.");
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
@@ -60,35 +68,60 @@ public class Robot extends TimedRobot
 
   @Override
   public void autonomousPeriodic() 
-  {}
-
-  @Override
-  public void autonomousExit() {}
-
-  @Override
-  public void teleopInit() {
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
-    }
+  {
+    // Intentionally Empty
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void autonomousExit()
+  {
+    this.m_PackLog.Log("Exiting AUTONOMOUS mode.");
+  }
 
   @Override
-  public void teleopExit() {}
+  public void teleopInit() 
+  {
+    this.m_PackLog.Log("Entering TELEOP mode.");
+    if (m_autonomousCommand != null) {
+      m_autonomousCommand.cancel();
+    }
+    // m_robotContainer.InitializeDefaultCommands();
+  }
 
   @Override
-  public void testInit() {
+  public void teleopPeriodic() 
+  {
+    // Intentionally Empty
+  }
+
+  @Override
+  public void teleopExit() 
+  {
+    this.m_PackLog.Log("Exiting TELEOP mode.");
+  }
+
+  @Override
+  public void testInit() 
+  {
+    this.m_PackLog.Log("Entering TEST mode.");
     CommandScheduler.getInstance().cancelAll();
   }
 
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() 
+  {
+    // Intentionally Empty
+  }
 
   @Override
-  public void testExit() {}
+  public void testExit() 
+  {
+    this.m_PackLog.Log("Exiting TEST mode.");
+  }
 
   @Override
-  public void simulationPeriodic() {}
+  public void simulationPeriodic() 
+  {
+    // Intentionally Empty
+  }
 }
