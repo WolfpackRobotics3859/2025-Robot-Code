@@ -6,12 +6,14 @@
     "ALIGNMENT-PATHS",
     "CLEAN DEPARTURES",
     "COMMON LEFT START",
+    "COMMON RIGHT STARTS",
     "CROSS PATHS",
     "FACE TO INTAKE",
     "FAR LEFT STARTS",
     "FAR RIGHT STARTS",
+    "LINT TO X",
     "MIDDLE STARTS",
-    "LINT TO X"
+    "RINT TO X"
   ],
   "autoFolders": [
     "Cross Only"

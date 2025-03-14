@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.595250000000001,
-        "y": 7.48625
+        "x": 1.5405000000000002,
+        "y": 0.7002499999999998
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.9250000000000007,
-        "y": 7.11575
+        "x": 1.9688290874992884,
+        "y": 1.7056038133487033
       },
       "isLocked": false,
-      "linkedName": "FAR_LEFT_START"
+      "linkedName": "RINT"
     },
     {
       "anchor": {
@@ -20,8 +20,8 @@
         "y": 4.161499999999999
       },
       "prevControl": {
-        "x": 0.4484999999959478,
-        "y": 3.843665983601541
+        "x": 2.9073848402973255,
+        "y": 3.5249890525194627
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,7 +30,18 @@
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "pointTowardsZones": [],
+  "pointTowardsZones": [
+    {
+      "fieldPosition": {
+        "x": 3.5,
+        "y": 4.0
+      },
+      "rotationOffset": 0.0,
+      "minWaypointRelativePos": 0.25,
+      "maxWaypointRelativePos": 0.75,
+      "name": "Point Towards Zone"
+    }
+  ],
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
@@ -45,10 +56,10 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "FAR LEFT STARTS",
+  "folder": "RINT TO X",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 52.43140797117256
   },
   "useDefaultConstraints": true
 }

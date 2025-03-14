@@ -65,7 +65,10 @@ public class Shooter extends SubsystemBase
       {
         this.ApplyPosition(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION);
       }
-      this.ApplyPosition(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION_LOW);
+      else
+      {
+        this.ApplyPosition(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION_LOW);
+      }
     });
   }
 

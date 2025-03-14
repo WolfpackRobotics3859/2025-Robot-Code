@@ -1,0 +1,70 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.5405000000000002,
+        "y": 0.7002499999999998
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.9,
+        "y": 1.3827499999999997
+      },
+      "isLocked": false,
+      "linkedName": "RINT"
+    },
+    {
+      "anchor": {
+        "x": 5.00175,
+        "y": 2.7769999999999992
+      },
+      "prevControl": {
+        "x": 4.7824785450473115,
+        "y": 2.656916574653572
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "2L"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": 0.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [
+    {
+      "fieldPosition": {
+        "x": 4.0,
+        "y": 3.2
+      },
+      "rotationOffset": 0.0,
+      "minWaypointRelativePos": 0.16942446043165435,
+      "maxWaypointRelativePos": 0.6370503597122316,
+      "name": "Point Towards Zone"
+    }
+  ],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 119.99999999999999
+  },
+  "reversed": false,
+  "folder": "RINT TO X",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 52.43140797117256
+  },
+  "useDefaultConstraints": true
+}

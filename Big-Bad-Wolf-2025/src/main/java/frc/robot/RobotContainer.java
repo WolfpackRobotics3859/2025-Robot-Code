@@ -111,7 +111,7 @@ public class RobotContainer
       break; 
 
       case DRIVETRAIN_DEBUG:
-        m_Manager.addSubsystem(TunerConstants.createDrivetrain());
+        m_Manager.addSubsystem(new Drivetrain(TunerConstants.DrivetrainConstants, TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight));
         this.configureDrivetrainDebugBindings();
       break;
 
@@ -179,7 +179,7 @@ public class RobotContainer
 
     shooterAlgae.setDefaultCommand(shooterAlgae.HoldAlgae());
 
-    m_DriverController.rightTrigger().onTrue(new ParallelCommandGroup(drivetrain.AlignCoralNoEnd(), shooter.MoveToSelectedShot(), elevator.MoveToSelectorLevel()))
+    m_DriverController.rightTrigger().whileTrue(new ParallelCommandGroup(drivetrain.AlignCoralNoEnd(), shooter.MoveToSelectedShot(), elevator.MoveToSelectorLevel()))
                                      .onFalse(shooter.StowShooter().andThen(elevator.MoveToLevel(LEVELS.HOME)));
 
     m_DriverController.leftTrigger().whileTrue(new ParallelDeadlineGroup(shooterCoral.IntakeCoralRoutine(),
@@ -187,7 +187,7 @@ public class RobotContainer
                                                                          shooter.MoveToIntake()))
                                     .onFalse(shooter.StowShooter().andThen(elevator.MoveToLevel(LEVELS.HOME)));
 
-    m_DriverController.a().onTrue(new WaitCommand(0.1).andThen(shooterCoral.DeployCoralRoutine()))
+    m_DriverController.a().whileTrue(shooterCoral.DeployCoralRoutine())
                           .onFalse(shooterCoral.StopCoral());
 
     m_CoDriverController.leftBumper().onTrue(dataStuff.Left().ignoringDisable(true));
@@ -207,12 +207,18 @@ public class RobotContainer
     NamedCommands.registerCommand("CoralFourDeploy", new ParallelCommandGroup(elevator.MoveToLevel(LEVELS.FOUR), shooter.MoveToDeployHigh()));
     NamedCommands.registerCommand("DeployCoral", shooterCoral.DeployCoralRoutine());
 
-    NamedCommands.registerCommand("Align4L", new ParallelDeadlineGroup(new WaitCommand(0.75), drivetrain.AlignToFace(0, 4)));
-    NamedCommands.registerCommand("Align4R", new ParallelDeadlineGroup(new WaitCommand(0.75), drivetrain.AlignToFace(1, 4)));
-    NamedCommands.registerCommand("Align5L", new ParallelDeadlineGroup(new WaitCommand(0.75), drivetrain.AlignToFace(0, 5)));
-    NamedCommands.registerCommand("Align5R", new ParallelDeadlineGroup(new WaitCommand(0.75), drivetrain.AlignToFace(1, 5)));
-    NamedCommands.registerCommand("Align6L", new ParallelDeadlineGroup(new WaitCommand(0.75), drivetrain.AlignToFace(0, 6)));
-    NamedCommands.registerCommand("Align6R", new ParallelDeadlineGroup(new WaitCommand(0.75), drivetrain.AlignToFace(1, 6)));
+    NamedCommands.registerCommand("Align1L", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(0, 1)));
+    NamedCommands.registerCommand("Align1R", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(1, 1)));
+    NamedCommands.registerCommand("Align2L", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(0, 2)));
+    NamedCommands.registerCommand("Align2R", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(1, 2)));
+    NamedCommands.registerCommand("Align3L", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(0, 3)));
+    NamedCommands.registerCommand("Align3R", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(1, 3)));
+    NamedCommands.registerCommand("Align4L", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(0, 4)));
+    NamedCommands.registerCommand("Align4R", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(1, 4)));
+    NamedCommands.registerCommand("Align5L", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(0, 5)));
+    NamedCommands.registerCommand("Align5R", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(1, 5)));
+    NamedCommands.registerCommand("Align6L", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(0, 6)));
+    NamedCommands.registerCommand("Align6R", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(1, 6)));
 
     NamedCommands.registerCommand("ShooterLowPosition", new ParallelCommandGroup(shooter.MoveToDeployLow(), elevator.MoveToLevel(LEVELS.ZERO)));
 

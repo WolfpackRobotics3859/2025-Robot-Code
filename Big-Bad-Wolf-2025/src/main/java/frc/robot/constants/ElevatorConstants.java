@@ -23,8 +23,8 @@ public class ElevatorConstants
     public static final double ELEVATOR_ZERO_POSITION = 0;
     public static final double ELEVATOR_HOME_POSITION = 30;
     public static final double ELEVATOR_LEVEL_ONE = 15;
-    public static final double ELEVATOR_LEVEL_TWO = 50.0;  // 50
-    public static final double ELEVATOR_LEVEL_THREE = 78.0;  // 78
+    public static final double ELEVATOR_LEVEL_TWO = 46.0;  // 50
+    public static final double ELEVATOR_LEVEL_THREE = 76.0; // 78  
     public static final double ELEVATOR_LEVEL_FOUR = 105.0;
     public static final double CORAL_INTAKING_LEVEL = 2;
     public static final double ALGAE_PROCESSING_POSITION = 5;

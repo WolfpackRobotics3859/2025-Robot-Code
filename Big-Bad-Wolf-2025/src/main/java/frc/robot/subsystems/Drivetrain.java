@@ -62,7 +62,9 @@ public class Drivetrain extends CommandSwerveDrivetrain
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
     private PhotonCamera m_ForwardCamera;
+   // private PhotonCamera m_FarCamera;
     private PhotonPoseEstimator m_ForwardCameraEstimator;
+ //   private PhotonPoseEstimator m_FarCameraEstimator;
 
     AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
@@ -79,33 +81,53 @@ public class Drivetrain extends CommandSwerveDrivetrain
     public void periodic() 
     {
         super.periodic();
-       // this.m_CameraManager.UpdateCameras(this::addVisionMeasurement);
+  //      this.m_CameraManager.UpdateCameras();
         this.UpdateForwardCamera();
-    SmartDashboard.putBoolean("Forward Camera Connected", this.m_ForwardCamera.isConnected());
-    publisher.set(this.getState().Pose);
+   //     this.UpdateFarCamera();
+        SmartDashboard.putBoolean("Forward Camera Connected", this.m_ForwardCamera.isConnected());
+    //    SmartDashboard.putBoolean("Far Camera Connected", this.m_FarCamera.isConnected());
+        publisher.set(this.getState().Pose);
     }
 
-      private void ConfigureCameras()
-  {
-    this.m_ForwardCamera = new PhotonCamera("FORWARD_CAM");
-    this.m_ForwardCameraEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, CameraConstants.ROBOT_TO_CAM_TRANFORMS[0]);
-  }
+    private void ConfigureCameras()
+    {
+        this.m_ForwardCamera = new PhotonCamera("FORWARD_CAM");
+        this.m_ForwardCameraEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, CameraConstants.ROBOT_TO_CAM_TRANFORMS[0]);
+        // this.m_FarCamera = new PhotonCamera("FAR_CAM");
+        // this.m_FarCameraEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, CameraConstants.ROBOT_TO_CAM_TRANFORMS[2]);
+    }
 
-  private void UpdateForwardCamera()
-  {
+    private void UpdateForwardCamera()
+    {
     if(m_ForwardCamera.isConnected())
     {
-      List<PhotonPipelineResult> list = m_ForwardCamera.getAllUnreadResults();
-      if(!list.isEmpty())
-      {
-          Optional<EstimatedRobotPose> estimatedPose = m_ForwardCameraEstimator.update(list.get(0));
-          if(estimatedPose.isPresent())
-          {
+        List<PhotonPipelineResult> list = m_ForwardCamera.getAllUnreadResults();
+        if(!list.isEmpty())
+        {
+            Optional<EstimatedRobotPose> estimatedPose = m_ForwardCameraEstimator.update(list.get(0));
+            if(estimatedPose.isPresent())
+            {
             this.addVisionMeasurement(estimatedPose.get().estimatedPose.toPose2d(), Utils.getCurrentTimeSeconds());
-          }  
-      }
+            }  
+        }
     }
-  }
+    }
+
+    // private void UpdateFarCamera()
+    // {
+    // if(m_FarCamera.isConnected())
+    // {
+    //     List<PhotonPipelineResult> list = m_FarCamera.getAllUnreadResults();
+    //     if(!list.isEmpty())
+    //     {
+    //         Optional<EstimatedRobotPose> estimatedPose = m_FarCameraEstimator.update(list.get(0));
+    //         if(estimatedPose.isPresent())
+    //         {
+    //         this.addVisionMeasurement(estimatedPose.get().estimatedPose.toPose2d(), Utils.getCurrentTimeSeconds());
+    //         }  
+    //     }
+    // }
+    // }
 
     public Command AlignCoral()
     {
@@ -282,12 +304,12 @@ public class Drivetrain extends CommandSwerveDrivetrain
 
     private double GetXOutput()
     {
-        return MathUtil.clamp(this.m_XController.calculate(this.getState().Pose.getX()), -TunerConstants.MaxSpeed, TunerConstants.MaxSpeed);
+        return MathUtil.clamp(this.m_XController.calculate(this.getState().Pose.getX()), -TunerConstants.MaxSpeed * 0.5, TunerConstants.MaxSpeed * 0.5);
     }
 
     private double GetYOutput()
     {
-        return MathUtil.clamp(this.m_YController.calculate(this.getState().Pose.getY()), -TunerConstants.MaxSpeed, TunerConstants.MaxSpeed);
+        return MathUtil.clamp(this.m_YController.calculate(this.getState().Pose.getY()), -TunerConstants.MaxSpeed * 0.5, TunerConstants.MaxSpeed * 0.5);
     }
 
     private double GetRotationOutput()
@@ -306,7 +328,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
         this.ConfigureAutobuilder();
         this.ConfigurePIDControllers();
 
-        this.m_CameraManager = new CameraManager();
+        this.m_CameraManager = new CameraManager(this);
         this.m_CameraManager.InitializeCameras(CameraConstants.CAMERA_PIPELINES, CameraConstants.ROBOT_TO_CAM_TRANFORMS);
 
         this.m_SwerveRequestField = new SwerveRequest.FieldCentric();
@@ -319,19 +341,19 @@ public class Drivetrain extends CommandSwerveDrivetrain
     private void ConfigurePIDControllers()
     {
         this.m_PackLog.Log("Beginning configuration.");
-        this.m_XController = new PIDController(20, 0.0,0.025);
+        this.m_XController = new PIDController(15, 0.0,0.025); // 20 0.1 0.025
         this.m_XController.setTolerance(0.01, 0.025);
         this.m_XController.setIntegratorRange(-TunerConstants.MaxSpeed * 0.1,TunerConstants.MaxSpeed * 0.1);
-        this.m_XController.setIZone(1);
+        this.m_XController.setIZone(0.01);
         SmartDashboard.putData(this.m_XController);
 
-        this.m_YController = new PIDController (20, 0.0 ,0.025);
+        this.m_YController = new PIDController (15, 0.0 ,0.025);
         this.m_YController.setTolerance(0.01, 0.025);
         this.m_YController.setIntegratorRange(-TunerConstants.MaxSpeed * 0.1,TunerConstants.MaxSpeed * 0.1);
-        this.m_YController.setIZone(1);
+        this.m_YController.setIZone(0.01);
         SmartDashboard.putData(this.m_YController);
 
-        this.m_RotationController = new PIDController (0.25, 0 ,0);
+        this.m_RotationController = new PIDController (0.3, 0.0 ,0); // 0.25 
         this.m_RotationController.setTolerance(1, 1);
         this.m_RotationController.setIntegratorRange(-TunerConstants.MaxAngularRate * 0.1,TunerConstants.MaxAngularRate * 0.1);
         this.m_RotationController.setIZone(10);

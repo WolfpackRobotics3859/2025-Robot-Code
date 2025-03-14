@@ -11,10 +11,14 @@ import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 
+import com.ctre.phoenix6.Utils;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj.DataLogManager;
+import frc.robot.subsystems.Drivetrain;
 
 public class CameraManager 
 {
@@ -25,10 +29,13 @@ public class CameraManager
 
     private AprilTagFieldLayout m_FieldLayout;
 
-    public CameraManager()
+    private Drivetrain m_Drivetrain;
+
+    public CameraManager(Drivetrain drivetrain)
     {
         this.m_Logger = new PackLog("CAMERA-MANAGER");
         this.m_FieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+        this.m_Drivetrain = drivetrain;
     }
 
     // For completeness this method should be checking for incorrect inputs.
@@ -57,13 +64,15 @@ public class CameraManager
             {
                 this.m_Logger.Log(String.format("%-15s %15s%n", camera.getName(), "CONNECTED"));
             }
-            this.m_Logger.Log(String.format("%-15s %15s%n", camera.getName(), "DISCONNECTED"));
+            else
+            {
+                this.m_Logger.Log(String.format("%-15s %15s%n", camera.getName(), "DISCONNECTED"));
+            }
         }
-
         return true; // always return true for now
     }
 
-    public void UpdateCameras(BiConsumer<Pose2d, Double> addVisionMeasurement)
+    public void UpdateCameras()
     {
         int i = 0;
         for (PhotonCamera camera : this.m_Cameras)
@@ -83,9 +92,9 @@ public class CameraManager
             Optional<EstimatedRobotPose> possiblePose = this.m_PoseEstimators[i].update(results.get(0));
             if(possiblePose.isPresent())
             {
+                DataLogManager.log("i see it!");
                 EstimatedRobotPose estimatedPose = possiblePose.get();
-                addVisionMeasurement.accept(estimatedPose.estimatedPose.toPose2d(), estimatedPose.timestampSeconds);
-                // addVisionMeasurement.apply(estimatedPose.estimatedPose.toPose2d(), Utils.getCurrentTimeSeconds());
+                this.m_Drivetrain.addVisionMeasurement(estimatedPose.estimatedPose.toPose2d(), Utils.getCurrentTimeSeconds());
             }
 
             i++;
