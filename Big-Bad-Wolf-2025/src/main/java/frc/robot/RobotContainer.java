@@ -294,9 +294,6 @@ public class RobotContainer
     m_CoDriverController.povUp().onTrue(dataStuff.Up().ignoringDisable(true));
     m_CoDriverController.povDown().onTrue(dataStuff.Down().ignoringDisable(true));
 
-    m_CoDriverController.a().onTrue(shooterAlgae.DeployAlgae())
-                            .onFalse(shooterAlgae.StopAlgae());
-
     m_CoDriverController.y().onTrue(elevator.ZeroElevator());
 
 
@@ -304,8 +301,11 @@ public class RobotContainer
     m_CoDriverController.x().whileTrue(climb.setClimbVoltage(ClimbConstants.CLIMB_WRIST_VOLTAGE)).onFalse(climb.setClimbVoltage(0));
     //climb wheels
     m_CoDriverController.b().whileTrue(climb.setRollerVoltage(ClimbConstants.CLIMB_ROLLER_VOLTAGE)).onFalse(climb.setRollerVoltage(0));
-    //m_CoDriverController.b().whileTrue(climb.setLatchVoltage(-2)).onFalse(climb.setLatchVoltage(0));
-
+    
+    // //funnel latch
+    // m_CoDriverController.a().whileTrue(climb.setLatchPosition(ClimbConstants.CLIMB_FUNNEL_POSITION)).onFalse(climb.setLatchPosition(0));
+    // //foot unhook
+    // m_CoDriverController.y().whileTrue(climb.setFootPosition(ClimbConstants.CLIMB_FOOT_POSITION)).onFalse(climb.setFootPosition(0));
 
     NamedCommands.registerCommand("CoralTwoDeploy", new ParallelCommandGroup(elevator.MoveToLevel(LEVELS.TWO), shooter.MoveToDeployLow()));
     NamedCommands.registerCommand("StartIntake", new ParallelDeadlineGroup(shooterCoral.IntakeCoralRoutine(), elevator.MoveToLevel(LEVELS.CORAL_INTAKE), shooter.MoveToIntake()));
@@ -416,7 +416,16 @@ public class RobotContainer
     Climb climb = m_Manager.getSubsystemOfType(Climb.class).get();
     SmartDashboard.putData(climb);
 
-   // climb.setDefaultCommand(climb.setVoltage(() -> -m_DriverController.getRawAxis(5)*10));
+
+    //climb wrist
+    m_CoDriverController.x().whileTrue(climb.setClimbVoltage(ClimbConstants.CLIMB_WRIST_VOLTAGE)).onFalse(climb.setClimbVoltage(0));
+    //climb wheels
+    m_CoDriverController.b().whileTrue(climb.setRollerVoltage(ClimbConstants.CLIMB_ROLLER_VOLTAGE)).onFalse(climb.setRollerVoltage(0));
+    
+    //funnel latch
+    m_CoDriverController.a().onTrue(climb.setLatchPosition(ClimbConstants.CLIMB_FUNNEL_POSITION));
+    //foot unhook
+    m_CoDriverController.y().onTrue(climb.setFootPosition(ClimbConstants.CLIMB_FOOT_POSITION));
   }
 
   private void configureElevatorShooterDebugBindings()

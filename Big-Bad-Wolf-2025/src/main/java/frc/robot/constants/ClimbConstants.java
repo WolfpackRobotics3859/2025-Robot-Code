@@ -11,8 +11,10 @@ import com.ctre.phoenix6.signals.InvertedValue;
 // Initializing constants for Climb.
 public class ClimbConstants 
 {
-    public static final double CLIMB_WRIST_VOLTAGE = 2;
-    public static final double CLIMB_ROLLER_VOLTAGE = 2;
+    public static final double CLIMB_WRIST_VOLTAGE = 3;
+    public static final double CLIMB_ROLLER_VOLTAGE = 12;
+    public static final double CLIMB_FUNNEL_POSITION = 0;
+    public static final double CLIMB_FOOT_POSITION = 0;
 
     public static final MotorOutputConfigs CLIMB_WRIST_MOTOR_OUTPUT = new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive);
     public static final MotorOutputConfigs CLIMB_ROLLER_MOTOR_OUTPUT = new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive);

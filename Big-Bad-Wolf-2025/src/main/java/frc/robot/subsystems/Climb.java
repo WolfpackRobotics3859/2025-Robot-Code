@@ -5,7 +5,9 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.ClimbConstants;
@@ -16,6 +18,8 @@ import frc.robot.utilities.MotorManager;
 public class Climb extends SubsystemBase
 { 
   private final VoltageOut m_VoltageRequest;
+  private final TalonFX m_LatchMotor;
+  private final TalonFX m_FootMotor;
 
   /**
    * Climb subsystem constructor.
@@ -31,6 +35,10 @@ public class Climb extends SubsystemBase
     MotorManager.ApplyConfigs(ClimbConstants.FUNNEL_LATCH_MOTOR_CONFIGURATION, Hardware.CORAL_FUNNEL_MOTOR);
 
     m_VoltageRequest = new VoltageOut(0);
+    m_LatchMotor = MotorManager.GetMotor(Hardware.CORAL_FUNNEL_MOTOR);
+    m_FootMotor = MotorManager.GetMotor(Hardware.CORAL_FUNNEL_MOTOR);
+
+
   }
 
   public Command setClimbVoltage(double voltage)
@@ -43,14 +51,20 @@ public class Climb extends SubsystemBase
     return this.run(() -> MotorManager.ApplyControlRequest(m_VoltageRequest.withOutput(voltage), Hardware.CLIMB_ROLLER_MOTOR));
   }
 
-  public Command setLatchVoltage(double voltage)
+  public Command setLatchPosition(double position)
   {
-    return this.runOnce(() -> MotorManager.ApplyControlRequest(m_VoltageRequest.withOutput(voltage), Hardware.CORAL_FUNNEL_MOTOR));
+    return this.runOnce(() -> MotorManager.ApplyControlRequest(m_VoltageRequest.withOutput(position), Hardware.CORAL_FUNNEL_MOTOR));
+  }
+
+  public Command setFootPosition(double position)
+  {
+    return this.runOnce(() -> MotorManager.ApplyControlRequest(m_VoltageRequest.withOutput(position), Hardware.CORAL_FUNNEL_MOTOR));
   }
 
   @Override
   public void periodic() 
   {
-    // This method will be called once per scheduler run
+  SmartDashboard.putNumber("Latch Position", this.m_LatchMotor.getPosition().getValueAsDouble());
+  SmartDashboard.putNumber("Foot Position", this.m_FootMotor.getPosition().getValueAsDouble());  
   }
 }
