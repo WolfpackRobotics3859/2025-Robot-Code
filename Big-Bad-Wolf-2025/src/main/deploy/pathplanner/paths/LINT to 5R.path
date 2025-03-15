@@ -32,7 +32,7 @@
   "constraintZones": [
     {
       "name": "EndZoneSlowDown",
-      "minWaypointRelativePos": 0.887464387464387,
+      "minWaypointRelativePos": 0.7994652406417109,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
         "maxVelocity": 1.0,
@@ -45,7 +45,14 @@
     }
   ],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "CoralFourDeploy",
+      "waypointRelativePos": 0.8315508021390372,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
