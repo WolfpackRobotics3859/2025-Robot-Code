@@ -70,19 +70,6 @@ public class RobotContainer
     this.configurationChooser(Global.ACTIVE_BUILD);
   }
 
-  public void InitializeDefaultCommands()
-  {
-    // Elevator elevator = m_Manager.getSubsystemOfType(Elevator.class).get();
-    // SmartDashboard.putData(elevator);
-
-    // Shooter shooter = m_Manager.getSubsystemOfType(Shooter.class).get();
-    // SmartDashboard.putData(shooter);
-
-    // elevator.MoveToLevel(LEVELS.HOME).schedule();
-    // shooter.StowShooter().schedule();
-    this.m_PackLog.Log("Default commands scheduled.");
-  }
-
   private void configurationChooser(BUILD_TYPE type)
   {
     this.m_PackLog.Log("Beginning configuration.");
@@ -195,11 +182,13 @@ public class RobotContainer
     m_CoDriverController.povUp().onTrue(dataStuff.Up().ignoringDisable(true));
     m_CoDriverController.povDown().onTrue(dataStuff.Down().ignoringDisable(true));
 
-    //climb wrist
-    //m_CoDriverController.x().whileTrue(climb.setClimbVoltage(ClimbConstants.CLIMB_WRIST_VOLTAGE)).onFalse(climb.setClimbVoltage(0));
-    //climb wheels
-    //m_CoDriverController.b().whileTrue(climb.setRollerVoltage(ClimbConstants.CLIMB_ROLLER_VOLTAGE)).onFalse(climb.setRollerVoltage(0));
-    //m_CoDriverController.b().whileTrue(climb.setLatchVoltage(-2)).onFalse(climb.setLatchVoltage(0));
+    m_CoDriverController.rightTrigger().onTrue(climb.setClimbVoltage(ClimbConstants.CLIMB_WRIST_VOLTAGE)).onFalse(climb.setClimbVoltage(0));
+
+    m_CoDriverController.leftTrigger().onTrue(climb.setRollerVoltage(12)).onFalse(climb.setRollerVoltage(0));
+
+    m_CoDriverController.a().onTrue(climb.setLatchVoltage(-1)).onFalse(climb.setLatchVoltage(0));
+    m_CoDriverController.b().onTrue(climb.setLatchVoltage(1)).onFalse(climb.setLatchVoltage(0));
+    m_CoDriverController.y().onTrue(climb.setClimbVoltage(-1)).onFalse(climb.setClimbVoltage(0));
 
     NamedCommands.registerCommand("ElevatorHome", elevator.MoveToLevel(LEVELS.HOME));
     NamedCommands.registerCommand("CoralTwoDeploy", new ParallelCommandGroup(elevator.MoveToLevel(LEVELS.TWO), shooter.MoveToDeployLow()));

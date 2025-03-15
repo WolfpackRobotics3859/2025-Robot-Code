@@ -16,6 +16,6 @@ public class CameraConstants
     {
         new Transform3d(0.0529080684974, -0.228599418, 0.6483841884469, new Rotation3d(0, 0.610865, 0.349066)), // Forward Cam
         new Transform3d(0.0529080684974, -0.228599418, 0.6483841884469, new Rotation3d(0, 0.610865, 0.349066)), // Climb Cam
-        new Transform3d(0.0529080684974, -0.228599418, 0.6483841884469, new Rotation3d(0, 0.610865, 0.349066)) // Climb Cam
+        new Transform3d(0.0127, -0.2301875, 0.4587875, new Rotation3d(0, 0, 0)) // Climb Cam
     };
 }

@@ -38,7 +38,6 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import frc.robot.constants.CameraConstants;
 import frc.robot.constants.DrivetrainConstants;
 import frc.robot.generated.TunerConstants;
-import frc.robot.utilities.CameraManager;
 import frc.robot.utilities.DataStuff;
 import frc.robot.utilities.PackLog;
 
@@ -46,13 +45,12 @@ public class Drivetrain extends CommandSwerveDrivetrain
 {
     private PackLog m_PackLog;
 
-    private CameraManager m_CameraManager;
-
     private PIDController m_XController;
     private PIDController m_YController;
     private PIDController m_RotationController;
 
     private SwerveRequest.FieldCentric m_SwerveRequestField;
+    private SwerveRequest.FieldCentricFacingAngle m_SwerveFieldCentricFacingAngle;
     private SwerveRequest.RobotCentric m_SwerveRequestRobot;
     private SwerveRequest.ApplyRobotSpeeds m_SwerveRequestSpeeds;
 
@@ -62,9 +60,9 @@ public class Drivetrain extends CommandSwerveDrivetrain
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
     private PhotonCamera m_ForwardCamera;
-   // private PhotonCamera m_FarCamera;
+    private PhotonCamera m_FarCamera;
     private PhotonPoseEstimator m_ForwardCameraEstimator;
- //   private PhotonPoseEstimator m_FarCameraEstimator;
+    private PhotonPoseEstimator m_FarCameraEstimator;
 
     AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
@@ -83,9 +81,9 @@ public class Drivetrain extends CommandSwerveDrivetrain
         super.periodic();
   //      this.m_CameraManager.UpdateCameras();
         this.UpdateForwardCamera();
-   //     this.UpdateFarCamera();
+        this.UpdateFarCamera();
         SmartDashboard.putBoolean("Forward Camera Connected", this.m_ForwardCamera.isConnected());
-    //    SmartDashboard.putBoolean("Far Camera Connected", this.m_FarCamera.isConnected());
+        SmartDashboard.putBoolean("Far Camera Connected", this.m_FarCamera.isConnected());
         publisher.set(this.getState().Pose);
     }
 
@@ -93,8 +91,8 @@ public class Drivetrain extends CommandSwerveDrivetrain
     {
         this.m_ForwardCamera = new PhotonCamera("FORWARD_CAM");
         this.m_ForwardCameraEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, CameraConstants.ROBOT_TO_CAM_TRANFORMS[0]);
-        // this.m_FarCamera = new PhotonCamera("FAR_CAM");
-        // this.m_FarCameraEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, CameraConstants.ROBOT_TO_CAM_TRANFORMS[2]);
+        this.m_FarCamera = new PhotonCamera("FAR_CAM");
+        this.m_FarCameraEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, CameraConstants.ROBOT_TO_CAM_TRANFORMS[2]);
     }
 
     private void UpdateForwardCamera()
@@ -113,21 +111,21 @@ public class Drivetrain extends CommandSwerveDrivetrain
     }
     }
 
-    // private void UpdateFarCamera()
-    // {
-    // if(m_FarCamera.isConnected())
-    // {
-    //     List<PhotonPipelineResult> list = m_FarCamera.getAllUnreadResults();
-    //     if(!list.isEmpty())
-    //     {
-    //         Optional<EstimatedRobotPose> estimatedPose = m_FarCameraEstimator.update(list.get(0));
-    //         if(estimatedPose.isPresent())
-    //         {
-    //         this.addVisionMeasurement(estimatedPose.get().estimatedPose.toPose2d(), Utils.getCurrentTimeSeconds());
-    //         }  
-    //     }
-    // }
-    // }
+    private void UpdateFarCamera()
+    {
+    if(m_FarCamera.isConnected())
+    {
+        List<PhotonPipelineResult> list = m_FarCamera.getAllUnreadResults();
+        if(!list.isEmpty())
+        {
+            Optional<EstimatedRobotPose> estimatedPose = m_FarCameraEstimator.update(list.get(0));
+            if(estimatedPose.isPresent())
+            {
+            this.addVisionMeasurement(estimatedPose.get().estimatedPose.toPose2d(), Utils.getCurrentTimeSeconds());
+            }  
+        }
+    }
+    }
 
     public Command AlignCoral()
     {
@@ -328,10 +326,8 @@ public class Drivetrain extends CommandSwerveDrivetrain
         this.ConfigureAutobuilder();
         this.ConfigurePIDControllers();
 
-        this.m_CameraManager = new CameraManager(this);
-        this.m_CameraManager.InitializeCameras(CameraConstants.CAMERA_PIPELINES, CameraConstants.ROBOT_TO_CAM_TRANFORMS);
-
         this.m_SwerveRequestField = new SwerveRequest.FieldCentric();
+        this.m_SwerveFieldCentricFacingAngle = new SwerveRequest.FieldCentricFacingAngle();
         this.m_SwerveRequestRobot = new SwerveRequest.RobotCentric();
         this.m_SwerveRequestSpeeds = new SwerveRequest.ApplyRobotSpeeds();
 
