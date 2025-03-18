@@ -139,6 +139,16 @@ public class RobotContainer
         m_Manager.addSubsystem(new ShooterCoral());
         this.configureElevatorShooterDebugBindings();
       break;
+
+      case CO_ELEVATOR_SHOOTER_DEBUG:
+        m_Manager.addSubsystem(new Drivetrain(TunerConstants.DrivetrainConstants, TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight));
+        m_Manager.addSubsystem(new ShooterCoral());
+        m_Manager.addSubsystem(new ShooterAlgae());
+        m_Manager.addSubsystem(new Elevator());
+        m_Manager.addSubsystem(new Shooter());
+        m_Manager.addSubsystem(new DataStuff());
+        this.configureCodriverShooterElevator();
+
       
       default:
         System.out.println("Did you mean to configure nothing? :( Sad Robot Face");
@@ -456,6 +466,94 @@ public class RobotContainer
                                               elevator.MoveToLevel(LEVELS.CORAL_INTAKE),
                                               shooter.MoveToIntake()));
                                             }
+
+  private void configureCodriverShooterElevator()
+  {
+    Drivetrain drivetrain = m_Manager.getSubsystemOfType(Drivetrain.class).get();
+
+    Elevator elevator = m_Manager.getSubsystemOfType(Elevator.class).get();
+    SmartDashboard.putData(elevator);
+
+    Shooter shooter = m_Manager.getSubsystemOfType(Shooter.class).get();
+    SmartDashboard.putData(shooter);
+
+    DataStuff dataStuff = m_Manager.getSubsystemOfType(DataStuff.class).get();
+    SmartDashboard.putData(dataStuff);
+
+    ShooterCoral shooterCoral = m_Manager.getSubsystemOfType(ShooterCoral.class).get();
+    SmartDashboard.putData(shooterCoral);
+
+    ShooterAlgae shooterAlgae = m_Manager.getSubsystemOfType(ShooterAlgae.class).get();
+    SmartDashboard.putData(shooterAlgae);
+
+    drivetrain.setDefaultCommand
+    (
+        drivetrain.DefaultDrive(() -> m_DriverController.getLeftY(), () -> m_DriverController.getLeftX(), () -> m_DriverController.getRightX())
+    );
+
+    shooterAlgae.setDefaultCommand(shooterAlgae.HoldAlgae());
+
+    m_DriverController.rightTrigger().whileTrue(new ParallelCommandGroup(drivetrain.AlignCoralNoEnd(), shooter.MoveToSelectedShot(), elevator.MoveToSelectorLevel()))
+                                     .onFalse(shooter.StowShooter().andThen(elevator.MoveToLevel(LEVELS.HOME)));
+
+    m_DriverController.leftTrigger().whileTrue(new ParallelDeadlineGroup(shooterCoral.IntakeCoralRoutine(),
+                                                                         elevator.MoveToLevel(LEVELS.CORAL_INTAKE),
+                                                                         shooter.MoveToIntake()))
+                                    .onFalse(shooter.StowShooter().andThen(elevator.MoveToLevel(LEVELS.HOME)));
+
+    m_DriverController.a().whileTrue(shooterCoral.DeployCoralRoutine())
+                          .onFalse(shooterCoral.StopCoral());
+
+    m_DriverController.x().whileTrue(new ParallelDeadlineGroup(shooterAlgae.CleanAlgaeRoutine(), 
+                                                               elevator.MoveToLevel(LEVELS.LOW_ALGAE),
+                                                               shooter.MoveToAlgaeClean()))
+                          .onFalse(shooter.StowShooter().andThen(elevator.MoveToLevel(LEVELS.HOME)));
+
+    m_CoDriverController.leftBumper().onTrue(dataStuff.Left().ignoringDisable(true));
+    m_CoDriverController.rightBumper().onTrue(dataStuff.Right().ignoringDisable(true));
+    m_CoDriverController.povUp().onTrue(dataStuff.Up().ignoringDisable(true));
+    m_CoDriverController.povDown().onTrue(dataStuff.Down().ignoringDisable(true));
+
+    //climb wrist
+    // m_CoDriverController.x().whileTrue(climb.setClimbVoltage(ClimbConstants.CLIMB_WRIST_VOLTAGE)).onFalse(climb.setClimbVoltage(0));
+    // climb wheels
+    // m_CoDriverController.b().whileTrue(climb.setRollerVoltage(ClimbConstants.CLIMB_ROLLER_VOLTAGE)).onFalse(climb.setRollerVoltage(0));
+    // m_CoDriverController.b().whileTrue(climb.setLatchVoltage(-2)).onFalse(climb.setLatchVoltage(0));
+
+    NamedCommands.registerCommand("ElevatorHome", elevator.MoveToLevel(LEVELS.HOME));
+    NamedCommands.registerCommand("CoralTwoDeploy", new ParallelCommandGroup(elevator.MoveToLevel(LEVELS.TWO), shooter.MoveToDeployLow()));
+    NamedCommands.registerCommand("CoralThreeDeploy", new ParallelCommandGroup(elevator.MoveToLevel(LEVELS.THREE), shooter.MoveToDeployLow()));
+    NamedCommands.registerCommand("CoralFourDeploy", new ParallelCommandGroup(elevator.MoveToLevel(LEVELS.FOUR), shooter.MoveToDeployHigh()));
+    NamedCommands.registerCommand("DeployCoral", shooterCoral.DeployCoralRoutine());
+
+    NamedCommands.registerCommand("Align1L", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(0, 1)));
+    NamedCommands.registerCommand("Align1R", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(1, 1)));
+    NamedCommands.registerCommand("Align2L", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(0, 2)));
+    NamedCommands.registerCommand("Align2R", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(1, 2)));
+    NamedCommands.registerCommand("Align3L", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(0, 3)));
+    NamedCommands.registerCommand("Align3R", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(1, 3)));
+    NamedCommands.registerCommand("Align4L", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(0, 4)));
+    NamedCommands.registerCommand("Align4R", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(1, 4)));
+    NamedCommands.registerCommand("Align5L", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(0, 5)));
+    NamedCommands.registerCommand("Align5R", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(1, 5)));
+    NamedCommands.registerCommand("Align6L", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(0, 6)));
+    NamedCommands.registerCommand("Align6R", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(1, 6)));
+
+    NamedCommands.registerCommand("ShooterLowPosition", new ParallelCommandGroup(shooter.MoveToDeployLow(), elevator.MoveToLevel(LEVELS.ZERO)));
+
+    NamedCommands.registerCommand("StartIntake", new ParallelDeadlineGroup(shooterCoral.IntakeCoralRoutine(), elevator.MoveToLevel(LEVELS.CORAL_INTAKE), shooter.MoveToIntake()));
+    
+    try 
+    {
+      m_Chooser = AutoBuilder.buildAutoChooser();
+      SmartDashboard.putData(m_Chooser);
+     } 
+     catch (Exception e) 
+     {
+       DriverStation.reportError("Failed to load autonomous chooser.", e.getStackTrace());
+       e.printStackTrace();
+     }
+  }
 
   public Command getAutonomousCommand() 
   {

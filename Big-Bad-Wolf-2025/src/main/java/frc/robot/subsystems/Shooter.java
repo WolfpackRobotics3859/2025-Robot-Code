@@ -97,6 +97,16 @@ public class Shooter extends SubsystemBase
     return MoveToCommandBuilder(ShooterConstants.WRIST_ALGAE_PROCESSOR_DEPLOYMENT_POSITION);
   }
 
+  public Command MoveToAlgaeClean()
+  {
+    return MoveToCommandBuilder(ShooterConstants.WRIST_ALGAE_INTAKE_POSITION);
+  }
+
+  public Command MoveToAlgaeHold()
+  {
+    return MoveToCommandBuilder(ShooterConstants.WRIST_ALGAE_HOLDING_POSITION);
+  }
+
   public Command MoveToAlgaeSweep()
   {
     return MoveToCommandBuilder(ShooterConstants.WRIST_ALGAE_SWEEPING_POSITION);

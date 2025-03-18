@@ -28,8 +28,8 @@ public class ElevatorConstants
     public static final double ELEVATOR_LEVEL_FOUR = 105.0;
     public static final double CORAL_INTAKING_LEVEL = 2;
     public static final double ALGAE_PROCESSING_POSITION = 5;
-    public static final double LOW_CLEAN = 35.25;
-    public static final double HIGH_CLEAN = 55.75;
+    public static final double LOW_CLEAN = 26.43;
+    public static final double HIGH_CLEAN = 54.79;
 
     // Maximum allowable magnitude deviation from setpoint when determining the end of the movement command.
     public static final double POSITION_ERROR_TOLERANCE = 1;
