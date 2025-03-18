@@ -37,7 +37,8 @@ public class ShooterConstants
     public static final double WRIST_CORAL_DEPLOYMENT_POSITION_LOW = -3.5; // -0.58
     public static final double WRIST_CORAL_DEPLOYMENT_POSITION = -1.00; // -1.23
     public static final double WRIST_CORAL_INTAKE_POSITION = -0.4; // -0.62
-    public static final double WRIST_ALGAE_INTAKE_POSITION = -11.0;
+    public static final double WRIST_ALGAE_INTAKE_POSITION = -8.07;
+    public static final double WRIST_ALGAE_HOLDING_POSITION = -5.32;
     public static final double WRIST_ALGAE_PROCESSOR_DEPLOYMENT_POSITION = -11; // -0.38
     public static final double WRIST_ALGAE_SHOOTING_POSITION = -0.15;
     public static final double WRIST_ALGAE_SWEEPING_POSITION = -0.5;

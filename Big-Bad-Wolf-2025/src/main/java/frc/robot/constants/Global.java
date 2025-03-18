@@ -18,7 +18,8 @@ public class Global
         SHOOTER_DEBUG,
         INTAKE_DEBUG,
         CLIMB_DEBUG,
-        ELEVATOR_SHOOTER_DEBUG
+        ELEVATOR_SHOOTER_DEBUG,
+        CO_ELEVATOR_SHOOTER_DEBUG
     }
 
     public static BUILD_TYPE ACTIVE_BUILD = BUILD_TYPE.COMPETITION;
