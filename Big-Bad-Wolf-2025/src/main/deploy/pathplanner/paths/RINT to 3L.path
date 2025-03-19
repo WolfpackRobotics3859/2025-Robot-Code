@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.2175,
-        "y": 2.114
+        "x": 1.5405000000000002,
+        "y": 0.7002499999999998
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.658381107081476,
-        "y": 2.861492496217152
+        "x": 2.6990442968857122,
+        "y": 1.5256925572735662
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "RINT"
     },
     {
       "anchor": {
@@ -20,17 +20,33 @@
         "y": 2.947368421052632
       },
       "prevControl": {
-        "x": 3.3780360440598587,
-        "y": 2.5200808619057455
+        "x": 2.827017159869628,
+        "y": 1.700029455984823
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "3L"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": 0.0
+    }
+  ],
   "constraintZones": [],
-  "pointTowardsZones": [],
+  "pointTowardsZones": [
+    {
+      "fieldPosition": {
+        "x": 4.0,
+        "y": 3.2
+      },
+      "rotationOffset": 0.0,
+      "minWaypointRelativePos": 0.3402366863905327,
+      "maxWaypointRelativePos": 0.6370503597122316,
+      "name": "Point Towards Zone"
+    }
+  ],
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
@@ -45,10 +61,10 @@
     "rotation": 61.85839876773822
   },
   "reversed": false,
-  "folder": "ALIGNMENT-PATHS",
+  "folder": "RINT TO X",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 59.99999999999999
+    "rotation": 52.43140797117256
   },
   "useDefaultConstraints": true
 }

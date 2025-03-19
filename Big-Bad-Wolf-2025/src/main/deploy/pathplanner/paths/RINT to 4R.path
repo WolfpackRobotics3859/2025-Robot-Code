@@ -3,34 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.282319078947368,
-        "y": 2.9569901315789475
-      },
-      "prevControl": null,
-      "nextControl": {
-        "x": 3.877549342105263,
-        "y": 2.3027138157894744
-      },
-      "isLocked": false,
-      "linkedName": "2R"
-    },
-    {
-      "anchor": {
         "x": 1.5405000000000002,
         "y": 0.7002499999999998
       },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.1167763157894735,
+        "y": 2.5240131578947365
+      },
+      "isLocked": false,
+      "linkedName": "RINT"
+    },
+    {
+      "anchor": {
+        "x": 3.1492500000000003,
+        "y": 3.87515368852459
+      },
       "prevControl": {
-        "x": 3.4830592105263154,
-        "y": 1.8216282894736842
+        "x": 1.8185032894736843,
+        "y": 2.754934210526315
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "RINT"
+      "linkedName": "4R"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "pointTowardsZones": [],
+  "pointTowardsZones": [
+    {
+      "fieldPosition": {
+        "x": 3.5,
+        "y": 4.0
+      },
+      "rotationOffset": 0.0,
+      "minWaypointRelativePos": 0.23224852071005916,
+      "maxWaypointRelativePos": 0.3032544378698223,
+      "name": "Point Towards Zone"
+    }
+  ],
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
@@ -42,13 +53,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 52.43140797117256
+    "rotation": 0.0
   },
   "reversed": false,
-  "folder": "FACE TO INTAKE",
+  "folder": "RINT TO X",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 120.01836742760914
+    "rotation": 52.43140797117256
   },
   "useDefaultConstraints": true
 }
