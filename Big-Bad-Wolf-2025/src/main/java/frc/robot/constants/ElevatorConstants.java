@@ -28,7 +28,8 @@ public class ElevatorConstants
     public static final double ELEVATOR_LEVEL_FOUR = 105.0;
     public static final double CORAL_INTAKING_LEVEL = 2;
     public static final double ALGAE_PROCESSING_POSITION = 5;
-    public static final double LOW_CLEAN = 26.43;
+    public static final double ALGAE_BARGE_POSITION = 105;
+    public static final double LOW_CLEAN = 22.43;
     public static final double HIGH_CLEAN = 54.79;
 
     // Maximum allowable magnitude deviation from setpoint when determining the end of the movement command.
@@ -53,7 +54,8 @@ public class ElevatorConstants
         CORAL_INTAKE(CORAL_INTAKING_LEVEL),
         LOW_ALGAE(LOW_CLEAN),
         HIGH_ALGAE(HIGH_CLEAN),
-        ALGAE_PROCESS(ALGAE_PROCESSING_POSITION);
+        ALGAE_PROCESS(ALGAE_PROCESSING_POSITION),
+        ALGAE_BARGE(ALGAE_BARGE_POSITION);
 
         private double levelValue;
 

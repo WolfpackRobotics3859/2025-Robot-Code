@@ -12,8 +12,8 @@ import frc.robot.utilities.MotorManager;
 public class ShooterAlgae extends SubsystemBase
 {
 
-    double motorCurrent;
-    double stallCurrentThreshold;
+    // double motorCurrent;
+    // double stallCurrentThreshold;
 
     private VoltageOut m_VoltageRequest;
 
@@ -23,16 +23,27 @@ public class ShooterAlgae extends SubsystemBase
         MotorManager.ApplyConfigs(ShooterConstants.SHOOTER_ALGAE_MOTOR_CONFIG, Hardware.SHOOTER_ALGAE_MOTOR);
         m_VoltageRequest = new VoltageOut(0);
 
-        stallCurrentThreshold = 15; //Placeholder value
-        UpdateMotorCurrent();
+        // stallCurrentThreshold = 15; //Placeholder value
+        // UpdateMotorCurrent();
     }
 
     public Command CleanAlgaeRoutine()
     {
-        return new FunctionalCommand(() -> this.BeginSweepAlgae(),
-                                     () -> UpdateMotorCurrent(), 
-                                     interrupted -> this.HoldAlgae(),
-                                     () -> this.ExternalResistance(),   
+        return new FunctionalCommand(() -> SetAlgaeVoltage(ShooterConstants.ALGAE_SWEEPING_VOLTAGE),
+                                    //  () -> UpdateMotorCurrent(),
+                                    () -> {}, 
+                                     interrupted -> this.SetAlgaeVoltage(ShooterConstants.ALGAE_HOLDING_VOLTAGE),
+                                    //  () -> this.ExternalResistance(),   
+                                     ()-> false,
+                                     this);
+    }
+
+    public Command DeployAlgaeRoutine()
+    {
+        return new FunctionalCommand(() -> SetAlgaeVoltage(ShooterConstants.ALGAE_BARGE_SHOOTING_VOLTAGE),
+                                    () -> {}, 
+                                     interrupted -> this.SetAlgaeVoltage(0),
+                                     ()-> false,
                                      this);
     }
 
@@ -45,19 +56,19 @@ public class ShooterAlgae extends SubsystemBase
     //                                  this);
     // }
 
-    public double UpdateMotorCurrent()
-    {
-        return motorCurrent = MotorManager.GetMotor(Hardware.SHOOTER_ALGAE_MOTOR)
-                                          .getSupplyCurrent()
-                                          .getValueAsDouble();
-    }
+    // public double UpdateMotorCurrent()
+    // {
+    //     return motorCurrent = MotorManager.GetMotor(Hardware.SHOOTER_ALGAE_MOTOR)
+    //                                       .getSupplyCurrent()
+    //                                       .getValueAsDouble();
+    // }
 
-    public boolean ExternalResistance()
-    {
-        return motorCurrent >= stallCurrentThreshold;
-    }
+    // public boolean ExternalResistance()
+    // {
+    //     return motorCurrent >= stallCurrentThreshold;
+    // }
 
-    public Command BeginSweepAlgae()
+    public Command BeginCleanAlgae()
     {
         return this.runOnce(() -> this.SetAlgaeVoltage(ShooterConstants.ALGAE_SWEEPING_VOLTAGE));
     }

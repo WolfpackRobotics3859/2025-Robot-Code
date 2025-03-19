@@ -25,13 +25,13 @@ public class ShooterConstants
     
     // ALGAE MOTOR VOLTAGES   
     // Speed to use when cleaning the coral reef.
-    public static final double ALGAE_SWEEPING_VOLTAGE = 4;
+    public static final double ALGAE_SWEEPING_VOLTAGE = -10;
     // Speed to use when intaking algae from the ground.
     public static final double ALGAE_GROUND_INTAKING_VOLTAGE = -2.0;
     public static final double ALGAE_PROCESSOR_DEPLOYMENT_VOLTAGE = -6.0;
     // This will most likely be a variable algorithmic speed if we ever reach that level of automation.
-    public static final double ALGAE_TROUGH_SHOOTING_VOLTAGE = 8;
-    public static final double ALGAE_HOLDING_VOLTAGE = 1;
+    public static final double ALGAE_BARGE_SHOOTING_VOLTAGE = 8;
+    public static final double ALGAE_HOLDING_VOLTAGE = -0.5;
 
     public static final double WRIST_STOW_POSITION = -1.46; // -0.58
     public static final double WRIST_CORAL_DEPLOYMENT_POSITION_LOW = -3.5; // -0.58
