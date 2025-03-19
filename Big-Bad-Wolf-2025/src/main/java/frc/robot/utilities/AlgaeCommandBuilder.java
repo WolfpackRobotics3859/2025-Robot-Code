@@ -71,11 +71,11 @@ public class AlgaeCommandBuilder
     String[] splitKey = alignmentPath.split("-");
     if((splitKey[0] == "ONE") || (splitKey[0] == "THREE") || (splitKey[0] == "FOUR"))
     {
-        preparationCommand = new ParallelCommandGroup(this.m_Elevator.MoveToLevel(LEVELS.LOW_ALGAE), this.m_Shooter.MoveToAlgaeSweep(), this.m_ShooterAlgae.BeginSweepAlgae());
+        preparationCommand = new ParallelCommandGroup(this.m_Elevator.MoveToLevel(LEVELS.LOW_ALGAE), this.m_Shooter.MoveToAlgaeSweep(), this.m_ShooterAlgae.BeginCleanAlgae());
     }
     else
     {
-        preparationCommand = new ParallelCommandGroup(this.m_Elevator.MoveToLevel(LEVELS.HIGH_ALGAE), this.m_Shooter.MoveToAlgaeSweep(), this.m_ShooterAlgae.BeginSweepAlgae());
+        preparationCommand = new ParallelCommandGroup(this.m_Elevator.MoveToLevel(LEVELS.HIGH_ALGAE), this.m_Shooter.MoveToAlgaeSweep(), this.m_ShooterAlgae.BeginCleanAlgae());
     }
 
     DataLogManager.log("AlgaeCommandBuilder created clean for face " + splitKey[0]);

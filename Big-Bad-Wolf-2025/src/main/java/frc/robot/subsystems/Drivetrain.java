@@ -209,7 +209,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
     {
         return new FunctionalCommand(() -> 
                                         {
-                                            Pose2d goalPose = this.GetGoalCoralPose();
+                                            Pose2d goalPose = this.GetGoalCleanPose();
                                             this.m_XController.reset();
                                             this.m_YController.reset();
                                             this.m_XController.setSetpoint(goalPose.getX());
@@ -221,6 +221,23 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                                         m_PackLog.Log("Alignment command finished.");
                                                     }, 
                                      () -> IsAlignmentComplete(), 
+                                     this);
+    }
+
+    public Command AlignCenterNoEnd()
+    {
+        return new FunctionalCommand(() -> 
+                                        {
+                                            Pose2d goalPose = this.GetGoalCleanPose();
+                                            this.m_XController.reset();
+                                            this.m_YController.reset();
+                                            this.m_XController.setSetpoint(goalPose.getX());
+                                            this.m_YController.setSetpoint(goalPose.getY());
+                                            this.m_RotationController.setSetpoint(goalPose.getRotation().getDegrees());
+                                        }, 
+                                     () -> UpdateRequest(),
+                                     interrupted -> {}, 
+                                     () -> false, 
                                      this);
     }
 
