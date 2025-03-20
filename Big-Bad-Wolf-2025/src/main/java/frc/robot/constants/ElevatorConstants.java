@@ -15,6 +15,8 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
+import frc.robot.utilities.DataStuff;
+
 /** 
  * Where all constants related to elevator are declared.
  */
@@ -54,9 +56,9 @@ public class ElevatorConstants
         CORAL_INTAKE(CORAL_INTAKING_LEVEL),
         LOW_ALGAE(LOW_CLEAN),
         HIGH_ALGAE(HIGH_CLEAN),
+        // ALGAE_CLEAN(((DataStuff.GetCurrentFace() % 2) == 0) ? (HIGH_CLEAN) : (LOW_CLEAN)),
         ALGAE_PROCESS(ALGAE_PROCESSING_POSITION),
         ALGAE_BARGE(ALGAE_BARGE_POSITION);
-
         private double levelValue;
 
         LEVELS(double value)
