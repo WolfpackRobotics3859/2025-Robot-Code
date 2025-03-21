@@ -30,17 +30,17 @@ public class ShooterConstants
     public static final double ALGAE_GROUND_INTAKING_VOLTAGE = -2.0;
     public static final double ALGAE_PROCESSOR_DEPLOYMENT_VOLTAGE = -6.0;
     // This will most likely be a variable algorithmic speed if we ever reach that level of automation.
-    public static final double ALGAE_BARGE_SHOOTING_VOLTAGE = 8;
-    public static final double ALGAE_HOLDING_VOLTAGE = -0.5;
+    public static final double ALGAE_BARGE_SHOOTING_VOLTAGE = 12;
+    public static final double ALGAE_HOLDING_VOLTAGE = -1.5;
 
     public static final double WRIST_STOW_POSITION = -1.46; // -0.58
     public static final double WRIST_CORAL_DEPLOYMENT_POSITION_LOW = -3.5; // -0.58
     public static final double WRIST_CORAL_DEPLOYMENT_POSITION = -1.00; // -1.23
     public static final double WRIST_CORAL_INTAKE_POSITION = -0.4; // -0.62
-    public static final double WRIST_ALGAE_INTAKE_POSITION = -8.07;
-    public static final double WRIST_ALGAE_HOLDING_POSITION = -5.32;
-    public static final double WRIST_ALGAE_PROCESSOR_DEPLOYMENT_POSITION = -11; // -0.38
-    public static final double WRIST_ALGAE_SHOOTING_POSITION = -0.15;
+    public static final double WRIST_ALGAE_INTAKE_POSITION = -8.6;
+    public static final double WRIST_ALGAE_HOLDING_POSITION = -2.0;
+    public static final double WRIST_ALGAE_PROCESSOR_DEPLOYMENT_POSITION = -10.5; // -0.38
+    public static final double WRIST_ALGAE_SHOOTING_POSITION = -1.0;
     public static final double WRIST_ALGAE_SWEEPING_POSITION = -0.5;
 
     // Maximum allowable magnitude deviation from setpoint when determining the end of the movement command.

@@ -41,8 +41,11 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.utilities.CameraManager;
 import frc.robot.utilities.DataStuff;
 import frc.robot.utilities.PackLog;
+import frc.robot.utilities.SubsystemManager;
+import frc.robot.utilities.subsystemManager.SubsystemAddedEvent;
+import frc.robot.utilities.subsystemManager.SubsystemAddedListener;
 
-public class Drivetrain extends CommandSwerveDrivetrain 
+public class Drivetrain extends CommandSwerveDrivetrain implements SubsystemAddedListener
 {
     private PackLog m_PackLog;
 
@@ -55,6 +58,12 @@ public class Drivetrain extends CommandSwerveDrivetrain
     private SwerveRequest.FieldCentric m_SwerveRequestField;
     private SwerveRequest.RobotCentric m_SwerveRequestRobot;
     private SwerveRequest.ApplyRobotSpeeds m_SwerveRequestSpeeds;
+
+    private double m_DefaultDriveMaxSpeed;
+    private double m_DefaultDriveMaxAngularRate;
+
+    private SubsystemManager m_SubsystemManager;
+    private Elevator m_Elevator;
 
     private final SwerveRequest.FieldCentric m_OperatorDriveRequest = new SwerveRequest.FieldCentric()
         .withDeadband(TunerConstants.MaxSpeed * 0.05).withRotationalDeadband(TunerConstants.MaxAngularRate * 0.05) // Add a 10% deadband
@@ -70,11 +79,25 @@ public class Drivetrain extends CommandSwerveDrivetrain
 
     StructPublisher<Pose2d> publisher = NetworkTableInstance.getDefault().getStructTopic("Robot Pose", Pose2d.struct).publish();
 
-    public Drivetrain(SwerveDrivetrainConstants constants, SwerveModuleConstants<?, ?, ?>... modules)
+    public Drivetrain(SubsystemManager manager, SwerveDrivetrainConstants constants, SwerveModuleConstants<?, ?, ?>... modules)
     {
         super(constants, modules);    
         this.ConfigureDrivetrain();
         this.ConfigureCameras();
+
+        m_DefaultDriveMaxSpeed = TunerConstants.MaxSpeed;
+        m_DefaultDriveMaxAngularRate = TunerConstants.MaxAngularRate;
+
+        m_SubsystemManager = manager;
+        
+        if(!(m_SubsystemManager.getSubsystemOfType(Elevator.class) == null))
+        {
+            m_Elevator = m_SubsystemManager.getSubsystemOfType(Elevator.class).get();
+        }
+        else
+        {
+            m_SubsystemManager.subscribeSubsystemAdded(this);
+        }
     }
 
     @Override
@@ -296,9 +319,9 @@ public class Drivetrain extends CommandSwerveDrivetrain
 
     public Command DefaultDrive(Supplier<Double> thrust, Supplier<Double> strafe, Supplier<Double> rotation)
     {
-        return this.applyRequest(() -> this.m_OperatorDriveRequest.withVelocityX(-thrust.get() * TunerConstants.MaxSpeed * 0.8)
-                                                                  .withVelocityY(-strafe.get() * TunerConstants.MaxSpeed * 0.8)
-                                                                  .withRotationalRate(-rotation.get() * TunerConstants.MaxAngularRate));
+        return this.applyRequest(() -> this.m_OperatorDriveRequest.withVelocityX(-thrust.get() * m_DefaultDriveMaxSpeed * 0.8)
+                                                                  .withVelocityY(-strafe.get() * m_DefaultDriveMaxSpeed * 0.8)
+                                                                  .withRotationalRate(-rotation.get() * m_DefaultDriveMaxAngularRate));
     }
 
     private void UpdateRequest()
@@ -337,6 +360,12 @@ public class Drivetrain extends CommandSwerveDrivetrain
     private boolean IsAlignmentComplete()
     {
         return this.m_XController.atSetpoint() && this.m_YController.atSetpoint();
+    }
+
+    private void updateDefualtDriveSpeeds()
+    {
+        Supplier<Double> elevatorPosition = Elevator::getElevatorPosition;
+
     }
 
     private void ConfigureDrivetrain()
@@ -412,4 +441,15 @@ public class Drivetrain extends CommandSwerveDrivetrain
                 this
         );
     }
+
+    @Override
+  public void onSubsystemAddedEvent(SubsystemAddedEvent event) 
+  {
+    if(event.getSubsystem().getClass() == Elevator.class)
+    {
+      this.m_Elevator = (Elevator) event.getSubsystem();
+      m_Subsystems.unsubscribeSubsystemAdded(this);
+    }
+  }
 }
+

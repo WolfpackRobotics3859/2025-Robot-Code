@@ -83,7 +83,7 @@ public class CoralCommandBuilder
     {
         preparationCommand = AutoBuilder.followPath(m_AlignmentPaths.get(alignmentPath))
                                         .alongWith(this.m_Elevator.MoveToLevel(level))
-                                        .alongWith(this.m_Shooter.MoveToDeployHigh());
+                                        .alongWith(this.m_Shooter.MoveToBarge());
         return preparationCommand.andThen(this.m_ShooterCoral.DeployCoralRoutine());
     }
     
@@ -102,7 +102,7 @@ public class CoralCommandBuilder
     if(level == LEVELS.FOUR)
     {
         preparationCommand = this.m_Elevator.MoveToLevel(level)
-                                        .alongWith(this.m_Shooter.MoveToDeployHigh());
+                                        .alongWith(this.m_Shooter.MoveToBarge());
         return preparationCommand.andThen(this.m_ShooterCoral.DeployCoralRoutine());
     }
     
