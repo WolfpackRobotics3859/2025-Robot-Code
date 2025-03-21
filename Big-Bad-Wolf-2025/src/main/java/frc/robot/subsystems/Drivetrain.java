@@ -37,6 +37,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import frc.robot.constants.CameraConstants;
 import frc.robot.constants.DrivetrainConstants;
+import frc.robot.constants.ElevatorConstants;
+import frc.robot.constants.ElevatorConstants.LEVELS;
 import frc.robot.generated.TunerConstants;
 import frc.robot.utilities.CameraManager;
 import frc.robot.utilities.DataStuff;
@@ -89,14 +91,14 @@ public class Drivetrain extends CommandSwerveDrivetrain implements SubsystemAdde
         m_DefaultDriveMaxAngularRate = TunerConstants.MaxAngularRate;
 
         m_SubsystemManager = manager;
-        
-        if(!(m_SubsystemManager.getSubsystemOfType(Elevator.class) == null))
+
+        if (this.m_SubsystemManager.getSubsystemOfType(Elevator.class).isPresent())
         {
-            m_Elevator = m_SubsystemManager.getSubsystemOfType(Elevator.class).get();
+            this.m_Elevator = this.m_SubsystemManager.getSubsystemOfType(Elevator.class).get();
         }
         else
         {
-            m_SubsystemManager.subscribeSubsystemAdded(this);
+            this.m_SubsystemManager.subscribeSubsystemAdded(this);
         }
     }
 
@@ -319,6 +321,7 @@ public class Drivetrain extends CommandSwerveDrivetrain implements SubsystemAdde
 
     public Command DefaultDrive(Supplier<Double> thrust, Supplier<Double> strafe, Supplier<Double> rotation)
     {
+        updateDefaultltDriveSpeeds();
         return this.applyRequest(() -> this.m_OperatorDriveRequest.withVelocityX(-thrust.get() * m_DefaultDriveMaxSpeed * 0.8)
                                                                   .withVelocityY(-strafe.get() * m_DefaultDriveMaxSpeed * 0.8)
                                                                   .withRotationalRate(-rotation.get() * m_DefaultDriveMaxAngularRate));
@@ -362,10 +365,22 @@ public class Drivetrain extends CommandSwerveDrivetrain implements SubsystemAdde
         return this.m_XController.atSetpoint() && this.m_YController.atSetpoint();
     }
 
-    private void updateDefualtDriveSpeeds()
+    private void updateDefaultltDriveSpeeds()
     {
-        Supplier<Double> elevatorPosition = Elevator::getElevatorPosition;
-
+        double elevatorPosition = m_Elevator.getElevatorPosition();
+        double threshold = LEVELS.HOME.getValue();
+        double scale;
+        if (elevatorPosition <= threshold)
+        {
+            scale = 1;
+        }
+        else
+        {
+            scale = 1 - ((elevatorPosition - threshold) / (LEVELS.MAX_HIEGHT.getValue() - threshold));
+            scale = (scale < 0.2) ? 0.2 : scale;
+        }
+        m_DefaultDriveMaxAngularRate =  (TunerConstants.MaxAngularRate * scale);
+        m_DefaultDriveMaxSpeed = (TunerConstants.MaxSpeed * scale);
     }
 
     private void ConfigureDrivetrain()
@@ -445,10 +460,14 @@ public class Drivetrain extends CommandSwerveDrivetrain implements SubsystemAdde
     @Override
   public void onSubsystemAddedEvent(SubsystemAddedEvent event) 
   {
-    if(event.getSubsystem().getClass() == Elevator.class)
+    if(this.m_SubsystemManager.getSubsystemOfType(Elevator.class).isPresent())
     {
-      this.m_Elevator = (Elevator) event.getSubsystem();
-      m_Subsystems.unsubscribeSubsystemAdded(this);
+      this.m_Elevator = this.m_SubsystemManager.getSubsystemOfType(Elevator.class).get();
+    }
+
+    if(this.m_Elevator != null)
+    {
+      m_SubsystemManager.unsubscribeSubsystemAdded(this);
     }
   }
 }

@@ -33,6 +33,7 @@ public class ElevatorConstants
     public static final double ALGAE_BARGE_POSITION = 59.0;
     public static final double LOW_CLEAN = 15;
     public static final double HIGH_CLEAN = 37.05;
+    public static final double ELEVATOR_MAX_HEIGHT = 60.5; 
 
     // Maximum allowable magnitude deviation from setpoint when determining the end of the movement command.
     public static final double POSITION_ERROR_TOLERANCE = 0.57;
@@ -57,7 +58,8 @@ public class ElevatorConstants
         LOW_ALGAE(LOW_CLEAN),
         HIGH_ALGAE(HIGH_CLEAN),
         ALGAE_PROCESS(ALGAE_PROCESSING_POSITION),
-        ALGAE_BARGE(ALGAE_BARGE_POSITION);
+        ALGAE_BARGE(ALGAE_BARGE_POSITION),
+        MAX_HIEGHT(ELEVATOR_MAX_HEIGHT);
         private double levelValue;
 
         LEVELS(double value)
