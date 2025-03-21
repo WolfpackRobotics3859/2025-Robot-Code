@@ -15,6 +15,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -102,12 +104,6 @@ public class Shooter extends SubsystemBase
     return MoveToCommandBuilder(ShooterConstants.WRIST_ALGAE_SWEEPING_POSITION);
   }
 
-  public Command GoToManualPosition()
-  {
-    SmartDashboard.putNumber("Manual Shooter Position", 0.0);
-    return this.runOnce(() -> this.ApplySmartDashboardPosition());
-  }
-
   public Command SetBrake()
   {
     return this.runOnce(() -> this.ApplyBrake());
@@ -118,19 +114,12 @@ public class Shooter extends SubsystemBase
     return this.runOnce(() -> this.ApplyCoast());
   }
 
-  private Shooter ApplySmartDashboardPosition()
-  {
-    this.ApplyPosition(SmartDashboard.getNumber("Manual Shooter Position", 0));
-    return this;
-  }
-
   private Command MoveToCommandBuilder(double position)
   {
     return new FunctionalCommand(() -> this.ApplyPosition(position),
                                  () -> {}, 
                                  interrupted -> {},
-                                 () -> true,
-                   //              () -> this.isReady(ShooterConstants.WRIST_POSITION_ERROR_TOLERANCE, ShooterConstants.WRIST_POSITION_DERIVATIVE_TOLERANCE),
+                                 () -> this.isReady(ShooterConstants.WRIST_POSITION_ERROR_TOLERANCE, ShooterConstants.WRIST_POSITION_DERIVATIVE_TOLERANCE),
                                  this);
   }
 
@@ -192,12 +181,18 @@ public class Shooter extends SubsystemBase
   @Override
   public void periodic() 
   {
-    SmartDashboard.putNumber("SHOOTER POSITION", this.m_ShooterWristMotor.getPosition().getValueAsDouble());
+    // Empty for now
   }
 
   private void BuildToolbox()
   {
     SmartDashboard.putData("Static Brake Shooter", this.SetBrake().ignoringDisable(true));
     SmartDashboard.putData("Coast Shooter", this.SetCoast().ignoringDisable(true));
+  }
+
+  @AutoLogOutput
+  private double GetShooterPosition()
+  {
+    return this.m_ShooterWristMotor.getPosition().getValueAsDouble();
   }
 }

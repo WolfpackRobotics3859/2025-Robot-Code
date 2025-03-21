@@ -1,5 +1,12 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.InchesPerSecond;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -13,6 +20,7 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -26,7 +34,10 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
@@ -47,9 +58,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
 
     private PIDController m_XController;
     private PIDController m_YController;
-    private PIDController m_RotationController;
 
-    private SwerveRequest.FieldCentric m_SwerveRequestField;
     private SwerveRequest.FieldCentricFacingAngle m_SwerveFieldCentricFacingAngle;
     private SwerveRequest.RobotCentric m_SwerveRequestRobot;
     private SwerveRequest.ApplyRobotSpeeds m_SwerveRequestSpeeds;
@@ -57,7 +66,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
     private final SwerveRequest.FieldCentric m_OperatorDriveRequest = new SwerveRequest.FieldCentric()
         .withDeadband(TunerConstants.MaxSpeed * 0.05).withRotationalDeadband(TunerConstants.MaxAngularRate * 0.05) // Add a 10% deadband
         .withDeadband(TunerConstants.MaxSpeed * 0.05).withRotationalDeadband(TunerConstants.MaxAngularRate * 0.05) // Add a 10% deadband
-        .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+        .withDriveRequestType(DriveRequestType.Velocity); // Use open-loop control for drive motors
 
     private PhotonCamera m_ForwardCamera;
     private PhotonCamera m_FarCamera;
@@ -79,11 +88,8 @@ public class Drivetrain extends CommandSwerveDrivetrain
     public void periodic() 
     {
         super.periodic();
-  //      this.m_CameraManager.UpdateCameras();
         this.UpdateForwardCamera();
         this.UpdateFarCamera();
-        SmartDashboard.putBoolean("Forward Camera Connected", this.m_ForwardCamera.isConnected());
-        SmartDashboard.putBoolean("Far Camera Connected", this.m_FarCamera.isConnected());
         publisher.set(this.getState().Pose);
     }
 
@@ -136,7 +142,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                             this.m_YController.reset();
                                             this.m_XController.setSetpoint(goalPose.getX());
                                             this.m_YController.setSetpoint(goalPose.getY());
-                                            this.m_RotationController.setSetpoint(goalPose.getRotation().getDegrees());
+                                            this.m_SwerveFieldCentricFacingAngle.TargetDirection = goalPose.getRotation().rotateBy(Rotation2d.k180deg);
                                         }, 
                                      () -> UpdateRequest(), 
                                      interrupted -> {
@@ -155,7 +161,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                             this.m_YController.reset();
                                             this.m_XController.setSetpoint(goalPose.getX());
                                             this.m_YController.setSetpoint(goalPose.getY());
-                                            this.m_RotationController.setSetpoint(goalPose.getRotation().getDegrees());
+                                            this.m_SwerveFieldCentricFacingAngle.TargetDirection = goalPose.getRotation().rotateBy(Rotation2d.k180deg);
                                         }, 
                                      () -> UpdateRequest(), 
                                      interrupted -> {}, 
@@ -195,7 +201,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                             
                                             this.m_XController.setSetpoint(goalPose.getX());
                                             this.m_YController.setSetpoint(goalPose.getY());
-                                            this.m_RotationController.setSetpoint(goalPose.getRotation().getDegrees());
+                                            this.m_SwerveFieldCentricFacingAngle.TargetDirection = goalPose.getRotation();
                                         }, 
                                      () -> UpdateRequest(), 
                                      interrupted -> {}, 
@@ -212,7 +218,6 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                             this.m_YController.reset();
                                             this.m_XController.setSetpoint(goalPose.getX());
                                             this.m_YController.setSetpoint(goalPose.getY());
-                                            this.m_RotationController.setSetpoint(goalPose.getRotation().getDegrees());
                                         }, 
                                      () -> UpdateRequest(), 
                                      interrupted -> {
@@ -255,7 +260,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
     {
         // Create the constraints to use while pathfinding
         PathConstraints constraints = new PathConstraints(
-            3.0, 4.0,
+            1.0, 4.0,
             Units.degreesToRadians(540), Units.degreesToRadians(720));
 
         // Since AutoBuilder is configured, we can use it to build pathfinding commands
@@ -286,38 +291,33 @@ public class Drivetrain extends CommandSwerveDrivetrain
     {
         if(alliance == Alliance.Red)
         {
-            this.m_SwerveRequestField.VelocityX = -this.GetXOutput();
-            this.m_SwerveRequestField.VelocityY = -this.GetYOutput();
-            this.m_SwerveRequestField.RotationalRate = this.GetRotationOutput();
-            this.setControl(m_SwerveRequestField);
+            this.m_SwerveFieldCentricFacingAngle.VelocityX = -this.GetXOutput();
+            this.m_SwerveFieldCentricFacingAngle.VelocityY = -this.GetYOutput();
+            this.setControl(m_SwerveFieldCentricFacingAngle);
         }
         else
         {
-            this.m_SwerveRequestField.VelocityX = this.GetXOutput();
-            this.m_SwerveRequestField.VelocityY = this.GetYOutput();
-            this.m_SwerveRequestField.RotationalRate = this.GetRotationOutput();
-            this.setControl(m_SwerveRequestField);
+            this.m_SwerveFieldCentricFacingAngle.VelocityX = this.GetXOutput();
+            this.m_SwerveFieldCentricFacingAngle.VelocityY = this.GetYOutput();
+            this.setControl(m_SwerveFieldCentricFacingAngle);
         }
     }
 
     private double GetXOutput()
     {
-        return MathUtil.clamp(this.m_XController.calculate(this.getState().Pose.getX()), -TunerConstants.MaxSpeed * 0.5, TunerConstants.MaxSpeed * 0.5);
+        return MathUtil.clamp(this.m_XController.calculate(this.getState().Pose.getX()), -TunerConstants.MaxSpeed, TunerConstants.MaxSpeed);
     }
 
     private double GetYOutput()
     {
-        return MathUtil.clamp(this.m_YController.calculate(this.getState().Pose.getY()), -TunerConstants.MaxSpeed * 0.5, TunerConstants.MaxSpeed * 0.5);
+        return MathUtil.clamp(this.m_YController.calculate(this.getState().Pose.getY()), -TunerConstants.MaxSpeed, TunerConstants.MaxSpeed);
     }
 
-    private double GetRotationOutput()
-    {
-        return MathUtil.clamp(this.m_RotationController.calculate(this.getState().Pose.getRotation().getDegrees()), -TunerConstants.MaxAngularRate, TunerConstants.MaxAngularRate);
-    }
+    Debouncer debounce = new Debouncer(0.25, DebounceType.kRising);
 
     private boolean IsAlignmentComplete()
     {
-        return this.m_XController.atSetpoint() && this.m_YController.atSetpoint();
+        return debounce.calculate(this.m_XController.atSetpoint() && this.m_YController.atSetpoint());
     }
 
     private void ConfigureDrivetrain()
@@ -325,9 +325,9 @@ public class Drivetrain extends CommandSwerveDrivetrain
         this.m_PackLog = new PackLog("Drivetrain");
         this.ConfigureAutobuilder();
         this.ConfigurePIDControllers();
-
-        this.m_SwerveRequestField = new SwerveRequest.FieldCentric();
-        this.m_SwerveFieldCentricFacingAngle = new SwerveRequest.FieldCentricFacingAngle();
+        this.m_SwerveFieldCentricFacingAngle = new SwerveRequest.FieldCentricFacingAngle().withHeadingPID(3, 0.0, 0);
+        this.m_SwerveFieldCentricFacingAngle.withRotationalDeadband(DegreesPerSecond.of(0.5));
+        this.m_SwerveFieldCentricFacingAngle = m_SwerveFieldCentricFacingAngle.withSteerRequestType(SteerRequestType.Position);
         this.m_SwerveRequestRobot = new SwerveRequest.RobotCentric();
         this.m_SwerveRequestSpeeds = new SwerveRequest.ApplyRobotSpeeds();
 
@@ -336,25 +336,13 @@ public class Drivetrain extends CommandSwerveDrivetrain
 
     private void ConfigurePIDControllers()
     {
-        this.m_PackLog.Log("Beginning configuration.");
-        this.m_XController = new PIDController(15, 0.0,0.025); // 20 0.1 0.025
-        this.m_XController.setTolerance(0.01, 0.025);
-        this.m_XController.setIntegratorRange(-TunerConstants.MaxSpeed * 0.1,TunerConstants.MaxSpeed * 0.1);
-        this.m_XController.setIZone(0.01);
+        this.m_XController = new PIDController(10, 0.0,0); // 20 0.1 0.025
+        this.m_XController.setTolerance(Meters.convertFrom(0.5, Inches), MetersPerSecond.convertFrom(0.5, InchesPerSecond));
         SmartDashboard.putData(this.m_XController);
 
-        this.m_YController = new PIDController (15, 0.0 ,0.025);
-        this.m_YController.setTolerance(0.01, 0.025);
-        this.m_YController.setIntegratorRange(-TunerConstants.MaxSpeed * 0.1,TunerConstants.MaxSpeed * 0.1);
-        this.m_YController.setIZone(0.01);
+        this.m_YController = new PIDController (10, 0.0 ,0);
+        this.m_YController.setTolerance(Meters.convertFrom(0.5, Inches), MetersPerSecond.convertFrom(0.5, InchesPerSecond));
         SmartDashboard.putData(this.m_YController);
-
-        this.m_RotationController = new PIDController (0.3, 0.0 ,0); // 0.25 
-        this.m_RotationController.setTolerance(1, 1);
-        this.m_RotationController.setIntegratorRange(-TunerConstants.MaxAngularRate * 0.1,TunerConstants.MaxAngularRate * 0.1);
-        this.m_RotationController.setIZone(10);
-        this.m_RotationController.enableContinuousInput(-180, 180);
-        SmartDashboard.putData(this.m_RotationController);
     }
 
     private void ConfigureAutobuilder()
@@ -369,6 +357,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
         e.printStackTrace();
         return;
         }
+        // Ks 0.15033 Kv 0.92447 Ka 0.076706 P 26.116 I D 1.5506
 
         AutoBuilder.configure(
                 () -> this.getState().Pose, // Robot pose supplier
@@ -377,7 +366,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
                 (speeds, feedforwards) -> this.setControl(m_SwerveRequestSpeeds.withSpeeds(speeds).withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesX()).withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesY())), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
                 new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
                         new PIDConstants(15, 0.0, 0.0), // Translation PID constants
-                        new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+                        new PIDConstants(1.0474, 0.0, 0.0) // Rotation PID constants  // 5.0 0.0 0.0
                 ),
                 config,
                 () -> {

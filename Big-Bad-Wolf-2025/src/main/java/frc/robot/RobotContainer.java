@@ -9,7 +9,10 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.path.PathPlannerPath;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -17,11 +20,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.constants.Global;
 import frc.robot.constants.PathConstants;
 import frc.robot.constants.ClimbConstants;
+import frc.robot.constants.DrivetrainConstants;
 import frc.robot.constants.ElevatorConstants.LEVELS;
 import frc.robot.constants.Global.BUILD_TYPE;
 import frc.robot.generated.TunerConstants;
@@ -56,7 +61,7 @@ public class RobotContainer
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
           .withDeadband(TunerConstants.MaxSpeed * 0.05).withRotationalDeadband(TunerConstants.MaxAngularRate * 0.05) // Add a 10% deadband
           .withDeadband(TunerConstants.MaxSpeed * 0.05).withRotationalDeadband(TunerConstants.MaxAngularRate * 0.05) // Add a 10% deadband
-          .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+          .withDriveRequestType(DriveRequestType.Velocity); // Use open-loop control for drive motors
 
   private CoralCommandBuilder commandBuilder;
   private AlgaeCommandBuilder algaeCommandBuilder;
@@ -166,7 +171,7 @@ public class RobotContainer
 
     shooterAlgae.setDefaultCommand(shooterAlgae.HoldAlgae());
 
-    m_DriverController.rightTrigger().whileTrue(new ParallelCommandGroup(drivetrain.AlignCoralNoEnd(), shooter.MoveToSelectedShot(), elevator.MoveToSelectorLevel()))
+    m_DriverController.rightTrigger().whileTrue(new ParallelCommandGroup(drivetrain.AlignCoral(), shooter.MoveToSelectedShot(), elevator.MoveToSelectorLevel()))
                                      .onFalse(shooter.StowShooter().andThen(elevator.MoveToLevel(LEVELS.HOME)));
 
     m_DriverController.leftTrigger().whileTrue(new ParallelDeadlineGroup(shooterCoral.IntakeCoralRoutine(),
@@ -177,6 +182,19 @@ public class RobotContainer
     m_DriverController.a().whileTrue(shooterCoral.DeployCoralRoutine())
                           .onFalse(shooterCoral.StopCoral());
 
+
+    Pose2d three_left_start = new Pose2d(14.277, 5.853, Rotation2d.fromDegrees(-120));
+    try
+    {
+      PathPlannerPath threeLeftAlign = PathPlannerPath.fromPathFile("THREE-LEFT-ALIGN");
+      Command deploymentBum = new ParallelCommandGroup(elevator.MoveToLevel(LEVELS.FOUR), shooter.MoveToDeployHigh(), AutoBuilder.followPath(threeLeftAlign));
+      m_DriverController.y().onTrue(new SequentialCommandGroup(drivetrain.PathfindToPose(three_left_start), deploymentBum, shooterCoral.DeployCoralRoutine()));
+    }
+    catch(Exception e)
+    {
+      m_PackLog.Log("Three Left Align failed to load.");
+    }
+    
     m_CoDriverController.leftBumper().onTrue(dataStuff.Left().ignoringDisable(true));
     m_CoDriverController.rightBumper().onTrue(dataStuff.Right().ignoringDisable(true));
     m_CoDriverController.povUp().onTrue(dataStuff.Up().ignoringDisable(true));

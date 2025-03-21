@@ -20,7 +20,7 @@ public class ShooterConstants
 
     // CORAL MOTOR VOLTAGE
     public static final double CORAL_INTAKE_VOLTAGE = 2.75; // 2
-    public static final double CORAL_DEPLOYMENT_VOLTAGE = 7.25; // 6
+    public static final double CORAL_DEPLOYMENT_VOLTAGE = 8; // 6
     public static final double CORAL_DEPLOYMENT_VOLTAGE_HIGH = 7; // 6
     
     // ALGAE MOTOR VOLTAGES   
@@ -34,8 +34,8 @@ public class ShooterConstants
     public static final double ALGAE_HOLDING_VOLTAGE = 1;
 
     public static final double WRIST_STOW_POSITION = -1.46; // -0.58
-    public static final double WRIST_CORAL_DEPLOYMENT_POSITION_LOW = -3.5; // -0.58
-    public static final double WRIST_CORAL_DEPLOYMENT_POSITION = -1.00; // -1.23
+    public static final double WRIST_CORAL_DEPLOYMENT_POSITION_LOW = -2.5; // -3.5
+    public static final double WRIST_CORAL_DEPLOYMENT_POSITION = -0.5; // -1.23 // -1.0
     public static final double WRIST_CORAL_INTAKE_POSITION = -0.4; // -0.62
     public static final double WRIST_ALGAE_INTAKE_POSITION = -11.0;
     public static final double WRIST_ALGAE_PROCESSOR_DEPLOYMENT_POSITION = -11; // -0.38

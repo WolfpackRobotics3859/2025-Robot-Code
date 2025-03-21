@@ -13,6 +13,12 @@
         {
           "type": "named",
           "data": {
+            "name": "CoralFourDeploy"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "Align1R"
           }
         },

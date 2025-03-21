@@ -19,7 +19,7 @@ public class DrivetrainConstants
     {
         new Pose2d(11.6775, 4.1806, Rotation2d.fromDegrees(3.62)), // 1
         new Pose2d(12.515, 5.298, Rotation2d.fromDegrees(-57.031)), // 2
-        new Pose2d(13.9055, 5.1241, Rotation2d.fromDegrees(-117.15)), // 3
+        new Pose2d(13.9055, 5.1241, Rotation2d.fromDegrees(-117.15)),
         new Pose2d(14.438, 3.8534, Rotation2d.fromDegrees(-177.109)), // 4
         new Pose2d(13.6126, 2.7547, Rotation2d.fromDegrees(123.3357)), // 5
         new Pose2d(12.2162, 2.9196, Rotation2d.fromDegrees(62.457))  // 6 
@@ -29,7 +29,7 @@ public class DrivetrainConstants
     {
         new Pose2d(11.6852, 3.8255, Rotation2d.fromDegrees(7.061)), // 1
         new Pose2d(12.202, 5.1099, Rotation2d.fromDegrees(-52.049)), // 2
-        new Pose2d(13.573, 5.3125, Rotation2d.fromDegrees(-113.04)), // 3
+        new Pose2d(13.58, 5.32, Rotation2d.fromDegrees(-120)), // 3
         new Pose2d(14.4367, 4.2321, Rotation2d.fromDegrees(-172.337)), // 4
         new Pose2d(13.9304, 2.9429, Rotation2d.fromDegrees(127.817)), // 5
         new Pose2d(12.5739, 2.71538, Rotation2d.fromDegrees(68.597))  // 6 

@@ -1,5 +1,7 @@
 package frc.robot.utilities;
 
+import java.util.FormatterClosedException;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -26,6 +28,28 @@ public class DataStuff extends SubsystemBase
     public DataStuff()
     {
         UpdateEverything();
+    }
+
+    /**
+     * This value is 0 indexed for now where level one is represented by integer 0.
+     * @param level
+     */
+    public static void SetSelectedLevel(int level)
+    {
+        currentLevel = level;
+        UpdateLevelSmartDashboard();
+    }
+
+    public static void SetSelectedFace(int face)
+    {
+        currentFace = face;
+        UpdateFaceSmartdashboard();
+    }
+
+    public static void SetSelectedSide(int side)
+    {
+        currentSide = side;
+        UpdateSideSmartDashboard();
     }
 
     public Command Down()

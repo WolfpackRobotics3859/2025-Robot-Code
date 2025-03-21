@@ -3,41 +3,36 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.564,
-        "y": 6.5
+        "x": 1.365,
+        "y": 7.38875
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.839560637003267,
-        "y": 6.231697997897216
+        "x": 2.4332690686183502,
+        "y": 5.570184509965392
       },
       "isLocked": false,
-      "linkedName": "COMMON_LEFT_START"
+      "linkedName": "LINT"
     },
     {
       "anchor": {
-        "x": 3.955942622950819,
-        "y": 5.25373975409836
+        "x": 3.0420000000000003,
+        "y": 3.8592499999999994
       },
       "prevControl": {
-        "x": 4.567315573770491,
-        "y": 6.428534836065573
+        "x": 1.9294114795910446,
+        "y": 5.837979992854727
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "5L"
+      "linkedName": "4R"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.8480607756897222,
-      "rotationDegrees": -100.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.7962962962963034,
+      "minWaypointRelativePos": 0.8773381294964044,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
         "maxVelocity": 1.0,
@@ -50,7 +45,14 @@
     }
   ],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "CoralFourDeploy",
+      "waypointRelativePos": 0.9291366906474844,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 4.0,
     "maxAcceleration": 3.0,
@@ -61,13 +63,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -59.99999999999999
+    "rotation": 0.0
   },
   "reversed": false,
-  "folder": "COMMON LEFT START",
+  "folder": "LINT TO X",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -135.0
+    "rotation": -53.56914187983765
   },
   "useDefaultConstraints": true
 }

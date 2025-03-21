@@ -23,8 +23,8 @@ public class ElevatorConstants
     public static final double ELEVATOR_ZERO_POSITION = 0;
     public static final double ELEVATOR_HOME_POSITION = 30;
     public static final double ELEVATOR_LEVEL_ONE = 15;
-    public static final double ELEVATOR_LEVEL_TWO = 46.0;  // 50
-    public static final double ELEVATOR_LEVEL_THREE = 76.0; // 78  
+    public static final double ELEVATOR_LEVEL_TWO = 37;  // 50 // 47.5
+    public static final double ELEVATOR_LEVEL_THREE = 68; // 78  // 76
     public static final double ELEVATOR_LEVEL_FOUR = 105.0;
     public static final double CORAL_INTAKING_LEVEL = 2;
     public static final double ALGAE_PROCESSING_POSITION = 5;
@@ -39,7 +39,6 @@ public class ElevatorConstants
 
     public static final double ELEVATOR_UP_VOLTAGE = 3;
     public static final double ELEVATOR_DOWN_VOLTAGE = -1.5;
- 
     public static final double HOMING_VOLTAGE = -0.5;
 
     public enum LEVELS 
@@ -68,8 +67,6 @@ public class ElevatorConstants
         }
     }
 
-    // TalonFX Configs
-
     // LEFT MOTOR CONFIGS
     public static final MotorOutputConfigs LEFT_MOTOR_OUTPUT_CONFIG = new MotorOutputConfigs()
                                                                           .withInverted(InvertedValue.Clockwise_Positive)
@@ -81,10 +78,10 @@ public class ElevatorConstants
                                                                                              .withContinuousWrap(false);
 
     public static final CurrentLimitsConfigs LEFT_MOTOR_CURRENT_LIMIT_CONFIG = new CurrentLimitsConfigs()
-                                                                                    .withStatorCurrentLimit(120)
+                                                                                    .withStatorCurrentLimit(60)
                                                                                     .withStatorCurrentLimitEnable(true)
-                                                                                    .withSupplyCurrentLimit(40)
-                                                                                    .withSupplyCurrentLimitEnable(false)
+                                                                                    .withSupplyCurrentLimit(20)
+                                                                                    .withSupplyCurrentLimitEnable(true)
                                                                                     .withSupplyCurrentLowerLimit(30)
                                                                                     .withSupplyCurrentLowerTime(1);
 
