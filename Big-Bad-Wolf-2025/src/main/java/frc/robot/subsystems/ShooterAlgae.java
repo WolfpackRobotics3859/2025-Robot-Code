@@ -30,11 +30,9 @@ public class ShooterAlgae extends SubsystemBase
     public Command CleanAlgaeRoutine()
     {
         return new FunctionalCommand(() -> SetAlgaeVoltage(ShooterConstants.ALGAE_SWEEPING_VOLTAGE),
-                                    //  () -> UpdateMotorCurrent(),
-                                    () -> {}, 
-                                     interrupted -> this.SetAlgaeVoltage(ShooterConstants.ALGAE_HOLDING_VOLTAGE),
-                                    //  () -> this.ExternalResistance(),   
-                                     ()-> false,
+                                    () -> {}, //  () -> UpdateMotorCurrent(),
+                                     interrupted -> this.SetAlgaeVoltage(ShooterConstants.ALGAE_HOLDING_VOLTAGE),   
+                                     ()-> false, //  () -> this.ExternalResistance(),
                                      this);
     }
 

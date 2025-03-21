@@ -88,6 +88,26 @@ public class Elevator extends SubsystemBase
     );
   }
 
+  public Command MoveToSelectorAlgaeLevel(ALGAE_MODE mode)
+  {
+    return new FunctionalCommand(
+      () -> {
+              if (mode == ALGAE_MODE.DEPLOY)
+              {
+                this.ApplyPosition((DataStuff.GetCurrentLevel() < 2) ? LEVELS.ALGAE_PROCESS.getValue() : LEVELS.ALGAE_BARGE.getValue());
+              }
+              else
+              {
+                this.ApplyPosition(((DataStuff.GetCurrentFace() % 2) == 0) ? LEVELS.LOW_ALGAE.getValue() : LEVELS.HIGH_ALGAE.getValue());
+              }
+            },
+      () -> {},
+      interrupted -> {},
+      () -> this.isReady(ElevatorConstants.POSITION_ERROR_TOLERANCE, ElevatorConstants.POSITION_DERIVATIVE_TOLERANCE),
+      this
+    );
+  }
+
   public Command MoveToLevel(LEVELS level)
   {
     return new FunctionalCommand(
@@ -202,6 +222,17 @@ public class Elevator extends SubsystemBase
     DataLogManager.log("elevator ready.");
 
     return true;
+  }
+
+  public double getElevatorPosition()
+  {
+    return this.m_ElevatorMotor.getPosition().getValueAsDouble();
+  }
+
+  public enum ALGAE_MODE
+  {
+    CLEAN,
+    DEPLOY;
   }
 
   private void BuildToolbox()

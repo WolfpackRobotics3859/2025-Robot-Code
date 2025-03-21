@@ -23,19 +23,19 @@ import frc.robot.utilities.DataStuff;
 public class ElevatorConstants 
 {
     public static final double ELEVATOR_ZERO_POSITION = 0;
-    public static final double ELEVATOR_HOME_POSITION = 30;
-    public static final double ELEVATOR_LEVEL_ONE = 15;
-    public static final double ELEVATOR_LEVEL_TWO = 46.76;  // 50 // 46
-    public static final double ELEVATOR_LEVEL_THREE = 76.0; // 78  
-    public static final double ELEVATOR_LEVEL_FOUR = 105.0;
-    public static final double CORAL_INTAKING_LEVEL = 2;
-    public static final double ALGAE_PROCESSING_POSITION = 5;
-    public static final double ALGAE_BARGE_POSITION = 105;
-    public static final double LOW_CLEAN = 22.43;
-    public static final double HIGH_CLEAN = 54.79;
+    public static final double ELEVATOR_HOME_POSITION = 17.29;
+    public static final double ELEVATOR_LEVEL_ONE = 8.643;
+    public static final double ELEVATOR_LEVEL_TWO = 26.943;  // 50 // 46
+    public static final double ELEVATOR_LEVEL_THREE = 43.79; // 78  
+    public static final double ELEVATOR_LEVEL_FOUR = 60.5; 
+    public static final double CORAL_INTAKING_LEVEL = 1.1524;
+    public static final double ALGAE_PROCESSING_POSITION = 0.576;
+    public static final double ALGAE_BARGE_POSITION = 59.0;
+    public static final double LOW_CLEAN = 15;
+    public static final double HIGH_CLEAN = 37.05;
 
     // Maximum allowable magnitude deviation from setpoint when determining the end of the movement command.
-    public static final double POSITION_ERROR_TOLERANCE = 1;
+    public static final double POSITION_ERROR_TOLERANCE = 0.57;
     public static final double POSITION_DERIVATIVE_TOLERANCE = 0.05;
 
     // Max Height should be around 100-105
@@ -56,7 +56,6 @@ public class ElevatorConstants
         CORAL_INTAKE(CORAL_INTAKING_LEVEL),
         LOW_ALGAE(LOW_CLEAN),
         HIGH_ALGAE(HIGH_CLEAN),
-        // ALGAE_CLEAN(((DataStuff.GetCurrentFace() % 2) == 0) ? (HIGH_CLEAN) : (LOW_CLEAN)),
         ALGAE_PROCESS(ALGAE_PROCESSING_POSITION),
         ALGAE_BARGE(ALGAE_BARGE_POSITION);
         private double levelValue;
@@ -98,14 +97,14 @@ public class ElevatorConstants
                                                                     .withKD(0)
                                                                     .withKG(0.2532)
                                                                     .withKI(0)
-                                                                    .withKP(15)
+                                                                    .withKP(10)
                                                                     .withKS(0.10171)
                                                                     .withKV(0.11636)
                                                                     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
 
     public static final MotionMagicConfigs LEFT_MOTOR_MOTION_MAGIC_CONFIG = new MotionMagicConfigs()
-                                                                                .withMotionMagicAcceleration(175)
-                                                                                .withMotionMagicCruiseVelocity(800)
+                                                                                .withMotionMagicAcceleration(125) // 175
+                                                                                .withMotionMagicCruiseVelocity(700) // 800
                                                                                 .withMotionMagicExpo_kA(0.014085)
                                                                                 .withMotionMagicExpo_kV(0.11636)
                                                                                 .withMotionMagicJerk(0);

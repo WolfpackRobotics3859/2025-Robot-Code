@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.constants.Global;
@@ -32,6 +31,7 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.ShooterAlgae;
 import frc.robot.subsystems.ShooterCoral;
+import frc.robot.subsystems.Elevator.ALGAE_MODE;
 import frc.robot.utilities.AlgaeCommandBuilder;
 import frc.robot.utilities.CoralCommandBuilder;
 import frc.robot.utilities.DataStuff;
@@ -216,7 +216,7 @@ public class RobotContainer
     NamedCommands.registerCommand("ElevatorHome", elevator.MoveToLevel(LEVELS.HOME));
     NamedCommands.registerCommand("CoralTwoDeploy", new ParallelCommandGroup(elevator.MoveToLevel(LEVELS.TWO), shooter.MoveToDeployLow()));
     NamedCommands.registerCommand("CoralThreeDeploy", new ParallelCommandGroup(elevator.MoveToLevel(LEVELS.THREE), shooter.MoveToDeployLow()));
-    NamedCommands.registerCommand("CoralFourDeploy", new ParallelCommandGroup(elevator.MoveToLevel(LEVELS.FOUR), shooter.MoveToDeployHigh()));
+    NamedCommands.registerCommand("CoralFourDeploy", new ParallelCommandGroup(elevator.MoveToLevel(LEVELS.FOUR), shooter.MoveToBarge()));
     NamedCommands.registerCommand("DeployCoral", shooterCoral.DeployCoralRoutine());
 
     NamedCommands.registerCommand("Align1L", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(0, 1)));
@@ -420,7 +420,7 @@ public class RobotContainer
 
     m_DriverController.a().onTrue(shooter.StowShooter());
     m_DriverController.b().onTrue(shooter.MoveToProcess());
-    m_DriverController.y().onTrue(shooter.MoveToDeployHigh());
+    m_DriverController.y().onTrue(shooter.MoveToBarge());
     m_DriverController.x().onTrue(shooter.MoveToDeployLow()); 
 
     System.out.println("[Wolfpack] Shooter Debug bindings successfully configured.");
@@ -462,7 +462,7 @@ public class RobotContainer
     m_DriverController.b().onTrue(new ParallelCommandGroup(shooter.MoveToDeployLow(), elevator.MoveToLevel(LEVELS.THREE)))
                           .onFalse(new ParallelCommandGroup(shooter.StowShooter(), elevator.MoveToLevel(LEVELS.HOME)));
     
-    m_DriverController.y().onTrue(new ParallelCommandGroup(shooter.MoveToDeployHigh(), elevator.MoveToLevel(LEVELS.FOUR)))
+    m_DriverController.y().onTrue(new ParallelCommandGroup(shooter.MoveToBarge(), elevator.MoveToLevel(LEVELS.FOUR)))
                           .onFalse(new ParallelCommandGroup(shooter.StowShooter(), elevator.MoveToLevel(LEVELS.HOME)));
 
     m_DriverController.rightBumper().onTrue(shooterCoral.DeployCoralRoutine()).onFalse(shooterCoral.StopCoral());
@@ -506,16 +506,28 @@ public class RobotContainer
                                                                          shooter.MoveToIntake()))
                                     .onFalse(shooter.StowShooter().andThen(elevator.MoveToLevel(LEVELS.HOME)));
 
-    m_DriverController.leftBumper().whileTrue(new ParallelCommandGroup(drivetrain.AlignCenterNoEnd(), shooterAlgae.CleanAlgaeRoutine(), elevator.MoveToLevel(LEVELS.LOW_ALGAE), shooter.MoveToAlgaeClean()))
-                          .onFalse(shooter.StowShooter().andThen(elevator.MoveToLevel(LEVELS.HOME)));
+    // m_DriverController.leftBumper().whileTrue(new ParallelCommandGroup(drivetrain.AlignCenterNoEnd(), shooterAlgae.CleanAlgaeRoutine(), elevator.MoveToLevel(LEVELS.LOW_ALGAE), shooter.MoveToAlgaeClean()))
+    //                       .onFalse(shooter.StowShooter().andThen(elevator.MoveToLevel(LEVELS.HOME)));
 
-    m_DriverController.rightBumper().whileTrue(new ParallelCommandGroup(drivetrain.AlignCenterNoEnd(), shooterAlgae.CleanAlgaeRoutine(), elevator.MoveToLevel(LEVELS.HIGH_ALGAE), shooter.MoveToAlgaeClean()))
-                          .onFalse(shooter.StowShooter().andThen(elevator.MoveToLevel(LEVELS.HOME)));
+    // m_DriverController.rightBumper().whileTrue(new ParallelCommandGroup(drivetrain.AlignCenterNoEnd(), shooterAlgae.CleanAlgaeRoutine(), elevator.MoveToLevel(LEVELS.HIGH_ALGAE), shooter.MoveToAlgaeClean()))
+    //                       .onFalse(shooter.StowShooter().andThen(elevator.MoveToLevel(LEVELS.HOME)));
+
+    m_DriverController.rightBumper().whileTrue(drivetrain.AlignCenterNoEnd());
+                                    
+     m_DriverController.leftBumper().whileTrue(new ParallelCommandGroup(shooterAlgae.CleanAlgaeRoutine(), elevator.MoveToSelectorAlgaeLevel(ALGAE_MODE.CLEAN), shooter.MoveToAlgaeClean()))
+                                    .onFalse(shooter.MoveToAlgaeHold().andThen(elevator.MoveToLevel(LEVELS.HOME)));
+
+     m_DriverController.povUp().whileTrue(new ParallelCommandGroup(elevator.MoveToLevel(LEVELS.ALGAE_BARGE), shooter.MoveToBarge()))
+                                    .onFalse(shooter.StowShooter().andThen(elevator.MoveToLevel(LEVELS.HOME)));
+
+     m_DriverController.povDown().whileTrue(new ParallelCommandGroup(elevator.MoveToLevel(LEVELS.ALGAE_PROCESS), shooter.MoveToProcess()))
+                                    .onFalse(shooter.StowShooter().andThen(elevator.MoveToLevel(LEVELS.HOME)));
+
 
     m_DriverController.a().whileTrue(shooterCoral.DeployCoralRoutine())
                           .onFalse(shooterCoral.StopCoral());
 
-    m_DriverController.y().whileTrue(shooterAlgae.DeployAlgaeRoutine());
+    m_DriverController.x().whileTrue(shooterAlgae.DeployAlgaeRoutine());
 
     m_CoDriverController.leftBumper().onTrue(dataStuff.Left().ignoringDisable(true));
     m_CoDriverController.rightBumper().onTrue(dataStuff.Right().ignoringDisable(true));

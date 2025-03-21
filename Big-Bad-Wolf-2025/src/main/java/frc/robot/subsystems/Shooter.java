@@ -15,6 +15,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -72,14 +74,31 @@ public class Shooter extends SubsystemBase
     });
   }
 
+  public Command MoveToSelectorAlgaeDeploy()
+  {
+    return this.runOnce(() -> 
+    {
+      double level = DataStuff.GetCurrentLevel();
+      if(level < 2)
+      {
+        this.ApplyPosition(ShooterConstants.WRIST_ALGAE_PROCESSOR_DEPLOYMENT_POSITION);
+      }
+      else
+      {
+        this.ApplyPosition(ShooterConstants.WRIST_ALGAE_SHOOTING_POSITION);
+      }
+    });
+  }
+
+
   public Command StowShooter()
   {
     return this.runOnce(() -> ApplyPosition(ShooterConstants.WRIST_STOW_POSITION));
   }
 
-  public Command MoveToDeployHigh()
+  public Command MoveToBarge()
   {
-    return MoveToCommandBuilder(ShooterConstants.WRIST_CORAL_DEPLOYMENT_POSITION);
+    return MoveToCommandBuilder(ShooterConstants.WRIST_ALGAE_SHOOTING_POSITION);
   }
 
   public Command MoveToDeployLow()

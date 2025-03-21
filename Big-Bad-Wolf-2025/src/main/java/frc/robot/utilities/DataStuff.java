@@ -57,6 +57,15 @@ public class DataStuff extends SubsystemBase
         return currentSide;
     }
 
+     /**
+     * LEVELS
+     * @return 0 indexed
+     */
+    public static int GetCurrentLevel()
+    {
+        return currentLevel;
+    }
+
     /**
      * FACES
      * @return 0 indexed

@@ -9,7 +9,7 @@ public class DrivetrainConstants
     {
         new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0)), // 1
         new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0)), // 2
-        new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0)), // 3
+        new Pose2d(13.74, 5.24, Rotation2d.fromDegrees(-113.45)), // 3
         new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0)), // 4
         new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0)), // 5
         new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0))  // 6 
