@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -15,44 +17,51 @@ public class ShooterAlgae extends SubsystemBase
     // double motorCurrent;
     // double stallCurrentThreshold;
 
+    private TalonFX m_AlgaeMotor;
     private VoltageOut m_VoltageRequest;
+    private MotionMagicVoltage m_PositionRequest;
+
+    private double holdPosition;
+    private boolean applyHoldingPosition;
 
     public ShooterAlgae()
     {
         MotorManager.AddMotor("SHOOTER ALGAE MOTOR", Hardware.SHOOTER_ALGAE_MOTOR);
         MotorManager.ApplyConfigs(ShooterConstants.SHOOTER_ALGAE_MOTOR_CONFIG, Hardware.SHOOTER_ALGAE_MOTOR);
+        m_AlgaeMotor = MotorManager.GetMotor(Hardware.SHOOTER_ALGAE_MOTOR);
         m_VoltageRequest = new VoltageOut(0);
 
         // stallCurrentThreshold = 15; //Placeholder value
         // UpdateMotorCurrent();
     }
 
+    private double updateHoldingposition()
+    {
+        return m_AlgaeMotor.getPosition().getValueAsDouble();
+    }
+
     public Command CleanAlgaeRoutine()
     {
-        return new FunctionalCommand(() -> SetAlgaeVoltage(ShooterConstants.ALGAE_SWEEPING_VOLTAGE),
-                                    () -> {}, //  () -> UpdateMotorCurrent(),
-                                     interrupted -> this.SetAlgaeVoltage(ShooterConstants.ALGAE_HOLDING_VOLTAGE),   
+        return new FunctionalCommand(() -> this.SetAlgaeVoltage(ShooterConstants.ALGAE_SWEEPING_VOLTAGE),
+                                     () -> holdPosition = this.updateHoldingposition(),
+                                     interrupted -> this.applyHoldingPosition = true,   
                                      ()-> false, //  () -> this.ExternalResistance(),
                                      this);
     }
 
     public Command DeployAlgaeRoutine()
     {
-        return new FunctionalCommand(() -> SetAlgaeVoltage(ShooterConstants.ALGAE_BARGE_SHOOTING_VOLTAGE),
-                                    () -> {}, 
+        return new FunctionalCommand(() -> 
+                                     {
+                                        this.applyHoldingPosition = false;
+                                        this.SetAlgaeVoltage(ShooterConstants.ALGAE_BARGE_SHOOTING_VOLTAGE);
+                                     },
+                                     () -> {}, 
                                      interrupted -> this.SetAlgaeVoltage(0),
                                      ()-> false,
                                      this);
     }
 
-    // public Command ProcessAlgaeRoutine()
-    // {
-    //     return new FunctionalCommand(() -> this.DeployAlgae(), 
-    //                                  () -> {}, 
-    //                                  interrupted -> this.StopAlgae(), 
-    //                                  () -> false, 
-    //                                  this);
-    // }
 
     // public double UpdateMotorCurrent()
     // {
@@ -71,15 +80,16 @@ public class ShooterAlgae extends SubsystemBase
         return this.runOnce(() -> this.SetAlgaeVoltage(ShooterConstants.ALGAE_SWEEPING_VOLTAGE));
     }
 
+    public Command StopAlgae()
+    {
+        return this.runOnce(() -> this.SetAlgaeVoltage(0));
+    }
+
     public Command HoldAlgae()
     {
         return this.runOnce(() -> this.SetAlgaeVoltage(ShooterConstants.ALGAE_HOLDING_VOLTAGE));
     }
 
-    public Command StopAlgae()
-    {
-        return this.runOnce(() -> this.SetAlgaeVoltage(0));
-    }
 
     public Command DeployAlgae()
     {
@@ -91,9 +101,15 @@ public class ShooterAlgae extends SubsystemBase
         MotorManager.ApplyControlRequest(m_VoltageRequest.withOutput(voltage), Hardware.SHOOTER_ALGAE_MOTOR);
     }
 
+    private void SetAlgaePosition(double position)
+    {
+        MotorManager.ApplyControlRequest(m_PositionRequest.withPosition(position), Hardware.SHOOTER_ALGAE_MOTOR);
+    }
+
     @Override
     public void periodic() 
     {
         // updateMotorCurrent();
+        if (applyHoldingPosition) SetAlgaePosition(holdPosition);
     }
 }
