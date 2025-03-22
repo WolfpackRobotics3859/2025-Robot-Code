@@ -1,0 +1,94 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "RCOMM to 2R"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CoralFourDeploy"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Align2R"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "DeployCoral"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "2R to RINT"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "StartIntake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "RINT to 3R"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CoralFourDeploy"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Align3R"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "DeployCoral"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Sam's Funky Autos",
+  "choreoAuto": false
+}

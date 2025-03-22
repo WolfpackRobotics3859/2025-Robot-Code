@@ -223,6 +223,9 @@ public class RobotContainer
     NamedCommands.registerCommand("ShooterLowPosition", new ParallelCommandGroup(shooter.MoveToDeployLow(), elevator.MoveToLevel(LEVELS.ZERO)));
 
     NamedCommands.registerCommand("StartIntake", new ParallelDeadlineGroup(shooterCoral.IntakeCoralRoutine(), elevator.MoveToLevel(LEVELS.CORAL_INTAKE), shooter.MoveToIntake()));
+
+    NamedCommands.registerCommand("BeginAlgaeClean", null); // Algae cleaning prep
+    NamedCommands.registerCommand("AlgaeCleanRoutine", null); // Algae cleaning
     
     try 
     {
