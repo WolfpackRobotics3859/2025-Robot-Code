@@ -37,12 +37,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import frc.robot.constants.CameraConstants;
 import frc.robot.constants.DrivetrainConstants;
+import frc.robot.constants.ElevatorConstants;
+import frc.robot.constants.ElevatorConstants.LEVELS;
 import frc.robot.generated.TunerConstants;
 import frc.robot.utilities.CameraManager;
 import frc.robot.utilities.DataStuff;
 import frc.robot.utilities.PackLog;
+import frc.robot.utilities.SubsystemManager;
+import frc.robot.utilities.subsystemManager.SubsystemAddedEvent;
+import frc.robot.utilities.subsystemManager.SubsystemAddedListener;
 
-public class Drivetrain extends CommandSwerveDrivetrain
+public class Drivetrain extends CommandSwerveDrivetrain implements SubsystemAddedListener
 {
     private PackLog m_PackLog;
 
@@ -59,6 +64,9 @@ public class Drivetrain extends CommandSwerveDrivetrain
     private double m_DefaultDriveMaxSpeed;
     private double m_DefaultDriveMaxAngularRate;
 
+    private SubsystemManager m_SubsystemManager;
+    private Elevator m_Elevator;
+
     private final SwerveRequest.FieldCentric m_OperatorDriveRequest = new SwerveRequest.FieldCentric()
         .withDeadband(TunerConstants.MaxSpeed * 0.05).withRotationalDeadband(TunerConstants.MaxAngularRate * 0.05) // Add a 10% deadband
         .withDeadband(TunerConstants.MaxSpeed * 0.05).withRotationalDeadband(TunerConstants.MaxAngularRate * 0.05) // Add a 10% deadband
@@ -73,7 +81,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
 
     StructPublisher<Pose2d> publisher = NetworkTableInstance.getDefault().getStructTopic("Robot Pose", Pose2d.struct).publish();
 
-    public Drivetrain(SwerveDrivetrainConstants constants, SwerveModuleConstants<?, ?, ?>... modules)
+    public Drivetrain(SubsystemManager manager, SwerveDrivetrainConstants constants, SwerveModuleConstants<?, ?, ?>... modules)
     {
         super(constants, modules);    
         this.ConfigureDrivetrain();
@@ -250,7 +258,6 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                      () -> IsAlignmentComplete(), 
                                      this);
     }
-
     public Command AlignCenterNoEnd()
     {
         return new FunctionalCommand(() -> 
