@@ -31,11 +31,6 @@ public class ShooterAlgae extends SubsystemBase
         MotorManager.ApplyConfigs(ShooterConstants.SHOOTER_ALGAE_MOTOR_CONFIG, Hardware.SHOOTER_ALGAE_MOTOR);
         m_AlgaeMotor = MotorManager.GetMotor(Hardware.SHOOTER_ALGAE_MOTOR);
         m_VoltageRequest = new VoltageOut(0);
-        // holdPosition = 5;
-
-
-        // stallCurrentThreshold = 15; //Placeholder value
-        // UpdateMotorCurrent();
     }
 
     private double updateHoldingposition()
@@ -47,8 +42,8 @@ public class ShooterAlgae extends SubsystemBase
     {
         return new FunctionalCommand(() -> this.SetAlgaeVoltage(ShooterConstants.ALGAE_SWEEPING_VOLTAGE),
                                      () -> holdPosition = this.updateHoldingposition(),
-                                     interrupted -> SetAlgaeVoltage(ShooterConstants.ALGAE_HOLDING_VOLTAGE),//this.SetAlgaePosition(holdPosition),//this.applyHoldingPosition = true,   
-                                     ()-> false, //  () -> this.ExternalResistance(),
+                                     interrupted -> SetAlgaeVoltage(ShooterConstants.ALGAE_HOLDING_VOLTAGE),   
+                                     ()-> false, 
                                      this);
     }
 
@@ -64,19 +59,6 @@ public class ShooterAlgae extends SubsystemBase
                                      ()-> false,
                                      this);
     }
-
-
-    // public double UpdateMotorCurrent()
-    // {
-    //     return motorCurrent = MotorManager.GetMotor(Hardware.SHOOTER_ALGAE_MOTOR)
-    //                                       .getSupplyCurrent()
-    //                                       .getValueAsDouble();
-    // }
-
-    // public boolean ExternalResistance()
-    // {
-    //     return motorCurrent >= stallCurrentThreshold;
-    // }
 
     public Command BeginCleanAlgae()
     {
@@ -94,7 +76,7 @@ public class ShooterAlgae extends SubsystemBase
     }
 
 
-    public Command DeployAlgae()
+    public Command ProcessAlgae()
     {
         return this.runOnce(() -> this.SetAlgaeVoltage(ShooterConstants.ALGAE_PROCESSOR_DEPLOYMENT_VOLTAGE));
     }
@@ -113,8 +95,6 @@ public class ShooterAlgae extends SubsystemBase
     @Override
     public void periodic() 
     {
-        // updateMotorCurrent();
-        // if (applyHoldingPosition) SetAlgaePosition(holdPosition);
         SmartDashboard.putNumber("Roller Position lol", MotorManager.GetMotor(Hardware.SHOOTER_ALGAE_MOTOR).getPosition().getValueAsDouble());
     }
 }

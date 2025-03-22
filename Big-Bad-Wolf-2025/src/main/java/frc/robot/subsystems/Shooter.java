@@ -201,23 +201,6 @@ public class Shooter extends SubsystemBase
     return this;
   }
 
-  private boolean isInPosition(double tolerance)
-  {
-    return Math.abs(this.m_ShooterWristMotor.getPosition().getValueAsDouble() - this.m_WristPositionRequest.Position) < tolerance;
-  }
-
-  private boolean isReady(double positionTolerance, double derivativeTolerance)
-  {
-    StatusSignal.refreshAll(this.m_WristRPS, this.m_WristPosition);
-    if((Math.abs(this.m_WristPosition.getValueAsDouble()) > derivativeTolerance) || (Math.abs(this.m_WristPosition.getValueAsDouble() - this.m_WristPositionRequest.Position) > positionTolerance))
-    {
-      return false;
-    }
-    DataLogManager.log("shooter ready.");
-
-    return true;
-  }
-
   @Override
   public void periodic() 
   {
