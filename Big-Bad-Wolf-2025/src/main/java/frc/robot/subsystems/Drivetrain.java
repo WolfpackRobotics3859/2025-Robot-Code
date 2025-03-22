@@ -78,11 +78,26 @@ public class Drivetrain extends CommandSwerveDrivetrain
         super(constants, modules);    
         this.ConfigureDrivetrain();
         this.ConfigureCameras();
+
+        m_DefaultDriveMaxSpeed = TunerConstants.MaxSpeed;
+        m_DefaultDriveMaxAngularRate = TunerConstants.MaxAngularRate;
+
+        m_SubsystemManager = manager;
+
+        if (m_SubsystemManager.getSubsystemOfType(Elevator.class).isPresent())
+        {
+            m_Elevator = m_SubsystemManager.getSubsystemOfType(Elevator.class).get();
+        }
+        else
+        {
+            m_SubsystemManager.subscribeSubsystemAdded(this);
+        }
     }
 
     @Override
     public void periodic() 
     {
+        updateDefaultDriveSpeeds();
         super.periodic();
   //      this.m_CameraManager.UpdateCameras();
         this.UpdateForwardCamera();
@@ -351,6 +366,27 @@ public class Drivetrain extends CommandSwerveDrivetrain
         return this.m_XController.atSetpoint() && this.m_YController.atSetpoint();
     }
 
+    private void updateDefaultDriveSpeeds()
+    {
+        double elevatorPosition = m_Elevator.getElevatorPosition();
+        // SmartDashboard.putNumber("elevator position!!: ", m_Elevator.getElevatorPosition());
+        double threshold = LEVELS.HOME.getValue();
+        double scale;
+        if (elevatorPosition <= threshold)
+        {
+            scale = 1;
+        }
+        else
+        {
+            scale = 1 - ((elevatorPosition - threshold) / (LEVELS.MAX_HIEGHT.getValue() - threshold));
+            scale = (scale < 0.2) ? 0.2 : scale;
+
+            // SmartDashboard.putNumber("Scale!!!: ", scale);
+        }
+        m_DefaultDriveMaxAngularRate = (TunerConstants.MaxAngularRate * scale);
+        m_DefaultDriveMaxSpeed = (TunerConstants.MaxSpeed * scale);
+    }
+
     private void ConfigureDrivetrain()
     {
         this.m_PackLog = new PackLog("Drivetrain");
@@ -425,5 +461,14 @@ public class Drivetrain extends CommandSwerveDrivetrain
         );
     }
 
+    @Override
+  public void onSubsystemAddedEvent(SubsystemAddedEvent event) 
+  {
+    if (event.getSubsystem().getClass() == Elevator.class)
+    {
+      m_Elevator = (Elevator)event.getSubsystem();
+      m_SubsystemManager.unsubscribeSubsystemAdded(this);
+    }
+  }
 }
 

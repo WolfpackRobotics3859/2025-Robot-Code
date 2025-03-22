@@ -90,10 +90,10 @@ public class RobotContainer
     switch(type)
     {
       case COMPETITION:
-        m_Manager.addSubsystem(new Drivetrain(TunerConstants.DrivetrainConstants, TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight));
+        m_Manager.addSubsystem(new Elevator());
+        m_Manager.addSubsystem(new Drivetrain(m_Manager, TunerConstants.DrivetrainConstants, TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight));
         m_Manager.addSubsystem(new ShooterCoral());
         m_Manager.addSubsystem(new ShooterAlgae());
-        m_Manager.addSubsystem(new Elevator());
         m_Manager.addSubsystem(new Climb());
         m_Manager.addSubsystem(new Shooter());
         m_Manager.addSubsystem(new DataStuff());
@@ -142,10 +142,10 @@ public class RobotContainer
       break;
 
       case CO_ELEVATOR_SHOOTER_DEBUG:
-        m_Manager.addSubsystem(new Drivetrain(TunerConstants.DrivetrainConstants, TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight));
+        m_Manager.addSubsystem(new Elevator());
+        m_Manager.addSubsystem(new Drivetrain(m_Manager, TunerConstants.DrivetrainConstants, TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight));
         m_Manager.addSubsystem(new ShooterCoral());
         m_Manager.addSubsystem(new ShooterAlgae());
-        m_Manager.addSubsystem(new Elevator());
         m_Manager.addSubsystem(new Shooter());
         m_Manager.addSubsystem(new DataStuff());
         this.configureCodriverShooterElevator();
@@ -191,7 +191,7 @@ public class RobotContainer
 
     shooterAlgae.setDefaultCommand(shooterAlgae.HoldAlgae());
 
-    m_DriverController.rightTrigger().whileTrue(new ParallelCommandGroup(drivetrain.AlignCoralNoEnd(), shooter.MoveToSelectedShot(), elevator.MoveToSelectorLevel()))
+    m_DriverController.rightTrigger().whileTrue(new ParallelCommandGroup(drivetrain.AlignCoralNoEnd(),shooter.MoveToSelectedShot(), elevator.MoveToSelectorLevel()))
                                      .onFalse(shooter.StowShooter().andThen(elevator.MoveToLevel(LEVELS.HOME)));
 
     m_DriverController.leftTrigger().whileTrue(new ParallelDeadlineGroup(shooterCoral.IntakeCoralRoutine(),
@@ -207,11 +207,11 @@ public class RobotContainer
     m_CoDriverController.povUp().onTrue(dataStuff.Up().ignoringDisable(true));
     m_CoDriverController.povDown().onTrue(dataStuff.Down().ignoringDisable(true));
 
-    //climb wrist
-    //m_CoDriverController.x().whileTrue(climb.setClimbVoltage(ClimbConstants.CLIMB_WRIST_VOLTAGE)).onFalse(climb.setClimbVoltage(0));
-    //climb wheels
-    //m_CoDriverController.b().whileTrue(climb.setRollerVoltage(ClimbConstants.CLIMB_ROLLER_VOLTAGE)).onFalse(climb.setRollerVoltage(0));
-    //m_CoDriverController.b().whileTrue(climb.setLatchVoltage(-2)).onFalse(climb.setLatchVoltage(0));
+    // climb wrist
+    m_CoDriverController.x().whileTrue(climb.setClimbVoltage(ClimbConstants.CLIMB_WRIST_VOLTAGE)).onFalse(climb.setClimbVoltage(0));
+    // climb wheels
+    m_CoDriverController.b().whileTrue(climb.setRollerVoltage(ClimbConstants.CLIMB_ROLLER_VOLTAGE)).onFalse(climb.setRollerVoltage(0));
+    // m_CoDriverController.b().whileTrue(climb.setLatchVoltage(-2)).onFalse(climb.setLatchVoltage(0));
 
     NamedCommands.registerCommand("ElevatorHome", elevator.MoveToLevel(LEVELS.HOME));
     NamedCommands.registerCommand("CoralTwoDeploy", new ParallelCommandGroup(elevator.MoveToLevel(LEVELS.TWO), shooter.MoveToDeployLow()));

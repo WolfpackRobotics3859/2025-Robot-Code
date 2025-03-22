@@ -40,7 +40,7 @@ public class ShooterConstants
     public static final double WRIST_ALGAE_INTAKE_POSITION = -8.6;
     public static final double WRIST_ALGAE_HOLDING_POSITION = -2.0;
     public static final double WRIST_ALGAE_PROCESSOR_DEPLOYMENT_POSITION = -10.5; // -0.38
-    public static final double WRIST_ALGAE_SHOOTING_POSITION = -1.0;
+    public static final double WRIST_ALGAE_BARGE_POSITION = -1.0;
     public static final double WRIST_ALGAE_SWEEPING_POSITION = -0.5;
 
     // Maximum allowable magnitude deviation from setpoint when determining the end of the movement command.
