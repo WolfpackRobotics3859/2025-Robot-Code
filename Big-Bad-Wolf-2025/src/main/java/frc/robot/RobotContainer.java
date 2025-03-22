@@ -90,7 +90,7 @@ public class RobotContainer
     switch(type)
     {
       case COMPETITION:
-        m_Manager.addSubsystem(new Drivetrain(m_Manager, TunerConstants.DrivetrainConstants, TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight));
+        m_Manager.addSubsystem(new Drivetrain(TunerConstants.DrivetrainConstants, TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight));
         m_Manager.addSubsystem(new ShooterCoral());
         m_Manager.addSubsystem(new ShooterAlgae());
         m_Manager.addSubsystem(new Elevator());
@@ -101,7 +101,7 @@ public class RobotContainer
       break;
 
       case COMPETITION_NO_VISION:
-        m_Manager.addSubsystem(new Drivetrain(m_Manager, TunerConstants.DrivetrainConstants, TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight));
+        m_Manager.addSubsystem(new Drivetrain(TunerConstants.DrivetrainConstants, TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight));
         m_Manager.addSubsystem(new ShooterCoral());
         m_Manager.addSubsystem(new ShooterAlgae());
         m_Manager.addSubsystem(new Elevator());
@@ -112,7 +112,7 @@ public class RobotContainer
       break; 
 
       case DRIVETRAIN_DEBUG:
-        m_Manager.addSubsystem(new Drivetrain(m_Manager, TunerConstants.DrivetrainConstants, TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight));
+        m_Manager.addSubsystem(new Drivetrain(TunerConstants.DrivetrainConstants, TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight));
         this.configureDrivetrainDebugBindings();
       break;
 
@@ -134,7 +134,7 @@ public class RobotContainer
       break;
 
       case ELEVATOR_SHOOTER_DEBUG:
-        m_Manager.addSubsystem(new Drivetrain(m_Manager, TunerConstants.DrivetrainConstants, TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight));
+        m_Manager.addSubsystem(new Drivetrain(TunerConstants.DrivetrainConstants, TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight));
         m_Manager.addSubsystem(new Elevator());
         m_Manager.addSubsystem(new Shooter());
         m_Manager.addSubsystem(new ShooterCoral());
@@ -142,7 +142,7 @@ public class RobotContainer
       break;
 
       case CO_ELEVATOR_SHOOTER_DEBUG:
-        m_Manager.addSubsystem(new Drivetrain(m_Manager, TunerConstants.DrivetrainConstants, TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight));
+        m_Manager.addSubsystem(new Drivetrain(TunerConstants.DrivetrainConstants, TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight));
         m_Manager.addSubsystem(new ShooterCoral());
         m_Manager.addSubsystem(new ShooterAlgae());
         m_Manager.addSubsystem(new Elevator());
@@ -242,10 +242,6 @@ public class RobotContainer
     NamedCommands.registerCommand("ShooterLowPosition", new ParallelCommandGroup(shooter.MoveToDeployLow(), elevator.MoveToLevel(LEVELS.ZERO)));
 
     NamedCommands.registerCommand("StartIntake", new ParallelDeadlineGroup(shooterCoral.IntakeCoralRoutine(), elevator.MoveToLevel(LEVELS.CORAL_INTAKE), shooter.MoveToIntake()));
-
-    NamedCommands.registerCommand("PrepAlgaeCleanEvenFace",new ParallelCommandGroup(elevator.MoveToLevel(LEVELS.LOW_ALGAE), shooter.MoveToAlgaeClean())); 
-    NamedCommands.registerCommand("PrepAlgaeCleanOddFace", new ParallelCommandGroup(elevator.MoveToLevel(LEVELS.HIGH_ALGAE), shooter.MoveToAlgaeClean()));
-    NamedCommands.registerCommand("AlgaeCleanRoutine", shooterAlgae.CleanAlgaeRoutine()); 
     
     try 
     {

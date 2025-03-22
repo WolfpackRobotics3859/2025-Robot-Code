@@ -11,13 +11,13 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "3DEPTO3L"
+                  "pathName": "SHOP"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "CoralFourDeploy"
+                  "name": "CoralTwoDeploy"
                 }
               }
             ]
@@ -27,12 +27,6 @@
           "type": "named",
           "data": {
             "name": "Align3L"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "DeployCoral"
           }
         }
       ]

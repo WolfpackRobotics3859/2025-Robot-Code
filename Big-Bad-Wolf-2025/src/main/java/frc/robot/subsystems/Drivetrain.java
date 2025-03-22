@@ -37,17 +37,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import frc.robot.constants.CameraConstants;
 import frc.robot.constants.DrivetrainConstants;
-import frc.robot.constants.ElevatorConstants;
-import frc.robot.constants.ElevatorConstants.LEVELS;
 import frc.robot.generated.TunerConstants;
 import frc.robot.utilities.CameraManager;
 import frc.robot.utilities.DataStuff;
 import frc.robot.utilities.PackLog;
-import frc.robot.utilities.SubsystemManager;
-import frc.robot.utilities.subsystemManager.SubsystemAddedEvent;
-import frc.robot.utilities.subsystemManager.SubsystemAddedListener;
 
-public class Drivetrain extends CommandSwerveDrivetrain implements SubsystemAddedListener
+public class Drivetrain extends CommandSwerveDrivetrain
 {
     private PackLog m_PackLog;
 
@@ -64,9 +59,6 @@ public class Drivetrain extends CommandSwerveDrivetrain implements SubsystemAdde
     private double m_DefaultDriveMaxSpeed;
     private double m_DefaultDriveMaxAngularRate;
 
-    private SubsystemManager m_SubsystemManager;
-    private Elevator m_Elevator;
-
     private final SwerveRequest.FieldCentric m_OperatorDriveRequest = new SwerveRequest.FieldCentric()
         .withDeadband(TunerConstants.MaxSpeed * 0.05).withRotationalDeadband(TunerConstants.MaxAngularRate * 0.05) // Add a 10% deadband
         .withDeadband(TunerConstants.MaxSpeed * 0.05).withRotationalDeadband(TunerConstants.MaxAngularRate * 0.05) // Add a 10% deadband
@@ -81,25 +73,11 @@ public class Drivetrain extends CommandSwerveDrivetrain implements SubsystemAdde
 
     StructPublisher<Pose2d> publisher = NetworkTableInstance.getDefault().getStructTopic("Robot Pose", Pose2d.struct).publish();
 
-    public Drivetrain(SubsystemManager manager, SwerveDrivetrainConstants constants, SwerveModuleConstants<?, ?, ?>... modules)
+    public Drivetrain(SwerveDrivetrainConstants constants, SwerveModuleConstants<?, ?, ?>... modules)
     {
         super(constants, modules);    
         this.ConfigureDrivetrain();
         this.ConfigureCameras();
-
-        m_DefaultDriveMaxSpeed = TunerConstants.MaxSpeed;
-        m_DefaultDriveMaxAngularRate = TunerConstants.MaxAngularRate;
-
-        m_SubsystemManager = manager;
-
-        if (this.m_SubsystemManager.getSubsystemOfType(Elevator.class).isPresent())
-        {
-            this.m_Elevator = this.m_SubsystemManager.getSubsystemOfType(Elevator.class).get();
-        }
-        else
-        {
-            this.m_SubsystemManager.subscribeSubsystemAdded(this);
-        }
     }
 
     @Override
@@ -330,7 +308,6 @@ public class Drivetrain extends CommandSwerveDrivetrain implements SubsystemAdde
 
     public Command DefaultDrive(Supplier<Double> thrust, Supplier<Double> strafe, Supplier<Double> rotation)
     {
-        updateDefaultltDriveSpeeds();
         return this.applyRequest(() -> this.m_OperatorDriveRequest.withVelocityX(-thrust.get() * m_DefaultDriveMaxSpeed * 0.8)
                                                                   .withVelocityY(-strafe.get() * m_DefaultDriveMaxSpeed * 0.8)
                                                                   .withRotationalRate(-rotation.get() * m_DefaultDriveMaxAngularRate));
@@ -372,24 +349,6 @@ public class Drivetrain extends CommandSwerveDrivetrain implements SubsystemAdde
     private boolean IsAlignmentComplete()
     {
         return this.m_XController.atSetpoint() && this.m_YController.atSetpoint();
-    }
-
-    private void updateDefaultltDriveSpeeds()
-    {
-        double elevatorPosition = m_Elevator.getElevatorPosition();
-        double threshold = LEVELS.HOME.getValue();
-        double scale;
-        if (elevatorPosition <= threshold)
-        {
-            scale = 1;
-        }
-        else
-        {
-            scale = 1 - ((elevatorPosition - threshold) / (LEVELS.MAX_HIEGHT.getValue() - threshold));
-            scale = (scale < 0.2) ? 0.2 : scale;
-        }
-        m_DefaultDriveMaxAngularRate =  (TunerConstants.MaxAngularRate * scale);
-        m_DefaultDriveMaxSpeed = (TunerConstants.MaxSpeed * scale);
     }
 
     private void ConfigureDrivetrain()
@@ -466,18 +425,5 @@ public class Drivetrain extends CommandSwerveDrivetrain implements SubsystemAdde
         );
     }
 
-    @Override
-  public void onSubsystemAddedEvent(SubsystemAddedEvent event) 
-  {
-    if(this.m_SubsystemManager.getSubsystemOfType(Elevator.class).isPresent())
-    {
-      this.m_Elevator = this.m_SubsystemManager.getSubsystemOfType(Elevator.class).get();
-    }
-
-    if(this.m_Elevator != null)
-    {
-      m_SubsystemManager.unsubscribeSubsystemAdded(this);
-    }
-  }
 }
 
