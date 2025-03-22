@@ -230,13 +230,22 @@ public class Drivetrain extends CommandSwerveDrivetrain implements SubsystemAdde
                                      this);
     }
 
-    public Command AlignCenter()
+    public Command AlignCenter(int face)
     {
         return new FunctionalCommand(() -> 
                                         {
-                                            Pose2d goalPose = this.GetGoalCleanPose();
                                             this.m_XController.reset();
                                             this.m_YController.reset();
+                                            Pose2d goalPose;
+                                            if(alliance == Alliance.Blue)
+                                            {
+                                                goalPose = DrivetrainConstants.BLUE_CENTER_ALIGNMENTS[face - 1];
+                                            }
+                                            else
+                                            {
+                                                goalPose = DrivetrainConstants.RED_CENTER_ALIGNMENTS[face - 1];
+                                            }
+                                            
                                             this.m_XController.setSetpoint(goalPose.getX());
                                             this.m_YController.setSetpoint(goalPose.getY());
                                             this.m_RotationController.setSetpoint(goalPose.getRotation().getDegrees());

@@ -232,12 +232,20 @@ public class RobotContainer
     NamedCommands.registerCommand("Align6L", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(0, 6)));
     NamedCommands.registerCommand("Align6R", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(1, 6)));
 
+    NamedCommands.registerCommand("AlignCenter1", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignCenter(1)));
+    NamedCommands.registerCommand("AlignCenter2", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignCenter(2)));
+    NamedCommands.registerCommand("AlignCenter3", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignCenter(3)));
+    NamedCommands.registerCommand("AlignCenter4", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignCenter(4)));
+    NamedCommands.registerCommand("AlignCenter5", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignCenter(5)));
+    NamedCommands.registerCommand("AlignCenter6", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignCenter(6)));
+
     NamedCommands.registerCommand("ShooterLowPosition", new ParallelCommandGroup(shooter.MoveToDeployLow(), elevator.MoveToLevel(LEVELS.ZERO)));
 
     NamedCommands.registerCommand("StartIntake", new ParallelDeadlineGroup(shooterCoral.IntakeCoralRoutine(), elevator.MoveToLevel(LEVELS.CORAL_INTAKE), shooter.MoveToIntake()));
 
-    NamedCommands.registerCommand("BeginAlgaeClean", null); // Algae cleaning prep
-    NamedCommands.registerCommand("AlgaeCleanRoutine", null); // Algae cleaning
+    NamedCommands.registerCommand("PrepAlgaeCleanEvenFace",new ParallelCommandGroup(elevator.MoveToLevel(LEVELS.LOW_ALGAE), shooter.MoveToAlgaeClean())); 
+    NamedCommands.registerCommand("PrepAlgaeCleanOddFace", new ParallelCommandGroup(elevator.MoveToLevel(LEVELS.HIGH_ALGAE), shooter.MoveToAlgaeClean()));
+    NamedCommands.registerCommand("AlgaeCleanRoutine", shooterAlgae.CleanAlgaeRoutine()); 
     
     try 
     {

@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.5405000000000002,
-        "y": 0.7002499999999998
+        "x": 1.2219572368421052,
+        "y": 0.9171875
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.9,
-        "y": 1.3827499999999997
+        "x": 3.581457236842105,
+        "y": 1.5996875
       },
       "isLocked": false,
       "linkedName": "RINT"
@@ -43,7 +43,7 @@
       },
       "rotationOffset": 0.0,
       "minWaypointRelativePos": 0.16942446043165435,
-      "maxWaypointRelativePos": 0.6370503597122316,
+      "maxWaypointRelativePos": 0.6005917159763319,
       "name": "Point Towards Zone"
     }
   ],

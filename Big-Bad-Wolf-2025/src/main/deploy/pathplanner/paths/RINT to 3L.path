@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.5405000000000002,
-        "y": 0.7002499999999998
+        "x": 1.2219572368421052,
+        "y": 0.9171875
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.6990442968857122,
-        "y": 1.5256925572735662
+        "x": 2.3805015337278173,
+        "y": 1.7426300572735665
       },
       "isLocked": false,
       "linkedName": "RINT"
@@ -58,7 +58,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 61.85839876773822
+    "rotation": 59.98163257239088
   },
   "reversed": false,
   "folder": "RINT TO X",

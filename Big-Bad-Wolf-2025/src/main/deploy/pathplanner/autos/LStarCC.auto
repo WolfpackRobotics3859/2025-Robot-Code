@@ -1,0 +1,75 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "LCOMM to 6R"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CoralFourDeploy"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Align6R"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "DeployCoral"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "6R TO CLEAN ALIGN"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "PrepAlgaeCleanEvenFace"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlgaeCleanRoutine"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SIX-CLEAN-DEPARTURE"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Sam's Funky Autos",
+  "choreoAuto": false
+}
