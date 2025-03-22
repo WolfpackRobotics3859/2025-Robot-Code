@@ -128,7 +128,7 @@ public class Elevator extends SubsystemBase
       () -> m_CANdi.isConnected() && (m_CANdi.getS1State().getValue() == S1StateValue.Low) && m_CANdi.getS1Closed().getValue(),
       this
    
-      );
+    );
   }
 
   public Command SetVoltage(double voltage)

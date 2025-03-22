@@ -85,7 +85,7 @@ public class Shooter extends SubsystemBase
       }
       else
       {
-        this.ApplyPosition(ShooterConstants.WRIST_ALGAE_SHOOTING_POSITION);
+        this.ApplyPosition(ShooterConstants.WRIST_ALGAE_BARGE_POSITION);
       }
     });
   }
@@ -98,7 +98,7 @@ public class Shooter extends SubsystemBase
 
   public Command MoveToBarge()
   {
-    return MoveToCommandBuilder(ShooterConstants.WRIST_ALGAE_SHOOTING_POSITION);
+    return MoveToCommandBuilder(ShooterConstants.WRIST_ALGAE_BARGE_POSITION);
   }
 
   public Command MoveToDeployLow()

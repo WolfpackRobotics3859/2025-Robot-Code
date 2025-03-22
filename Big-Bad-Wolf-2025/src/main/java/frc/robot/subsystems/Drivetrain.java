@@ -92,19 +92,20 @@ public class Drivetrain extends CommandSwerveDrivetrain implements SubsystemAdde
 
         m_SubsystemManager = manager;
 
-        if (this.m_SubsystemManager.getSubsystemOfType(Elevator.class).isPresent())
+        if (m_SubsystemManager.getSubsystemOfType(Elevator.class).isPresent())
         {
-            this.m_Elevator = this.m_SubsystemManager.getSubsystemOfType(Elevator.class).get();
+            m_Elevator = m_SubsystemManager.getSubsystemOfType(Elevator.class).get();
         }
         else
         {
-            this.m_SubsystemManager.subscribeSubsystemAdded(this);
+            m_SubsystemManager.subscribeSubsystemAdded(this);
         }
     }
 
     @Override
     public void periodic() 
     {
+        updateDefaultDriveSpeeds();
         super.periodic();
   //      this.m_CameraManager.UpdateCameras();
         this.UpdateForwardCamera();
@@ -321,7 +322,6 @@ public class Drivetrain extends CommandSwerveDrivetrain implements SubsystemAdde
 
     public Command DefaultDrive(Supplier<Double> thrust, Supplier<Double> strafe, Supplier<Double> rotation)
     {
-        updateDefaultltDriveSpeeds();
         return this.applyRequest(() -> this.m_OperatorDriveRequest.withVelocityX(-thrust.get() * m_DefaultDriveMaxSpeed * 0.8)
                                                                   .withVelocityY(-strafe.get() * m_DefaultDriveMaxSpeed * 0.8)
                                                                   .withRotationalRate(-rotation.get() * m_DefaultDriveMaxAngularRate));
@@ -365,9 +365,10 @@ public class Drivetrain extends CommandSwerveDrivetrain implements SubsystemAdde
         return this.m_XController.atSetpoint() && this.m_YController.atSetpoint();
     }
 
-    private void updateDefaultltDriveSpeeds()
+    private void updateDefaultDriveSpeeds()
     {
         double elevatorPosition = m_Elevator.getElevatorPosition();
+        // SmartDashboard.putNumber("elevator position!!: ", m_Elevator.getElevatorPosition());
         double threshold = LEVELS.HOME.getValue();
         double scale;
         if (elevatorPosition <= threshold)
@@ -378,8 +379,10 @@ public class Drivetrain extends CommandSwerveDrivetrain implements SubsystemAdde
         {
             scale = 1 - ((elevatorPosition - threshold) / (LEVELS.MAX_HIEGHT.getValue() - threshold));
             scale = (scale < 0.2) ? 0.2 : scale;
+
+            // SmartDashboard.putNumber("Scale!!!: ", scale);
         }
-        m_DefaultDriveMaxAngularRate =  (TunerConstants.MaxAngularRate * scale);
+        m_DefaultDriveMaxAngularRate = (TunerConstants.MaxAngularRate * scale);
         m_DefaultDriveMaxSpeed = (TunerConstants.MaxSpeed * scale);
     }
 
@@ -460,13 +463,9 @@ public class Drivetrain extends CommandSwerveDrivetrain implements SubsystemAdde
     @Override
   public void onSubsystemAddedEvent(SubsystemAddedEvent event) 
   {
-    if(this.m_SubsystemManager.getSubsystemOfType(Elevator.class).isPresent())
+    if (event.getSubsystem().getClass() == Elevator.class)
     {
-      this.m_Elevator = this.m_SubsystemManager.getSubsystemOfType(Elevator.class).get();
-    }
-
-    if(this.m_Elevator != null)
-    {
+      m_Elevator = (Elevator)event.getSubsystem();
       m_SubsystemManager.unsubscribeSubsystemAdded(this);
     }
   }

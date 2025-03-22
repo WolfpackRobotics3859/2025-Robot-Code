@@ -4,6 +4,7 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -30,6 +31,8 @@ public class ShooterAlgae extends SubsystemBase
         MotorManager.ApplyConfigs(ShooterConstants.SHOOTER_ALGAE_MOTOR_CONFIG, Hardware.SHOOTER_ALGAE_MOTOR);
         m_AlgaeMotor = MotorManager.GetMotor(Hardware.SHOOTER_ALGAE_MOTOR);
         m_VoltageRequest = new VoltageOut(0);
+        // holdPosition = 5;
+
 
         // stallCurrentThreshold = 15; //Placeholder value
         // UpdateMotorCurrent();
@@ -44,7 +47,7 @@ public class ShooterAlgae extends SubsystemBase
     {
         return new FunctionalCommand(() -> this.SetAlgaeVoltage(ShooterConstants.ALGAE_SWEEPING_VOLTAGE),
                                      () -> holdPosition = this.updateHoldingposition(),
-                                     interrupted -> this.applyHoldingPosition = true,   
+                                     interrupted -> SetAlgaeVoltage(ShooterConstants.ALGAE_HOLDING_VOLTAGE),//this.SetAlgaePosition(holdPosition),//this.applyHoldingPosition = true,   
                                      ()-> false, //  () -> this.ExternalResistance(),
                                      this);
     }
@@ -101,15 +104,17 @@ public class ShooterAlgae extends SubsystemBase
         MotorManager.ApplyControlRequest(m_VoltageRequest.withOutput(voltage), Hardware.SHOOTER_ALGAE_MOTOR);
     }
 
-    private void SetAlgaePosition(double position)
+    private ShooterAlgae SetAlgaePosition(double position)
     {
         MotorManager.ApplyControlRequest(m_PositionRequest.withPosition(position), Hardware.SHOOTER_ALGAE_MOTOR);
+        return this;
     }
 
     @Override
     public void periodic() 
     {
         // updateMotorCurrent();
-        if (applyHoldingPosition) SetAlgaePosition(holdPosition);
+        // if (applyHoldingPosition) SetAlgaePosition(holdPosition);
+        SmartDashboard.putNumber("Roller Position lol", MotorManager.GetMotor(Hardware.SHOOTER_ALGAE_MOTOR).getPosition().getValueAsDouble());
     }
 }
