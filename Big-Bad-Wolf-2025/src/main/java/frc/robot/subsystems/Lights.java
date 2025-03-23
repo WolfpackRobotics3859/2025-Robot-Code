@@ -344,21 +344,6 @@ public class Lights extends SubsystemBase
     m_led.start();
   }
 
-//   public void setLightRicochet(int hue, int saturation, int brightness)
-//   {
-//     for(int x = 0; x < m_ledBuffer1.getLength(); x++)
-//     {
-//         m_ledBuffer1.setHSV(x, hue, saturation, brightness);
-//         if(x -1 > 0)
-//         {
-//             m_BootUpTimer.advanceIfElapsed(1)
-//                 m_ledBuffer1.setHSV(x -1, hue, saturation, 0);
-//         }
-//     }
-//     m_led.setData(m_ledBuffer1);
-//     m_led.start();
-//   }
-
   /**
    * @brief Sets a blue section to ricochet parallaled across both sides of the LED strip.
    * @param hue The hue(color) of the lights.
@@ -398,8 +383,6 @@ public class Lights extends SubsystemBase
     m_led.setData(m_ledBuffer1);
     m_led.start();
   }
-
-
 
   /**
    * @brief Turns off all of the lights when called.
