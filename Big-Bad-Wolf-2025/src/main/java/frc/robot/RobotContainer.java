@@ -157,13 +157,11 @@ public class RobotContainer
     m_CoDriverController.povUp().onTrue(dataStuff.Up().ignoringDisable(true));
     m_CoDriverController.povDown().onTrue(dataStuff.Down().ignoringDisable(true));
 
-    m_CoDriverController.rightTrigger().onTrue(climb.setClimbVoltage(ClimbConstants.CLIMB_WRIST_VOLTAGE)).onFalse(climb.setClimbVoltage(0));
+    //climb wrist
+    m_CoDriverController.rightTrigger().onTrue(climb.setClimbVoltage(ClimbConstants.CLIMB_WRIST_VOLTAGE)).onFalse(climb.setClimbVoltage(0));  
 
+    //climb rollers - stops and deploys latch when cage detected
     m_CoDriverController.leftTrigger().onTrue(climb.setRollerVoltage(12)).onFalse(climb.setRollerVoltage(0));
-
-    m_CoDriverController.a().onTrue(climb.setLatchVoltage(-1)).onFalse(climb.setLatchVoltage(0));
-    m_CoDriverController.b().onTrue(climb.setLatchVoltage(1)).onFalse(climb.setLatchVoltage(0));
-    m_CoDriverController.y().onTrue(climb.setClimbVoltage(-1)).onFalse(climb.setClimbVoltage(0));
 
     // NamedCommands.registerCommand("ElevatorHome", elevator.MoveToLevel(HEIGHTS.HOME));
     // NamedCommands.registerCommand("CoralTwoDeploy", new ParallelCommandGroup(elevator.MoveToLevel(HEIGHTS.TWO), shooter.MoveToDeployLow()));

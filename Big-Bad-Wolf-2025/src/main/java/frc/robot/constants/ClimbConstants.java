@@ -13,10 +13,13 @@ public class ClimbConstants
 {
     public static final double CLIMB_WRIST_VOLTAGE = 2;
     public static final double CLIMB_ROLLER_VOLTAGE = 2;
+    public static final double LATCH_RELEASE_VOLTAGE = 0; //TBD
 
     public static final MotorOutputConfigs CLIMB_WRIST_MOTOR_OUTPUT = new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive);
     public static final MotorOutputConfigs CLIMB_ROLLER_MOTOR_OUTPUT = new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive);
     public static final MotorOutputConfigs CORAL_FUNNEL_MOTOR_OUTPUT = new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive);
+
+    public static final double CAGE_GRAB_SENSOR_THRESHOLD = 0; // TBD
 
     public static final TalonFXConfiguration WRIST_MOTOR_CONFIG = new TalonFXConfiguration()
         .withMotorOutput(CLIMB_WRIST_MOTOR_OUTPUT);

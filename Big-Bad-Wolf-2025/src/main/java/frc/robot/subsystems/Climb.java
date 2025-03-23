@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.controls.VoltageOut;
+import com.playingwithfusion.TimeOfFlight;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -16,7 +17,7 @@ import frc.robot.utilities.MotorManager;
 public class Climb extends SubsystemBase
 { 
   private final VoltageOut m_VoltageRequest;
-
+  private TimeOfFlight m_ClimbTOF;
   /**
    * Climb subsystem constructor.
    */
@@ -30,6 +31,8 @@ public class Climb extends SubsystemBase
     MotorManager.ApplyConfigs(ClimbConstants.ROLLER_MOTOR_CONFIG, Hardware.CLIMB_ROLLER_MOTOR_ID);
     MotorManager.ApplyConfigs(ClimbConstants.FEET_MOTOR_CONFIG, Hardware.CLIMB_RELEASE_MOTOR_ID);
 
+    m_ClimbTOF = new TimeOfFlight(Hardware.CLIMB_TOF_SENSOR);
+
     m_VoltageRequest = new VoltageOut(0);
   }
 
@@ -40,12 +43,19 @@ public class Climb extends SubsystemBase
 
   public Command setRollerVoltage(double voltage)
   {
-    return this.run(() -> MotorManager.ApplyControlRequest(m_VoltageRequest.withOutput(voltage), Hardware.CLIMB_ROLLER_MOTOR_ID));
+    return this.run(() -> MotorManager.ApplyControlRequest(m_VoltageRequest.withOutput(voltage), Hardware.CLIMB_ROLLER_MOTOR_ID))
+                                                                    .until(this::CageGrabbed)
+                                                                    .andThen(setLatchVoltage(ClimbConstants.LATCH_RELEASE_VOLTAGE));
   }
 
   public Command setLatchVoltage(double voltage)
   {
     return this.runOnce(() -> MotorManager.ApplyControlRequest(m_VoltageRequest.withOutput(voltage), Hardware.CLIMB_RELEASE_MOTOR_ID));
+  }
+
+  public boolean CageGrabbed()
+  {
+    return m_ClimbTOF.getRange() > ClimbConstants.CAGE_GRAB_SENSOR_THRESHOLD;
   }
 
   @Override
