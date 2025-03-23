@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.Lights;
+import frc.robot.subsystems.Lights.LIGHT_CODES;
 import frc.robot.utilities.PackLog;
 
 public class Robot extends TimedRobot 
@@ -19,6 +21,7 @@ public class Robot extends TimedRobot
   private Command m_autonomousCommand;
 
   private final RobotContainer m_robotContainer;
+  private Lights m_Lights;
 
   public Robot() 
   {
@@ -28,6 +31,7 @@ public class Robot extends TimedRobot
     m_robotContainer = new RobotContainer();
     // Set the logger to log to the first flashdrive plugged in
     SignalLogger.setPath("/media/sda1/");
+    m_Lights = new Lights();
   }
 
   @Override
@@ -46,7 +50,7 @@ public class Robot extends TimedRobot
   @Override
   public void disabledPeriodic() 
   {
-    // Intentionally Empty
+    m_Lights.LightChooser(LIGHT_CODES.FADING_BLUE);
   }
 
   @Override

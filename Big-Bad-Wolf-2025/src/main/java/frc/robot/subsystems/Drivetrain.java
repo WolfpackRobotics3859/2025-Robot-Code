@@ -48,6 +48,7 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import frc.robot.constants.CameraConstants;
 import frc.robot.constants.DrivetrainConstants;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Lights.LIGHT_CODES;
 import frc.robot.utilities.DataStuff;
 import frc.robot.utilities.PackLog;
 
@@ -71,6 +72,8 @@ public class Drivetrain extends CommandSwerveDrivetrain
     private PhotonCamera m_FarCamera;
     private PhotonPoseEstimator m_ForwardCameraEstimator;
     private PhotonPoseEstimator m_FarCameraEstimator;
+
+    private Lights m_Lights;
 
     AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
@@ -110,7 +113,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
             Optional<EstimatedRobotPose> estimatedPose = m_ForwardCameraEstimator.update(list.get(0));
             if(estimatedPose.isPresent())
             {
-            this.addVisionMeasurement(estimatedPose.get().estimatedPose.toPose2d(), Utils.getCurrentTimeSeconds());
+                this.addVisionMeasurement(estimatedPose.get().estimatedPose.toPose2d(), Utils.getCurrentTimeSeconds());
             }  
         }
     }
@@ -126,7 +129,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
             Optional<EstimatedRobotPose> estimatedPose = m_FarCameraEstimator.update(list.get(0));
             if(estimatedPose.isPresent())
             {
-            this.addVisionMeasurement(estimatedPose.get().estimatedPose.toPose2d(), Utils.getCurrentTimeSeconds());
+                this.addVisionMeasurement(estimatedPose.get().estimatedPose.toPose2d(), Utils.getCurrentTimeSeconds());
             }  
         }
     }
@@ -143,9 +146,14 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                             this.m_YController.setSetpoint(goalPose.getY());
                                             this.m_SwerveFieldCentricFacingAngle.TargetDirection = goalPose.getRotation().rotateBy(Rotation2d.k180deg);
                                         }, 
-                                     () -> UpdateRequest(), 
+                                     () -> 
+                                        {
+                                            UpdateRequest();
+                                            // m_Lights.LightChooser(LIGHT_CODES.FLASHING_ORANGE);
+                                        },
                                      interrupted -> {
                                                         m_PackLog.Log("Alignment command finished.");
+                                                        // m_Lights.LightChooser(LIGHT_CODES.SOLID_BLUE);
                                                     }, 
                                      () -> IsAlignmentComplete(), 
                                      this);

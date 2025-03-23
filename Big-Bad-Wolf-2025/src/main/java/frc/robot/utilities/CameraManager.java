@@ -17,6 +17,8 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Lights;
+import frc.robot.subsystems.Lights.LIGHT_CODES;
 
 public class CameraManager 
 {
@@ -28,6 +30,8 @@ public class CameraManager
     private AprilTagFieldLayout m_FieldLayout;
 
     private Drivetrain m_Drivetrain;
+
+    private Lights m_Lights;
 
     public CameraManager(Drivetrain drivetrain)
     {
@@ -84,6 +88,8 @@ public class CameraManager
 
             if(results.isEmpty())
             {
+                // // will make it so that any time a target is not seen, it defaults to solid blue
+                // m_Lights.LightChooser(LIGHT_CODES.SOLID_BLUE);
                 continue;
             }
 
@@ -91,6 +97,8 @@ public class CameraManager
             if(possiblePose.isPresent())
             {
                 DataLogManager.log("i see it!");
+                // // could make it so that any time a target is seen, it switches to solid orange
+                // m_Lights.LightChooser(LIGHT_CODES.SOLID_ORANGE);
                 EstimatedRobotPose estimatedPose = possiblePose.get();
                 this.m_Drivetrain.addVisionMeasurement(estimatedPose.estimatedPose.toPose2d(), Utils.getCurrentTimeSeconds());
             }

@@ -35,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.ElevatorConstants.HEIGHTS;
 import frc.robot.lib.Positions.Level;
+import frc.robot.subsystems.Lights.LIGHT_CODES;
 import frc.robot.constants.Hardware;
 import frc.robot.utilities.DataStuff;
 import frc.robot.utilities.MotorManager;
@@ -45,6 +46,8 @@ public class Elevator extends SubsystemBase
   private final PackLog m_Logger;
 
   private final TalonFX m_ElevatorMotor;
+
+  private Lights m_Lights;
 
   private final VoltageOut m_VoltageRequest;
   private final MotionMagicVoltage m_PositionRequest;
@@ -113,7 +116,17 @@ public class Elevator extends SubsystemBase
     return new FunctionalCommand(
       () -> this.ApplyPosition(height),
       () -> {},
-      interrupted -> this.LogClosedLoopResults(interrupted),
+      interrupted -> {
+                        this.LogClosedLoopResults(interrupted);
+                        if(height == HEIGHTS.TRAVEL)
+                        {
+                          m_Lights.LightChooser(LIGHT_CODES.SOLID_BLUE);
+                        }
+                        if(height == HEIGHTS.INTAKE)
+                        {
+                          m_Lights.LightChooser(LIGHT_CODES.CENTER_INTAKE_FLASH);
+                        }
+                     },
       () -> this.isReady(ElevatorConstants.POSITION_ERROR_TOLERANCE, ElevatorConstants.POSITION_DERIVATIVE_TOLERANCE),
       this
     );

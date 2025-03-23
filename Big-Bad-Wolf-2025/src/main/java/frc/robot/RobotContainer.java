@@ -72,6 +72,7 @@ public class RobotContainer
         m_Manager.addSubsystem(new Drivetrain(TunerConstants.DrivetrainConstants, TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight));
         m_Manager.addSubsystem(new Wheels());
         m_Manager.addSubsystem(new Elevator());
+        // m_Manager.addSubsystem(new Lights());
         m_Manager.addSubsystem(new Climb());
         m_Manager.addSubsystem(new Wrist());
         m_Manager.addSubsystem(new DataStuff());
@@ -130,6 +131,9 @@ public class RobotContainer
     Climb climb = m_Manager.getSubsystemOfType(Climb.class).get();
     SmartDashboard.putData(climb);
 
+    // Lights lights = m_Manager.getSubsystemOfType(Lights.class).get();
+    // SmartDashboard.putData(lights);
+
     DataStuff dataStuff = m_Manager.getSubsystemOfType(DataStuff.class).get();
     SmartDashboard.putData(dataStuff);
 
@@ -141,16 +145,16 @@ public class RobotContainer
         drivetrain.DefaultDrive(() -> m_DriverController.getLeftY(), () -> m_DriverController.getLeftX(), () -> m_DriverController.getRightX())
     );
 
-    Command defaultSafe = new SequentialCommandGroup(wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.TRAVEL));
-    Command alignCoral = new ParallelCommandGroup(drivetrain.AlignCoral(), wrist.MoveToSelectedCoralDeployment(), elevator.MoveToDataLevel());
-    Command beginIntaking = new SequentialCommandGroup(wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.INTAKE), wrist.MoveToAngle(ANGLES.INTAKE)).withDeadline(wheels.BeginCoralIntakeRoutine());
-    Command intakeRoutine = new SequentialCommandGroup(beginIntaking, new ParallelCommandGroup(defaultSafe, wheels.CenterCoral()));
+    // Command defaultSafe = new SequentialCommandGroup(wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.TRAVEL));
+    // Command alignCoral = new ParallelCommandGroup(drivetrain.AlignCoral(), wrist.MoveToSelectedCoralDeployment(), elevator.MoveToDataLevel());
+    // Command beginIntaking = new SequentialCommandGroup(wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.INTAKE), wrist.MoveToAngle(ANGLES.INTAKE)).withDeadline(wheels.BeginCoralIntakeRoutine());
+    // Command intakeRoutine = new SequentialCommandGroup(beginIntaking, new ParallelCommandGroup(defaultSafe, wheels.CenterCoral()));
 
-    m_DriverController.rightTrigger().whileTrue(alignCoral)
-                                     .onFalse(defaultSafe);
+    // m_DriverController.rightTrigger().whileTrue(alignCoral)
+    //                                  .onFalse(defaultSafe);
 
-    m_DriverController.leftTrigger().whileTrue(intakeRoutine)
-                                    .onFalse(new ParallelCommandGroup(defaultSafe, wheels.CenterCoral()));
+    // m_DriverController.leftTrigger().whileTrue(intakeRoutine)
+    //                                 .onFalse(new ParallelCommandGroup(defaultSafe, wheels.CenterCoral()));
     
     m_CoDriverController.leftBumper().onTrue(dataStuff.Left().ignoringDisable(true));
     m_CoDriverController.rightBumper().onTrue(dataStuff.Right().ignoringDisable(true));

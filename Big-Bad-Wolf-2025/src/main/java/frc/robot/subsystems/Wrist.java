@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import frc.robot.constants.WristConstants.ANGLES;
 import frc.robot.lib.Positions.Level;
+import frc.robot.subsystems.Lights.LIGHT_CODES;
 import frc.robot.constants.Hardware;
 import frc.robot.constants.WristConstants;
 import frc.robot.utilities.DataStuff;
@@ -46,6 +47,9 @@ public class Wrist extends SubsystemBase
 
   private final TalonFX m_WristMotor;
   private SysIdRoutine m_SysIdRoutine;
+
+  private Lights m_Lights;
+  private Drivetrain m_Drivetrain;
 
   private final MotionMagicVoltage m_WristPositionRequest;
   private final StaticBrake m_BrakeRequest;
@@ -99,8 +103,14 @@ public class Wrist extends SubsystemBase
   public Command MoveToSelectedCoralDeployment()
   {
     return new FunctionalCommand(() -> this.MoveToProperCoralShotAccordingToData(),
-                                 () -> {}, 
-                                 interrupted -> this.LogClosedLoopResults(interrupted),
+                                 () -> m_Lights.LightChooser(LIGHT_CODES.FLASHING_RED), 
+                                 interrupted -> {
+                                                  this.LogClosedLoopResults(interrupted);
+                                                  if(m_Drivetrain.AlignCoral().isFinished())
+                                                  {
+                                                    m_Lights.LightChooser(LIGHT_CODES.SOLID_GREEN);
+                                                  }
+                                                },
                                  () -> this.isReady(WristConstants.WRIST_POSITION_ERROR_TOLERANCE, WristConstants.WRIST_POSITION_DERIVATIVE_TOLERANCE),
                                  this);
   }

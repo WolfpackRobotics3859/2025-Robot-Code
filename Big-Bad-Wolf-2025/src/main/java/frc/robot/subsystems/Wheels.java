@@ -25,12 +25,15 @@ import frc.robot.constants.Hardware;
 import frc.robot.constants.WheelConstants;
 import frc.robot.constants.WheelConstants.VoltageSpeeds;
 import frc.robot.constants.WristConstants;
+import frc.robot.subsystems.Lights.LIGHT_CODES;
 import frc.robot.utilities.MotorManager;
 import frc.robot.utilities.PackLog;
 
 public class Wheels extends SubsystemBase
 {
     private PackLog m_PackLog;
+
+    private Lights m_Lights;
 
     private TalonFX m_WheelsMotor;
     private TimeOfFlight m_ForwardTOF;
@@ -93,6 +96,7 @@ public class Wheels extends SubsystemBase
                                                       interrupted -> 
                                                       {
                                                         this.SetPosition(this.m_PositionSignal.refresh().getValueAsDouble());
+                                                        m_Lights.LightChooser(LIGHT_CODES.SOLID_BLUE);
                                                       }, 
                                                       () -> this.SimpleCentering(),
                                                       this);
