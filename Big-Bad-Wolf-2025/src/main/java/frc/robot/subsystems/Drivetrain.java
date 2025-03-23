@@ -37,7 +37,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import frc.robot.constants.CameraConstants;
 import frc.robot.constants.DrivetrainConstants;
-import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.ElevatorConstants.LEVELS;
 import frc.robot.generated.TunerConstants;
 import frc.robot.utilities.CameraManager;

@@ -15,7 +15,6 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
-import frc.robot.utilities.DataStuff;
 
 /** 
  * Where all constants related to elevator are declared.
