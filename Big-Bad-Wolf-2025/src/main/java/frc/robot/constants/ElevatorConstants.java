@@ -15,48 +15,30 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
-/** 
- * Where all constants related to elevator are declared.
- */
 public class ElevatorConstants 
 {
-    public static final double ELEVATOR_ZERO_POSITION = 0;
-    public static final double ELEVATOR_HOME_POSITION = 30;
-    public static final double ELEVATOR_LEVEL_ONE = 15;
-    public static final double ELEVATOR_LEVEL_TWO = 37;  // 50 // 47.5
-    public static final double ELEVATOR_LEVEL_THREE = 68; // 78  // 76
-    public static final double ELEVATOR_LEVEL_FOUR = 105.0;
-    public static final double CORAL_INTAKING_LEVEL = 2;
-    public static final double ALGAE_PROCESSING_POSITION = 5;
-    public static final double LOW_CLEAN = 35.25;
-    public static final double HIGH_CLEAN = 55.75;
-
+    public static final String NAME = "ELEVATOR";
     // Maximum allowable magnitude deviation from setpoint when determining the end of the movement command.
     public static final double POSITION_ERROR_TOLERANCE = 1;
     public static final double POSITION_DERIVATIVE_TOLERANCE = 0.05;
 
-    // Max Height should be around 100-105
-
-    public static final double ELEVATOR_UP_VOLTAGE = 3;
-    public static final double ELEVATOR_DOWN_VOLTAGE = -1.5;
-    public static final double HOMING_VOLTAGE = -0.5;
-
-    public enum LEVELS 
+    public enum HEIGHTS 
     {
-        ZERO(ELEVATOR_ZERO_POSITION),
-        HOME(ELEVATOR_HOME_POSITION),
-        ONE(ELEVATOR_LEVEL_ONE),
-        TWO(ELEVATOR_LEVEL_TWO),
-        THREE(ELEVATOR_LEVEL_THREE),
-        FOUR(ELEVATOR_LEVEL_FOUR),
-        CORAL_INTAKE(CORAL_INTAKING_LEVEL),
-        LOW_ALGAE(LOW_CLEAN),
-        HIGH_ALGAE(HIGH_CLEAN),
-        ALGAE_PROCESS(ALGAE_PROCESSING_POSITION);
+        ZERO(0),
+        TRAVEL(1),
+        ONE(10),
+        TWO(20),
+        THREE(30),
+        FOUR(40),
+        INTAKE(1),
+        LOW_CLEAN(25),
+        HIGH_CLEAN(35),
+        BARGE(64),
+        PROCESS(2);
 
         private double levelValue;
 
-        LEVELS(double value)
+        HEIGHTS(double value)
         {
             this.levelValue = value;
         }

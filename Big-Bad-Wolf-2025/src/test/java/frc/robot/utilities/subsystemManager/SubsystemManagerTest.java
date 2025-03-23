@@ -2,7 +2,7 @@ package frc.robot.utilities.subsystemManager;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Wrist;
 import frc.robot.subsystems.Elevator;
 import frc.robot.utilities.SubsystemManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,40 +23,40 @@ public class SubsystemManagerTest
     @Test
     void addSubsystemToManagerAndRetrieve()
     {
-        Shooter intake = new Shooter();
+        Wrist intake = new Wrist();
         assertTrue(UUT.addSubsystem(intake));
-        assertTrue(UUT.getSubsystemOfType(Shooter.class).get() == intake);
+        assertTrue(UUT.getSubsystemOfType(Wrist.class).get() == intake);
     }
 
     @Test
     void attemptToAddTwoSubsystems()
     {
-        Shooter intake = new Shooter();
+        Wrist intake = new Wrist();
         Elevator cleaner = new Elevator();
         assertTrue(UUT.addSubsystem(intake));
         assertTrue(UUT.addSubsystem(cleaner));
         assertTrue(UUT.getSubsystemOfType(Elevator.class).isPresent());
         assertTrue(UUT.removeSubsystem(cleaner));
-        assertTrue(UUT.getSubsystemOfType(Shooter.class).get() == intake);
+        assertTrue(UUT.getSubsystemOfType(Wrist.class).get() == intake);
         assertTrue(UUT.getSubsystemOfType(Elevator.class).isEmpty());
-        assertFalse(UUT.addSubsystem(new Shooter()));
+        assertFalse(UUT.addSubsystem(new Wrist()));
         assertTrue(UUT.removeSubsystem(intake));
         assertTrue(UUT.addSubsystem(intake));
         assertTrue(UUT.addSubsystem(cleaner));
-        assertTrue(UUT.getSubsystemOfType(Shooter.class).get() == intake);
+        assertTrue(UUT.getSubsystemOfType(Wrist.class).get() == intake);
         assertTrue(UUT.getSubsystemOfType(Elevator.class).get() == cleaner);
     }
 
     @Test
     void attemptToRemoveASubsystem()
     {
-        Shooter intake = new Shooter();
+        Wrist intake = new Wrist();
         Elevator cleaner = new Elevator();
         assertTrue(UUT.addSubsystem(intake));
         assertTrue(UUT.addSubsystem(cleaner));
-        assertTrue(UUT.getSubsystemOfType(Shooter.class).get() == intake);
+        assertTrue(UUT.getSubsystemOfType(Wrist.class).get() == intake);
         assertTrue(UUT.getSubsystemOfType(Elevator.class).get() == cleaner);
-        assertFalse(UUT.addSubsystem(new Shooter()));
+        assertFalse(UUT.addSubsystem(new Wrist()));
     }
 
     @Test
@@ -66,8 +66,8 @@ public class SubsystemManagerTest
         UUT.subscribeSubsystemAdded(subscriber);
         assertTrue(UUT.addSubsystem(new Elevator()));
         assertTrue(subscriber.subsystem.getClass() == Elevator.class);
-        assertTrue(UUT.addSubsystem(new Shooter()));
-        assertTrue(subscriber.subsystem.getClass() == Shooter.class);
+        assertTrue(UUT.addSubsystem(new Wrist()));
+        assertTrue(subscriber.subsystem.getClass() == Wrist.class);
     }
 }
 

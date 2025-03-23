@@ -4,26 +4,19 @@
 
 package frc.robot.constants;
 
-// Instantiating constants for hardware.
 public class Hardware
 {
-    //ELEVATOR
+    // MOTORS
     public static final int ELEVATOR_MOTOR = 1;
-    public static final int CANDI_0 = 0;
-    public static final int ELEVATOR_TOF = 0;
+    public static final int WRIST_MOTOR_ID = 2;
+    public static final int ALGAE_MOTOR_ID = 3;
+    public static final int CORAL_MOTOR_ID = 4;
+    public static final int CLIMB_WRIST_MOTOR_ID = 5;
+    public static final int CLIMB_ROLLER_MOTOR_ID = 6;
+    public static final int CLIMB_RELEASE_MOTOR_ID = 7;
 
-    //ALGAE INTAKE
-    public static final int INTAKE_ROLLER_MOTOR = 3;
-    public static final int INTAKE_WRIST_MOTOR = 4;
-
-    // SHOOTER
-    public static final int SHOOTER_WRIST_MOTOR = 5;
-    public static final int SHOOTER_ALGAE_MOTOR = 6;
-    public static final int SHOOTER_CORAL_MOTOR = 7;
-    public static final int CORAL_TOF_SENSOR = 1;
-
-    //CLIMB
-    public static final int CLIMB_WRIST_MOTOR = 8;
-    public static final int CLIMB_ROLLER_MOTOR = 9;
-    public static final int CORAL_FUNNEL_MOTOR = 10;
+    // TOF SENSORS
+    public static final int CORAL_FORWARD_TOF_SENSOR = 0;
+    public static final int CORAL_REAR_TOF_SENSOR = 1;
+    public static final int CLIMB_TOF_SENSOR = 2;
 }

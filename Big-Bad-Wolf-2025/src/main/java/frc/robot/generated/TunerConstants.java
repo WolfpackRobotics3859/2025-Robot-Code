@@ -27,35 +27,35 @@ public class TunerConstants
 
     private static final Slot0Configs steerGains = new Slot0Configs()
         .withKP(35).withKI(0).withKD(0.5) // P was originally 100 // 40
-        .withKS(0.1).withKV(1.91).withKA(0)
+        .withKS(0.1).withKV(1.91).withKA(0) // 0.1
         .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
 
     // The steer motor uses any SwerveModule.SteerRequestType control request with the
     // output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
     private static final Slot0Configs steerGainsLeftFront = new Slot0Configs()
         .withKP(22.957).withKI(0).withKD(0.96378) // P was originally 100 // 40
-        .withKS(0.26576).withKV(1.4004).withKA(0.056515)
+        .withKS(0).withKV(1.4004).withKA(0.056515) // 0.26576
         .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
 
     // The steer motor uses any SwerveModule.SteerRequestType control request with the
     // output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
     private static final Slot0Configs steerGainsRightFront = new Slot0Configs()
         .withKP(21.741).withKI(0).withKD(0.96378) // P was originally 100 // 40
-        .withKS(0.23307).withKV(1.4441).withKA(0.81172)
+        .withKS(0).withKV(1.4441).withKA(0.81172) // 0.23307
         .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
 
     // The steer motor uses any SwerveModule.SteerRequestType control request with the
     // output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
     private static final Slot0Configs steerGainsLeftRear = new Slot0Configs()
         .withKP(24.753).withKI(0).withKD(0.83629) // P was originally 100 // 40
-        .withKS(0.21906).withKV(1.4337).withKA(0.042902)
+        .withKS(0).withKV(1.4337).withKA(0.042902) // 0.21906
         .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
 
     // The steer motor uses any SwerveModule.SteerRequestType control request with the
     // output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
     private static final Slot0Configs steerGainsRightRear = new Slot0Configs()
         .withKP(23.837).withKI(0).withKD(0.90706) // P was originally 100 // 40
-        .withKS(0.26899).withKV(1.4086).withKA(0.049733)
+        .withKS(0).withKV(1.4086).withKA(0.049733) // 0.26899
         .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
 
     // When using closed-loop control, the drive motor uses the control
@@ -152,13 +152,8 @@ public class TunerConstants
     private static final Voltage kSteerFrictionVoltage = Volts.of(0.2);
     private static final Voltage kDriveFrictionVoltage = Volts.of(0.2);
 
-    
-
-    
     public static final double MaxSpeed = kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     public static final double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
-
-
 
     public static final SwerveDrivetrainConstants DrivetrainConstants = new SwerveDrivetrainConstants()
             .withCANBusName(kCANBus.getName())

@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.InchesPerSecond;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import java.util.List;
 import java.util.Optional;
@@ -233,27 +232,27 @@ public class Drivetrain extends CommandSwerveDrivetrain
     {
         if(alliance == Alliance.Blue)
         {
-            if(DataStuff.GetCurrentSide() == 0)
+            if(DataStuff.GetSide().getValue() == 0)
             {
-                return DrivetrainConstants.BLUE_LEFT_ALIGNMENTS[DataStuff.GetCurrentFace()];
+                return DrivetrainConstants.BLUE_LEFT_ALIGNMENTS[DataStuff.GetFace().getValue()];
             }
-            return DrivetrainConstants.BLUE_RIGHT_ALIGNMENTS[DataStuff.GetCurrentFace()];
+            return DrivetrainConstants.BLUE_RIGHT_ALIGNMENTS[DataStuff.GetFace().getValue()];
         }
 
-        if(DataStuff.GetCurrentSide() == 0)
+        if(DataStuff.GetSide().getValue() == 0)
         {
-            return DrivetrainConstants.RED_LEFT_ALIGNMENTS[DataStuff.GetCurrentFace()];
+            return DrivetrainConstants.RED_LEFT_ALIGNMENTS[DataStuff.GetFace().getValue()];
         }
-        return DrivetrainConstants.RED_RIGHT_ALIGNMENTS[DataStuff.GetCurrentFace()];
+        return DrivetrainConstants.RED_RIGHT_ALIGNMENTS[DataStuff.GetFace().getValue()];
     }
 
     private Pose2d GetGoalCleanPose()
     {
         if(alliance == Alliance.Blue)
         {
-            return DrivetrainConstants.BLUE_CENTER_ALIGNMENTS[DataStuff.GetCurrentFace()];
+            return DrivetrainConstants.BLUE_CENTER_ALIGNMENTS[DataStuff.GetFace().getValue()];
         }
-        return DrivetrainConstants.RED_CENTER_ALIGNMENTS[DataStuff.GetCurrentFace()];
+        return DrivetrainConstants.RED_CENTER_ALIGNMENTS[DataStuff.GetFace().getValue()];
     }
 
     public Command PathfindToPose(Pose2d goalPose)
@@ -357,7 +356,6 @@ public class Drivetrain extends CommandSwerveDrivetrain
         e.printStackTrace();
         return;
         }
-        // Ks 0.15033 Kv 0.92447 Ka 0.076706 P 26.116 I D 1.5506
 
         AutoBuilder.configure(
                 () -> this.getState().Pose, // Robot pose supplier

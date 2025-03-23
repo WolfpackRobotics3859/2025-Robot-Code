@@ -18,12 +18,12 @@ public class ClimbConstants
     public static final MotorOutputConfigs CLIMB_ROLLER_MOTOR_OUTPUT = new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive);
     public static final MotorOutputConfigs CORAL_FUNNEL_MOTOR_OUTPUT = new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive);
 
-    public static final TalonFXConfiguration CLIMB_WRIST_CONFIGURATION = new TalonFXConfiguration()
+    public static final TalonFXConfiguration WRIST_MOTOR_CONFIG = new TalonFXConfiguration()
         .withMotorOutput(CLIMB_WRIST_MOTOR_OUTPUT);
 
-    public static final TalonFXConfiguration CLIMB_ROLLER_CONFIGURATION = new TalonFXConfiguration()
+    public static final TalonFXConfiguration ROLLER_MOTOR_CONFIG = new TalonFXConfiguration()
         .withMotorOutput(CLIMB_ROLLER_MOTOR_OUTPUT);
     
-    public static final TalonFXConfiguration FUNNEL_LATCH_MOTOR_CONFIGURATION = new TalonFXConfiguration()
+    public static final TalonFXConfiguration FEET_MOTOR_CONFIG = new TalonFXConfiguration()
         .withMotorOutput(CORAL_FUNNEL_MOTOR_OUTPUT);
 }

@@ -1,11 +1,11 @@
 package frc.robot.utilities;
 
-import java.util.FormatterClosedException;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.ElevatorConstants.LEVELS;
+import frc.robot.lib.Positions.Face;
+import frc.robot.lib.Positions.Level;
+import frc.robot.lib.Positions.Side;
 
 public class DataStuff extends SubsystemBase
 {
@@ -18,7 +18,6 @@ public class DataStuff extends SubsystemBase
 
     // ONE | TWO | THREE | FOUR
     private static String[] level =  new String[] {"L1", "L2", "L3", "L4"};
-    private static LEVELS[] levelValue = new LEVELS[] {LEVELS.ONE, LEVELS.TWO, LEVELS.THREE, LEVELS.FOUR};
     private static int currentLevel = 0;
 
     // F1 | F2 | F3 | F4 | F5 | F6
@@ -30,10 +29,6 @@ public class DataStuff extends SubsystemBase
         UpdateEverything();
     }
 
-    /**
-     * This value is 0 indexed for now where level one is represented by integer 0.
-     * @param level
-     */
     public static void SetSelectedLevel(int level)
     {
         currentLevel = level;
@@ -76,43 +71,33 @@ public class DataStuff extends SubsystemBase
      * LEFT OR RIGHT
      * @return 0 for left, 1 for right
      */
-    public static int GetCurrentSide()
+    public static Side GetSide()
     {
-        return currentSide;
+        return Side.fromInt(currentSide);
     }
 
     /**
      * FACES
      * @return 0 indexed
      */
-    public static int GetCurrentFace()
+    public static Face GetFace()
     {
-        return currentFace;
+        return Face.fromInt(currentFace);
     }
 
-    public static String GetSide()
+    public static Level GetLevel()
     {
-        return leftRight[currentSide];
-    }
-
-    public static LEVELS GetLevel()
-    {
-        return levelValue[currentLevel];
-    }
-
-    public static String GetFace()
-    {
-        return face[currentFace];
+        return Level.fromInt(currentLevel);
     }
 
     public static String GetCoralAlignmentPathName()
     {
-        return GetFace() + "-" + GetSide() + "-ALIGN"; 
+        return GetFace().name() + "-" + GetSide().name() + "-ALIGN"; 
     }
 
     public static String GetCleanAlignmentPathName()
     {
-        return GetFace() + "-CLEAN-ALIGN";
+        return GetFace().name() + "-CLEAN-ALIGN";
     }
 
     public static void IncrementSelection()
