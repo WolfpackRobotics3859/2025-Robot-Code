@@ -26,12 +26,12 @@ import frc.robot.constants.Global;
 import frc.robot.constants.ClimbConstants;
 import frc.robot.constants.ElevatorConstants.HEIGHTS;
 import frc.robot.constants.Global.BUILD_TYPE;
+import frc.robot.constants.WristConstants.ANGLES;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Wrist;
-import frc.robot.subsystems.Algae;
 import frc.robot.subsystems.Wheels;
 import frc.robot.utilities.DataStuff;
 import frc.robot.utilities.PackLog;
@@ -49,14 +49,10 @@ import frc.robot.subsystems.Climb;
 public class RobotContainer 
 {
   private static final SubsystemManager m_Manager = new SubsystemManager();
+  private SendableChooser<Command> m_Chooser;
   
   private final CommandXboxController m_DriverController = new CommandXboxController(0);
   private final CommandXboxController m_CoDriverController = new CommandXboxController(1);
-  
-  private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-          .withDeadband(TunerConstants.MaxSpeed * 0.05).withRotationalDeadband(TunerConstants.MaxAngularRate * 0.05) // Add a 10% deadband
-          .withDeadband(TunerConstants.MaxSpeed * 0.05).withRotationalDeadband(TunerConstants.MaxAngularRate * 0.05) // Add a 10% deadband
-          .withDriveRequestType(DriveRequestType.Velocity); // Use open-loop control for drive motors
 
   private final PackLog m_PackLog;
   
@@ -75,12 +71,11 @@ public class RobotContainer
       case COMPETITION:
         m_Manager.addSubsystem(new Drivetrain(TunerConstants.DrivetrainConstants, TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight));
         m_Manager.addSubsystem(new Wheels());
-        m_Manager.addSubsystem(new Algae());
         m_Manager.addSubsystem(new Elevator());
         m_Manager.addSubsystem(new Climb());
         m_Manager.addSubsystem(new Wrist());
         m_Manager.addSubsystem(new DataStuff());
-        this.configureCompetitionBindingsV2();
+        this.configureCompetitionBindings();
       break;
 
       case DRIVETRAIN_DEBUG:
@@ -122,16 +117,15 @@ public class RobotContainer
     SmartDashboard.putString("Active Build", type.name());
   }
 
-  private SendableChooser<Command> m_Chooser;
-  private void configureCompetitionBindingsV2()
+  private void configureCompetitionBindings()
   {
     Drivetrain drivetrain = m_Manager.getSubsystemOfType(Drivetrain.class).get();
 
     Elevator elevator = m_Manager.getSubsystemOfType(Elevator.class).get();
     SmartDashboard.putData(elevator);
 
-    Wrist shooter = m_Manager.getSubsystemOfType(Wrist.class).get();
-    SmartDashboard.putData(shooter);
+    Wrist wrist = m_Manager.getSubsystemOfType(Wrist.class).get();
+    SmartDashboard.putData(wrist);
 
     Climb climb = m_Manager.getSubsystemOfType(Climb.class).get();
     SmartDashboard.putData(climb);
@@ -139,42 +133,24 @@ public class RobotContainer
     DataStuff dataStuff = m_Manager.getSubsystemOfType(DataStuff.class).get();
     SmartDashboard.putData(dataStuff);
 
-    Wheels shooterCoral = m_Manager.getSubsystemOfType(Wheels.class).get();
-    SmartDashboard.putData(shooterCoral);
-
-    Algae shooterAlgae = m_Manager.getSubsystemOfType(Algae.class).get();
-    SmartDashboard.putData(shooterAlgae);
+    Wheels wheels = m_Manager.getSubsystemOfType(Wheels.class).get();
+    SmartDashboard.putData(wheels);
 
     drivetrain.setDefaultCommand
     (
         drivetrain.DefaultDrive(() -> m_DriverController.getLeftY(), () -> m_DriverController.getLeftX(), () -> m_DriverController.getRightX())
     );
 
-    shooterAlgae.setDefaultCommand(shooterAlgae.HoldAlgae());
+    Command defaultSafe = new SequentialCommandGroup(wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.TRAVEL));
+    Command alignCoral = new ParallelCommandGroup(drivetrain.AlignCoral(), wrist.MoveToSelectedCoralDeployment(), elevator.MoveToDataLevel());
+    Command beginIntaking = new SequentialCommandGroup(wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.INTAKE), wrist.MoveToAngle(ANGLES.INTAKE)).withDeadline(wheels.BeginCoralIntakeRoutine());
+    Command intakeRoutine = new SequentialCommandGroup(beginIntaking, new ParallelCommandGroup(defaultSafe, wheels.CenterCoral()));
 
-    m_DriverController.rightTrigger().whileTrue(new ParallelCommandGroup(drivetrain.AlignCoral(), shooter.MoveToSelectedShot(), elevator.MoveToSelectorLevel()))
-                                     .onFalse(shooter.StowShooter().andThen(elevator.MoveToLevel(HEIGHTS.HOME)));
+    m_DriverController.rightTrigger().whileTrue(alignCoral)
+                                     .onFalse(defaultSafe);
 
-    m_DriverController.leftTrigger().whileTrue(new ParallelDeadlineGroup(shooterCoral.IntakeCoralRoutine(),
-                                                                         elevator.MoveToLevel(HEIGHTS.CORAL_INTAKE),
-                                                                         shooter.MoveToIntake()))
-                                    .onFalse(shooter.StowShooter().andThen(elevator.MoveToLevel(HEIGHTS.HOME)));
-
-    m_DriverController.a().whileTrue(shooterCoral.DeployCoralRoutine())
-                          .onFalse(shooterCoral.StopCoral());
-
-
-    Pose2d three_left_start = new Pose2d(14.277, 5.853, Rotation2d.fromDegrees(-120));
-    try
-    {
-      PathPlannerPath threeLeftAlign = PathPlannerPath.fromPathFile("THREE-LEFT-ALIGN");
-      Command deploymentBum = new ParallelCommandGroup(elevator.MoveToLevel(HEIGHTS.FOUR), shooter.MoveToDeployHigh(), AutoBuilder.followPath(threeLeftAlign));
-      m_DriverController.y().onTrue(new SequentialCommandGroup(drivetrain.PathfindToPose(three_left_start), deploymentBum, shooterCoral.DeployCoralRoutine()));
-    }
-    catch(Exception e)
-    {
-      m_PackLog.Log("Three Left Align failed to load.");
-    }
+    m_DriverController.leftTrigger().whileTrue(intakeRoutine)
+                                    .onFalse(new ParallelCommandGroup(defaultSafe, wheels.CenterCoral()));
     
     m_CoDriverController.leftBumper().onTrue(dataStuff.Left().ignoringDisable(true));
     m_CoDriverController.rightBumper().onTrue(dataStuff.Right().ignoringDisable(true));
@@ -189,28 +165,28 @@ public class RobotContainer
     m_CoDriverController.b().onTrue(climb.setLatchVoltage(1)).onFalse(climb.setLatchVoltage(0));
     m_CoDriverController.y().onTrue(climb.setClimbVoltage(-1)).onFalse(climb.setClimbVoltage(0));
 
-    NamedCommands.registerCommand("ElevatorHome", elevator.MoveToLevel(HEIGHTS.HOME));
-    NamedCommands.registerCommand("CoralTwoDeploy", new ParallelCommandGroup(elevator.MoveToLevel(HEIGHTS.TWO), shooter.MoveToDeployLow()));
-    NamedCommands.registerCommand("CoralThreeDeploy", new ParallelCommandGroup(elevator.MoveToLevel(HEIGHTS.THREE), shooter.MoveToDeployLow()));
-    NamedCommands.registerCommand("CoralFourDeploy", new ParallelCommandGroup(elevator.MoveToLevel(HEIGHTS.FOUR), shooter.MoveToDeployHigh()));
-    NamedCommands.registerCommand("DeployCoral", shooterCoral.DeployCoralRoutine());
+    // NamedCommands.registerCommand("ElevatorHome", elevator.MoveToLevel(HEIGHTS.HOME));
+    // NamedCommands.registerCommand("CoralTwoDeploy", new ParallelCommandGroup(elevator.MoveToLevel(HEIGHTS.TWO), shooter.MoveToDeployLow()));
+    // NamedCommands.registerCommand("CoralThreeDeploy", new ParallelCommandGroup(elevator.MoveToLevel(HEIGHTS.THREE), shooter.MoveToDeployLow()));
+    // NamedCommands.registerCommand("CoralFourDeploy", new ParallelCommandGroup(elevator.MoveToLevel(HEIGHTS.FOUR), shooter.MoveToDeployHigh()));
+    // NamedCommands.registerCommand("DeployCoral", shooterCoral.DeployCoralRoutine());
 
-    NamedCommands.registerCommand("Align1L", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(0, 1)));
-    NamedCommands.registerCommand("Align1R", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(1, 1)));
-    NamedCommands.registerCommand("Align2L", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(0, 2)));
-    NamedCommands.registerCommand("Align2R", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(1, 2)));
-    NamedCommands.registerCommand("Align3L", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(0, 3)));
-    NamedCommands.registerCommand("Align3R", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(1, 3)));
-    NamedCommands.registerCommand("Align4L", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(0, 4)));
-    NamedCommands.registerCommand("Align4R", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(1, 4)));
-    NamedCommands.registerCommand("Align5L", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(0, 5)));
-    NamedCommands.registerCommand("Align5R", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(1, 5)));
-    NamedCommands.registerCommand("Align6L", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(0, 6)));
-    NamedCommands.registerCommand("Align6R", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(1, 6)));
+    // NamedCommands.registerCommand("Align1L", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(0, 1)));
+    // NamedCommands.registerCommand("Align1R", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(1, 1)));
+    // NamedCommands.registerCommand("Align2L", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(0, 2)));
+    // NamedCommands.registerCommand("Align2R", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(1, 2)));
+    // NamedCommands.registerCommand("Align3L", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(0, 3)));
+    // NamedCommands.registerCommand("Align3R", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(1, 3)));
+    // NamedCommands.registerCommand("Align4L", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(0, 4)));
+    // NamedCommands.registerCommand("Align4R", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(1, 4)));
+    // NamedCommands.registerCommand("Align5L", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(0, 5)));
+    // NamedCommands.registerCommand("Align5R", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(1, 5)));
+    // NamedCommands.registerCommand("Align6L", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(0, 6)));
+    // NamedCommands.registerCommand("Align6R", new ParallelDeadlineGroup(new WaitCommand(1.0), drivetrain.AlignToFace(1, 6)));
 
-    NamedCommands.registerCommand("ShooterLowPosition", new ParallelCommandGroup(shooter.MoveToDeployLow(), elevator.MoveToLevel(HEIGHTS.ZERO)));
+    // NamedCommands.registerCommand("ShooterLowPosition", new ParallelCommandGroup(shooter.MoveToDeployLow(), elevator.MoveToLevel(HEIGHTS.ZERO)));
 
-    NamedCommands.registerCommand("StartIntake", new ParallelDeadlineGroup(shooterCoral.IntakeCoralRoutine(), elevator.MoveToLevel(HEIGHTS.CORAL_INTAKE), shooter.MoveToIntake()));
+    // NamedCommands.registerCommand("StartIntake", new ParallelDeadlineGroup(shooterCoral.IntakeCoralRoutine(), elevator.MoveToLevel(HEIGHTS.CORAL_INTAKE), shooter.MoveToIntake()));
     
     try 
     {
@@ -233,14 +209,14 @@ public class RobotContainer
     m_DriverController.y().whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
     m_DriverController.x().whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-    drivetrain.setDefaultCommand
-    (
-        m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get().applyRequest(() ->
-            drive.withVelocityX(-m_DriverController.getLeftY() * TunerConstants.MaxSpeed)
-                 .withVelocityY(-m_DriverController.getLeftX() * TunerConstants.MaxSpeed)
-                 .withRotationalRate(-m_DriverController.getRightX() * TunerConstants.MaxAngularRate)
-        )
-    );
+    // drivetrain.setDefaultCommand
+    // (
+    //     m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get().applyRequest(() ->
+    //         drive.withVelocityX(-m_DriverController.getLeftY() * TunerConstants.MaxSpeed)
+    //              .withVelocityY(-m_DriverController.getLeftX() * TunerConstants.MaxSpeed)
+    //              .withRotationalRate(-m_DriverController.getRightX() * TunerConstants.MaxAngularRate)
+    //     )
+    // );
 
     //m_DriverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
     m_DriverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
@@ -253,8 +229,6 @@ public class RobotContainer
 
     CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
 
-    m_DriverController.start().onTrue(elevator.ZeroElevator());
-
     SysIdRoutine sysIdRoutine = elevator.BuildSysIdRoutine();
 
     m_DriverController.a().onTrue(elevator.MoveToLevel(HEIGHTS.ONE));
@@ -266,15 +240,6 @@ public class RobotContainer
     m_DriverController.povRight().whileTrue(sysIdRoutine.dynamic(Direction.kReverse));
     m_DriverController.povDown().whileTrue(sysIdRoutine.quasistatic(Direction.kForward));
     m_DriverController.povLeft().whileTrue(sysIdRoutine.quasistatic(Direction.kReverse));
-
-    drivetrain.setDefaultCommand
-    (
-        m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get().applyRequest(() ->
-            drive.withVelocityX(-m_DriverController.getLeftY() * TunerConstants.MaxSpeed)
-                 .withVelocityY(-m_DriverController.getLeftX() * TunerConstants.MaxSpeed)
-                 .withRotationalRate(-m_DriverController.getRightX() * TunerConstants.MaxAngularRate)
-        )
-    );
 
     System.out.println("[Wolfpack] Elevator Debug bindings successfully configured.");
   }
@@ -291,11 +256,6 @@ public class RobotContainer
     m_DriverController.povDown().whileTrue(sysIdRoutine.quasistatic(Direction.kForward));
     m_DriverController.povLeft().whileTrue(sysIdRoutine.quasistatic(Direction.kReverse));
 
-    m_DriverController.a().onTrue(shooter.StowShooter());
-    m_DriverController.b().onTrue(shooter.MoveToProcess());
-    m_DriverController.y().onTrue(shooter.MoveToDeployHigh());
-    m_DriverController.x().onTrue(shooter.MoveToDeployLow()); 
-
     System.out.println("[Wolfpack] Shooter Debug bindings successfully configured.");
   }
 
@@ -309,41 +269,8 @@ public class RobotContainer
 
   private void configureElevatorShooterDebugBindings()
   {
-    Drivetrain drivetrain = m_Manager.getSubsystemOfType(Drivetrain.class).get();
-
-    Elevator elevator = m_Manager.getSubsystemOfType(Elevator.class).get();
-    SmartDashboard.putData(elevator);
-
-    Wrist shooter = m_Manager.getSubsystemOfType(Wrist.class).get();
-    SmartDashboard.putData(shooter);
-
-    Wheels shooterCoral = m_Manager.getSubsystemOfType(Wheels.class).get();
-    SmartDashboard.putData(shooterCoral);
-    
-    drivetrain.setDefaultCommand
-    (
-        m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get().applyRequest(() ->
-            drive.withVelocityX(-m_DriverController.getLeftY() * TunerConstants.MaxSpeed)
-                 .withVelocityY(-m_DriverController.getLeftX() * TunerConstants.MaxSpeed)
-                 .withRotationalRate(-m_DriverController.getRightX() * TunerConstants.MaxAngularRate)
-        )
-    );
-
-    m_DriverController.a().onTrue(new ParallelCommandGroup(shooter.MoveToDeployLow(), elevator.MoveToLevel(HEIGHTS.TWO)))
-                          .onFalse(new ParallelCommandGroup(shooter.StowShooter(), elevator.MoveToLevel(HEIGHTS.HOME)));
-
-    m_DriverController.b().onTrue(new ParallelCommandGroup(shooter.MoveToDeployLow(), elevator.MoveToLevel(HEIGHTS.THREE)))
-                          .onFalse(new ParallelCommandGroup(shooter.StowShooter(), elevator.MoveToLevel(HEIGHTS.HOME)));
-    
-    m_DriverController.y().onTrue(new ParallelCommandGroup(shooter.MoveToDeployHigh(), elevator.MoveToLevel(HEIGHTS.FOUR)))
-                          .onFalse(new ParallelCommandGroup(shooter.StowShooter(), elevator.MoveToLevel(HEIGHTS.HOME)));
-
-    m_DriverController.rightBumper().onTrue(shooterCoral.DeployCoralRoutine()).onFalse(shooterCoral.StopCoral());
-
-    m_DriverController.leftTrigger().whileTrue(new ParallelDeadlineGroup(shooterCoral.IntakeCoralRoutine(),
-                                              elevator.MoveToLevel(HEIGHTS.CORAL_INTAKE),
-                                              shooter.MoveToIntake()));
-                                            }
+    // Empty for now.
+  }
 
   public Command getAutonomousCommand() 
   {

@@ -20,6 +20,11 @@ public class WheelConstants
     public static final RangingMode TOF_RANGING_MODE = RangingMode.Short;
     public static final double TOF_IN_RANGE_THRESHOLD = 70;
 
+    public static final double SAFETY_SIGNAL_DEBOUNCE_SECONDS = 0.0625;
+    public static final double MOTOR_RESISTANCE_SENSE_DEBOUNCE_SECONDS = 0.125;
+
+    public static final double ALGAE_RESISTANCE_VELOCITY_THRESHOLD = 0.5;
+
     public enum VoltageSpeeds
     {
         ZERO(0),

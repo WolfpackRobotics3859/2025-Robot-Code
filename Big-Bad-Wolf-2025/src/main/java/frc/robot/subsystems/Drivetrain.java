@@ -65,7 +65,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
     private final SwerveRequest.FieldCentric m_OperatorDriveRequest = new SwerveRequest.FieldCentric()
         .withDeadband(TunerConstants.MaxSpeed * 0.05).withRotationalDeadband(TunerConstants.MaxAngularRate * 0.05) // Add a 10% deadband
         .withDeadband(TunerConstants.MaxSpeed * 0.05).withRotationalDeadband(TunerConstants.MaxAngularRate * 0.05) // Add a 10% deadband
-        .withDriveRequestType(DriveRequestType.Velocity); // Use open-loop control for drive motors
+        .withDriveRequestType(DriveRequestType.Velocity); 
 
     private PhotonCamera m_ForwardCamera;
     private PhotonCamera m_FarCamera;
@@ -226,6 +226,52 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                      this);
     }
 
+    public Command RotationTesting(Pose2d testPose)
+    {
+        return new FunctionalCommand(() -> 
+                                        {
+                                            this.m_SwerveFieldCentricFacingAngle.TargetDirection = Rotation2d.kZero;
+                                        }, 
+                                     () -> UpdateRotationOnly(), 
+                                     interrupted -> {
+                                                        m_PackLog.Log("Alignment command finished.");
+                                                    }, 
+                                     () -> false, 
+                                     this);
+    }
+
+    public Command AlignXTesting(Pose2d testPose)
+    {
+        return new FunctionalCommand(() -> 
+                                        {
+                                            this.m_XController.reset();
+                                            this.m_XController.setSetpoint(testPose.getX());
+                                            this.m_SwerveFieldCentricFacingAngle.TargetDirection = Rotation2d.kZero;
+                                        }, 
+                                     () -> UpdateXOnly(), 
+                                     interrupted -> {
+                                                        m_PackLog.Log("Alignment command finished.");
+                                                    }, 
+                                     () -> false, 
+                                     this);
+    }
+
+    public Command AlignYTesting(Pose2d testPose)
+    {
+        return new FunctionalCommand(() -> 
+                                        {
+                                            this.m_YController.reset();
+                                            this.m_YController.setSetpoint(testPose.getY());
+                                            this.m_SwerveFieldCentricFacingAngle.TargetDirection = Rotation2d.kZero;
+                                        }, 
+                                     () -> UpdateYOnly(), 
+                                     interrupted -> {
+                                                        m_PackLog.Log("Alignment command finished.");
+                                                    }, 
+                                     () -> false, 
+                                     this);
+    }
+
 
 
     private Pose2d GetGoalCoralPose()
@@ -259,7 +305,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
     {
         // Create the constraints to use while pathfinding
         PathConstraints constraints = new PathConstraints(
-            1.0, 4.0,
+            3.0, 4.0,
             Units.degreesToRadians(540), Units.degreesToRadians(720));
 
         // Since AutoBuilder is configured, we can use it to build pathfinding commands
@@ -298,6 +344,54 @@ public class Drivetrain extends CommandSwerveDrivetrain
         {
             this.m_SwerveFieldCentricFacingAngle.VelocityX = this.GetXOutput();
             this.m_SwerveFieldCentricFacingAngle.VelocityY = this.GetYOutput();
+            this.setControl(m_SwerveFieldCentricFacingAngle);
+        }
+    }
+
+    private void UpdateYOnly()
+    {
+        if(alliance == Alliance.Red)
+        {
+            this.m_SwerveFieldCentricFacingAngle.VelocityX = 0;
+            this.m_SwerveFieldCentricFacingAngle.VelocityY = -this.GetYOutput();
+            this.setControl(m_SwerveFieldCentricFacingAngle);
+        }
+        else
+        {
+            this.m_SwerveFieldCentricFacingAngle.VelocityX = 0;
+            this.m_SwerveFieldCentricFacingAngle.VelocityY = this.GetYOutput();
+            this.setControl(m_SwerveFieldCentricFacingAngle);
+        }
+    }
+
+    private void UpdateXOnly()
+    {
+        if(alliance == Alliance.Red)
+        {
+            this.m_SwerveFieldCentricFacingAngle.VelocityX = -this.GetXOutput();
+            this.m_SwerveFieldCentricFacingAngle.VelocityY = 0;
+            this.setControl(m_SwerveFieldCentricFacingAngle);
+        }
+        else
+        {
+            this.m_SwerveFieldCentricFacingAngle.VelocityX = this.GetXOutput();
+            this.m_SwerveFieldCentricFacingAngle.VelocityY = 0;
+            this.setControl(m_SwerveFieldCentricFacingAngle);
+        }
+    }
+
+    private void UpdateRotationOnly()
+    {
+        if(alliance == Alliance.Red)
+        {
+            this.m_SwerveFieldCentricFacingAngle.VelocityX = 0;
+            this.m_SwerveFieldCentricFacingAngle.VelocityY = 0;
+            this.setControl(m_SwerveFieldCentricFacingAngle);
+        }
+        else
+        {
+            this.m_SwerveFieldCentricFacingAngle.VelocityX = 0;
+            this.m_SwerveFieldCentricFacingAngle.VelocityY = 0;
             this.setControl(m_SwerveFieldCentricFacingAngle);
         }
     }
