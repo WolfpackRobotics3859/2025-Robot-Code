@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.controls.VoltageOut;
+import com.playingwithfusion.TimeOfFlight;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -17,6 +18,8 @@ public class Climb extends SubsystemBase
 { 
   private final VoltageOut m_VoltageRequest;
 
+  private final TimeOfFlight m_TOF;
+
   /**
    * Climb subsystem constructor.
    */
@@ -25,6 +28,8 @@ public class Climb extends SubsystemBase
     MotorManager.AddMotor("CLIMB WRIST MOTOR", Hardware.CLIMB_WRIST_MOTOR_ID);
     MotorManager.AddMotor("CLIMB ROLLER MOTOR", Hardware.CLIMB_ROLLER_MOTOR_ID);
     MotorManager.AddMotor("FUNNEL LATCH MOTOR", Hardware.CLIMB_RELEASE_MOTOR_ID);
+
+    this.m_TOF = new TimeOfFlight(Hardware.CLIMB_TOF_SENSOR);
 
     MotorManager.ApplyConfigs(ClimbConstants.WRIST_MOTOR_CONFIG, Hardware.CLIMB_WRIST_MOTOR_ID);
     MotorManager.ApplyConfigs(ClimbConstants.ROLLER_MOTOR_CONFIG, Hardware.CLIMB_ROLLER_MOTOR_ID);

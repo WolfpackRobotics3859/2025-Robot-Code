@@ -1,11 +1,16 @@
 package frc.robot.constants;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.CustomParamsConfigs;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -17,15 +22,15 @@ public class WristConstants
 
     public enum ANGLES 
     {
-        ZERO(0),
-        TRAVEL(-1.46),
-        DEPLOY_LOW(-2.5),
-        DEPLOY_HIGH(-0.5),
-        INTAKE(-0.4),
-        SWEEP(-0.5),
-        BARGE(-0.15),
-        PROCESSOR(-0.5),
-        GRAB(-0.5);
+        ZERO(-0.077637),
+        TRAVEL(-0.065918),
+        DEPLOY_LOW(-0.053955),
+        DEPLOY_HIGH(-0.077637),
+        INTAKE(-0.077637),
+        SWEEP(0.049561),
+        BARGE(-0.065918),
+        PROCESSOR(0.107666),
+        GRAB(0.161865);
 
         private double levelValue;
 
@@ -43,10 +48,14 @@ public class WristConstants
     // Maximum allowable magnitude deviation from setpoint when determining the end of the movement command.
     public static final double WRIST_POSITION_ERROR_TOLERANCE = 0.5;
     public static final double WRIST_POSITION_DERIVATIVE_TOLERANCE = 0.05;
+
+    public static final MagnetSensorConfigs MAG_SENSOR_CONFIGS = new MagnetSensorConfigs().withMagnetOffset(-0.471435546875);
+
+    public static final CANcoderConfiguration CANCODER_CONFIG = new CANcoderConfiguration().withMagnetSensor(MAG_SENSOR_CONFIGS);
     
     // WRIST MOTOR CONFIGS
     public static final MotorOutputConfigs WRIST_MOTOR_OUTPUT_CONFIG = new MotorOutputConfigs()
-                                                                          .withInverted(InvertedValue.Clockwise_Positive)
+                                                                          .withInverted(InvertedValue.CounterClockwise_Positive)
                                                                           .withNeutralMode(NeutralModeValue.Brake)
                                                                           .withPeakForwardDutyCycle(1)
                                                                           .withPeakReverseDutyCycle(-1);
@@ -68,7 +77,7 @@ public class WristConstants
                                                                     .withKD(0)
                                                                     .withKG(0)
                                                                     .withKI(0)
-                                                                    .withKP(15)
+                                                                    .withKP(35)
                                                                     .withKS(0)
                                                                     .withKV(0)
                                                                     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
@@ -80,10 +89,15 @@ public class WristConstants
                                                                                 .withMotionMagicExpo_kV(0.12)
                                                                                 .withMotionMagicJerk(0);
     
+    public static final FeedbackConfigs MOTOR_FEEDBACK_CONFIGS = new FeedbackConfigs()
+                                                                     .withFeedbackRemoteSensorID(Hardware.WRIST_ENCODER)
+                                                                     .withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder);
+    
     public static final TalonFXConfiguration WRIST_MOTOR_CONFIG = new TalonFXConfiguration()
                                                                      .withMotorOutput(WRIST_MOTOR_OUTPUT_CONFIG)
                                                                      .withClosedLoopGeneral(WRIST_MOTOR_CLOSED_LOOP_GENERAL_CONFIG)
                                                                      .withCurrentLimits(WRIST_MOTOR_CURRENT_LIMIT_CONFIG)
                                                                      .withSlot0(WRIST_MOTOR_SLOT_0_CONFIG)
-                                                                     .withMotionMagic(WRIST_MOTOR_MOTION_MAGIC_CONFIG);
+                                                                     .withMotionMagic(WRIST_MOTOR_MOTION_MAGIC_CONFIG)
+                                                                     .withFeedback(MOTOR_FEEDBACK_CONFIGS);
 }

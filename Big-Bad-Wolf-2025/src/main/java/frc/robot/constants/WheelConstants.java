@@ -30,10 +30,10 @@ public class WheelConstants
         ZERO(0),
         INTAKE(2),
         SWEEP(2),
-        FORWARD_CENTERING(2),
-        REVERSE_CENTERING(2),
+        FORWARD_CENTERING(1.5),
+        REVERSE_CENTERING(-1.5),
         DEPLOY_LOW(6),
-        DEPLOY_HIGH(6),
+        DEPLOY_HIGH(8),
         BARGE(9);
 
         private double value;

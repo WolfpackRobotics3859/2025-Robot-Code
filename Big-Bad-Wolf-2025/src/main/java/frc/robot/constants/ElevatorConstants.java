@@ -5,6 +5,7 @@
 package frc.robot.constants;
 
 import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
+import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -28,12 +29,12 @@ public class ElevatorConstants
         TRAVEL(1),
         ONE(10),
         TWO(20),
-        THREE(30),
-        FOUR(40),
+        THREE(35),
+        FOUR(58),
         INTAKE(1),
         LOW_CLEAN(25),
         HIGH_CLEAN(35),
-        BARGE(64),
+        BARGE(55),
         PROCESS(2);
 
         private double levelValue;
@@ -60,7 +61,7 @@ public class ElevatorConstants
                                                                                              .withContinuousWrap(false);
 
     public static final CurrentLimitsConfigs LEFT_MOTOR_CURRENT_LIMIT_CONFIG = new CurrentLimitsConfigs()
-                                                                                    .withStatorCurrentLimit(60)
+                                                                                    .withStatorCurrentLimit(70)
                                                                                     .withStatorCurrentLimitEnable(true)
                                                                                     .withSupplyCurrentLimit(20)
                                                                                     .withSupplyCurrentLimitEnable(true)
@@ -79,8 +80,8 @@ public class ElevatorConstants
                                                                     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
 
     public static final MotionMagicConfigs LEFT_MOTOR_MOTION_MAGIC_CONFIG = new MotionMagicConfigs()
-                                                                                .withMotionMagicAcceleration(175)
-                                                                                .withMotionMagicCruiseVelocity(800)
+                                                                                .withMotionMagicAcceleration(300)
+                                                                                .withMotionMagicCruiseVelocity(1200)
                                                                                 .withMotionMagicExpo_kA(0.014085)
                                                                                 .withMotionMagicExpo_kV(0.11636)
                                                                                 .withMotionMagicJerk(0);

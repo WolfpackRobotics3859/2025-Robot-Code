@@ -9,11 +9,14 @@ public class Hardware
     // MOTORS
     public static final int ELEVATOR_MOTOR = 1;
     public static final int WRIST_MOTOR_ID = 2;
-    public static final int ALGAE_MOTOR_ID = 3;
-    public static final int CORAL_MOTOR_ID = 4;
-    public static final int CLIMB_WRIST_MOTOR_ID = 5;
-    public static final int CLIMB_ROLLER_MOTOR_ID = 6;
-    public static final int CLIMB_RELEASE_MOTOR_ID = 7;
+    public static final int WHEELS_MOTOR_ID = 3;
+    public static final int CLIMB_WRIST_MOTOR_ID = 4;
+    public static final int CLIMB_ROLLER_MOTOR_ID = 5;
+    public static final int CLIMB_RELEASE_MOTOR_ID = 6;
+
+    // CANCODERS
+    public static final int CLIMB_ENCODER = 0;
+    public static final int WRIST_ENCODER = 1;
 
     // TOF SENSORS
     public static final int CORAL_FORWARD_TOF_SENSOR = 0;

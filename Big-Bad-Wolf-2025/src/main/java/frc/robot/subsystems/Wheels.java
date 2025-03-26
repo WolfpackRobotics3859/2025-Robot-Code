@@ -16,15 +16,14 @@ import com.playingwithfusion.TimeOfFlight;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constants.Hardware;
 import frc.robot.constants.WheelConstants;
 import frc.robot.constants.WheelConstants.VoltageSpeeds;
-import frc.robot.constants.WristConstants;
 import frc.robot.utilities.MotorManager;
 import frc.robot.utilities.PackLog;
 
@@ -52,9 +51,9 @@ public class Wheels extends SubsystemBase
     {
         this.m_PackLog = new PackLog(WheelConstants.NAME);
 
-        MotorManager.AddMotor("WHEEL MOTOR", Hardware.CORAL_MOTOR_ID);
-        MotorManager.ApplyConfigs(WheelConstants.MOTOR_CONFIG, Hardware.CORAL_MOTOR_ID);
-        this.m_WheelsMotor = MotorManager.GetMotor(Hardware.CORAL_MOTOR_ID);
+        MotorManager.AddMotor("WHEEL MOTOR", Hardware.WHEELS_MOTOR_ID);
+        MotorManager.ApplyConfigs(WheelConstants.MOTOR_CONFIG, Hardware.WHEELS_MOTOR_ID);
+        this.m_WheelsMotor = MotorManager.GetMotor(Hardware.WHEELS_MOTOR_ID);
 
         this.m_VelocitySignal = this.m_WheelsMotor.getVelocity();
         this.m_PositionSignal = this.m_WheelsMotor.getPosition();
@@ -74,7 +73,8 @@ public class Wheels extends SubsystemBase
     @Override
     public void periodic() 
     {
-        // Intentionally Empty
+        SmartDashboard.putBoolean("Forward Active", this.ForwardActive());
+        SmartDashboard.putBoolean("Rear Active", this.RearActive());
     }
 
     public Command BeginCoralIntakeRoutine()
@@ -93,6 +93,7 @@ public class Wheels extends SubsystemBase
                                                       interrupted -> 
                                                       {
                                                         this.SetPosition(this.m_PositionSignal.refresh().getValueAsDouble());
+                                                        this.m_PackLog.Log("Centering complete");
                                                       }, 
                                                       () -> this.SimpleCentering(),
                                                       this);
@@ -108,6 +109,30 @@ public class Wheels extends SubsystemBase
                                         this.SetPosition(this.m_PositionSignal.refresh().getValueAsDouble());
                                      }, 
                                      () -> this.SenseAlgae() || this.AnyActive(),
+                                     this);
+    }
+
+    public Command DeployCoralLow()
+    {
+        return new FunctionalCommand(() -> this.SetVoltage(VoltageSpeeds.DEPLOY_LOW),
+                                     () -> {},
+                                     interrupted -> 
+                                     {
+                                        this.SetVoltage(VoltageSpeeds.ZERO);
+                                     }, 
+                                     () -> !this.AnyActive(),
+                                     this);
+    }
+
+    public Command DeployCoralHigh()
+    {
+        return new FunctionalCommand(() -> this.SetVoltage(VoltageSpeeds.DEPLOY_HIGH),
+                                     () -> {},
+                                     interrupted -> 
+                                     {
+                                        this.SetVoltage(VoltageSpeeds.ZERO);
+                                     }, 
+                                     () -> !this.AnyActive(),
                                      this);
     }
 
@@ -135,12 +160,12 @@ public class Wheels extends SubsystemBase
 
     private void SetVoltage(VoltageSpeeds speed)
     {
-        MotorManager.ApplyControlRequest(m_VoltageRequest.withOutput(speed.getValue()), Hardware.CORAL_MOTOR_ID);
+        MotorManager.ApplyControlRequest(m_VoltageRequest.withOutput(speed.getValue()), Hardware.WHEELS_MOTOR_ID);
     }
 
     private void SetPosition(double position)
     {
-        MotorManager.ApplyControlRequest(m_PositionRequest.withPosition(position), Hardware.CORAL_MOTOR_ID);
+        MotorManager.ApplyControlRequest(m_PositionRequest.withPosition(position), Hardware.WHEELS_MOTOR_ID);
     }
 
     private void UpdateSafetySignal()
@@ -186,11 +211,13 @@ public class Wheels extends SubsystemBase
 
                 if(this.RearActive())
                 {
+                    this.m_PackLog.Log("Entering CASE 3");
                     this.SetVoltage(VoltageSpeeds.INTAKE);
                     this.m_CenteringState = 3;
                 }
                 else
                 {
+                    this.m_PackLog.Log("Entering CASE 1");
                     this.SetVoltage(VoltageSpeeds.REVERSE_CENTERING);
                     this.m_CenteringState = 1;
                 }
@@ -199,6 +226,7 @@ public class Wheels extends SubsystemBase
             case 1:
                 if(this.RearActive())
                 {
+                    this.m_PackLog.Log("Entering CASE 2");
                     this.SetVoltage(VoltageSpeeds.FORWARD_CENTERING);
                     this.m_CenteringState = 2;
                 }
@@ -207,6 +235,7 @@ public class Wheels extends SubsystemBase
             case 2:
                 if(!this.RearActive())
                 {
+                    this.m_PackLog.Log("Finishing Centering");
                     this.SetVoltage(VoltageSpeeds.ZERO);
                     return true;
                 }

@@ -10,6 +10,7 @@ import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import static edu.wpi.first.units.Units.Seconds;
@@ -45,6 +46,7 @@ public class Wrist extends SubsystemBase
   private final PackLog m_Logger;
 
   private final TalonFX m_WristMotor;
+  private final CANcoder m_Encoder;
   private SysIdRoutine m_SysIdRoutine;
 
   private final MotionMagicVoltage m_WristPositionRequest;
@@ -69,6 +71,8 @@ public class Wrist extends SubsystemBase
     MotorManager.AddMotor("WRIST MOTOR", Hardware.WRIST_MOTOR_ID);
     this.m_WristMotor = MotorManager.GetMotor(Hardware.WRIST_MOTOR_ID);
     MotorManager.ApplyConfigs(WristConstants.WRIST_MOTOR_CONFIG, Hardware.WRIST_MOTOR_ID);
+
+    this.m_Encoder = new CANcoder(Hardware.WRIST_ENCODER);
 
     this.m_WristPositionRequest = new MotionMagicVoltage(0);
     this.m_BrakeRequest = new StaticBrake();
@@ -166,7 +170,7 @@ public class Wrist extends SubsystemBase
   private boolean isReady(double positionTolerance, double derivativeTolerance)
   {
     StatusSignal.refreshAll(this.m_WristRPS, this.m_WristPosition);
-    if((Math.abs(this.m_WristPosition.getValueAsDouble()) > derivativeTolerance) || (Math.abs(this.m_WristPosition.getValueAsDouble() - this.m_WristPositionRequest.Position) > positionTolerance))
+    if((Math.abs(this.m_WristRPS.getValueAsDouble()) > derivativeTolerance) || (Math.abs(this.m_WristPosition.getValueAsDouble() - this.m_WristPositionRequest.Position) > positionTolerance))
     {
       return false;
     }

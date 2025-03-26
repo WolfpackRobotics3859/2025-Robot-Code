@@ -132,6 +132,24 @@ public class Drivetrain extends CommandSwerveDrivetrain
     }
     }
 
+    public Command Align(Pose2d goalPose)
+    {
+        return new FunctionalCommand(() -> 
+                                        {
+                                            this.m_XController.reset();
+                                            this.m_YController.reset();
+                                            this.m_XController.setSetpoint(goalPose.getX());
+                                            this.m_YController.setSetpoint(goalPose.getY());
+                                            this.m_SwerveFieldCentricFacingAngle.TargetDirection = goalPose.getRotation().rotateBy(Rotation2d.k180deg);
+                                        }, 
+                                     () -> UpdateRequest(), 
+                                     interrupted -> {
+                                                        m_PackLog.Log("Alignment command finished.");
+                                                    }, 
+                                     () -> IsAlignmentComplete(), 
+                                     this);
+    }
+
     public Command AlignCoral()
     {
         return new FunctionalCommand(() -> 
@@ -252,7 +270,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                      interrupted -> {
                                                         m_PackLog.Log("Alignment command finished.");
                                                     }, 
-                                     () -> false, 
+                                     () -> this.m_XController.atSetpoint(), 
                                      this);
     }
 
@@ -268,7 +286,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                      interrupted -> {
                                                         m_PackLog.Log("Alignment command finished.");
                                                     }, 
-                                     () -> false, 
+                                     () -> this.m_YController.atSetpoint(), 
                                      this);
     }
 
@@ -406,7 +424,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
         return MathUtil.clamp(this.m_YController.calculate(this.getState().Pose.getY()), -TunerConstants.MaxSpeed, TunerConstants.MaxSpeed);
     }
 
-    Debouncer debounce = new Debouncer(0.25, DebounceType.kRising);
+    Debouncer debounce = new Debouncer(0.00, DebounceType.kRising);
 
     private boolean IsAlignmentComplete()
     {
@@ -429,12 +447,14 @@ public class Drivetrain extends CommandSwerveDrivetrain
 
     private void ConfigurePIDControllers()
     {
-        this.m_XController = new PIDController(10, 0.0,0); // 20 0.1 0.025
-        this.m_XController.setTolerance(Meters.convertFrom(0.5, Inches), MetersPerSecond.convertFrom(0.5, InchesPerSecond));
+        this.m_XController = new PIDController(5, 10,0.7); // 20 0.1 0.025
+        this.m_XController.setTolerance(Meters.convertFrom(0.5, Inches), MetersPerSecond.convertFrom(3, InchesPerSecond));
+        this.m_XController.setIZone(0.1); // 0.0762
         SmartDashboard.putData(this.m_XController);
 
-        this.m_YController = new PIDController (10, 0.0 ,0);
-        this.m_YController.setTolerance(Meters.convertFrom(0.5, Inches), MetersPerSecond.convertFrom(0.5, InchesPerSecond));
+        this.m_YController = new PIDController (5, 10,0.7);
+        this.m_YController.setTolerance(Meters.convertFrom(0.5, Inches), MetersPerSecond.convertFrom(3, InchesPerSecond));
+        this.m_XController.setIZone(0.1);
         SmartDashboard.putData(this.m_YController);
     }
 

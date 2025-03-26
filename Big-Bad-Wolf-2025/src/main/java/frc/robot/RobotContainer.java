@@ -4,12 +4,7 @@
 
 package frc.robot;
 
-import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-
-import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -18,9 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.constants.Global;
 import frc.robot.constants.ClimbConstants;
@@ -105,6 +98,7 @@ public class RobotContainer
         m_Manager.addSubsystem(new Elevator());
         m_Manager.addSubsystem(new Wrist());
         m_Manager.addSubsystem(new Wheels());
+        m_Manager.addSubsystem(new DataStuff());
         this.configureElevatorShooterDebugBindings();
       break;
       
@@ -141,16 +135,16 @@ public class RobotContainer
         drivetrain.DefaultDrive(() -> m_DriverController.getLeftY(), () -> m_DriverController.getLeftX(), () -> m_DriverController.getRightX())
     );
 
-    Command defaultSafe = new SequentialCommandGroup(wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.TRAVEL));
-    Command alignCoral = new ParallelCommandGroup(drivetrain.AlignCoral(), wrist.MoveToSelectedCoralDeployment(), elevator.MoveToDataLevel());
-    Command beginIntaking = new SequentialCommandGroup(wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.INTAKE), wrist.MoveToAngle(ANGLES.INTAKE)).withDeadline(wheels.BeginCoralIntakeRoutine());
-    Command intakeRoutine = new SequentialCommandGroup(beginIntaking, new ParallelCommandGroup(defaultSafe, wheels.CenterCoral()));
+   // Command defaultSafe = new SequentialCommandGroup(wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.TRAVEL));
+   // Command alignCoral = new ParallelCommandGroup(drivetrain.AlignCoral(), wrist.MoveToSelectedCoralDeployment(), elevator.MoveToDataLevel());
+   // Command beginIntaking = new SequentialCommandGroup(wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.INTAKE), wrist.MoveToAngle(ANGLES.INTAKE)).withDeadline(wheels.BeginCoralIntakeRoutine());
+   // Command intakeRoutine = new SequentialCommandGroup(beginIntaking, new ParallelCommandGroup(defaultSafe, wheels.CenterCoral()));
 
-    m_DriverController.rightTrigger().whileTrue(alignCoral)
-                                     .onFalse(defaultSafe);
+    m_DriverController.rightTrigger().onTrue(new ParallelCommandGroup(drivetrain.AlignCoral(), wrist.MoveToSelectedCoralDeployment(), elevator.MoveToDataLevel()).andThen(wheels.DeployCoralLow())) // change later to selection
+                                     .onFalse(new SequentialCommandGroup(wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.TRAVEL)));
 
-    m_DriverController.leftTrigger().whileTrue(intakeRoutine)
-                                    .onFalse(new ParallelCommandGroup(defaultSafe, wheels.CenterCoral()));
+    m_DriverController.leftTrigger().onTrue(new SequentialCommandGroup(elevator.MoveToLevel(HEIGHTS.INTAKE), wrist.MoveToAngle(ANGLES.INTAKE)).withDeadline(new SequentialCommandGroup(wheels.BeginCoralIntakeRoutine(), wheels.CenterCoral())))
+                                    .onFalse(new ParallelCommandGroup(new SequentialCommandGroup(wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.TRAVEL)), wheels.CenterCoral()));
     
     m_CoDriverController.leftBumper().onTrue(dataStuff.Left().ignoringDisable(true));
     m_CoDriverController.rightBumper().onTrue(dataStuff.Right().ignoringDisable(true));
@@ -202,12 +196,17 @@ public class RobotContainer
 
   private void configureDrivetrainDebugBindings()
   {
-    CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
+    Drivetrain drivetrain = m_Manager.getSubsystemOfType(Drivetrain.class).get();
 
-    m_DriverController.a().whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-    m_DriverController.b().whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-    m_DriverController.y().whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-    m_DriverController.x().whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+    drivetrain.setDefaultCommand
+    (
+        drivetrain.DefaultDrive(() -> m_DriverController.getLeftY(), () -> m_DriverController.getLeftX(), () -> m_DriverController.getRightX())
+    );
+
+    // m_DriverController.a().whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+    // m_DriverController.b().whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+    // m_DriverController.y().whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+    // m_DriverController.x().whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
     // drivetrain.setDefaultCommand
     // (
@@ -217,9 +216,11 @@ public class RobotContainer
     //              .withRotationalRate(-m_DriverController.getRightX() * TunerConstants.MaxAngularRate)
     //     )
     // );
-
-    //m_DriverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
-    m_DriverController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+     m_DriverController.x().onTrue(drivetrain.Align(new Pose2d(14.015, 5.1, Rotation2d.fromDegrees(-119.34))));
+     m_DriverController.a().whileTrue(drivetrain.AlignXTesting(new Pose2d(1, 1, Rotation2d.k180deg)));
+     m_DriverController.b().whileTrue(drivetrain.AlignYTesting(new Pose2d(1, 1, Rotation2d.k180deg)));
+     m_DriverController.y().whileTrue(drivetrain.RotationTesting(new Pose2d(1, 1, Rotation2d.k180deg)));
+    // m_DriverController.x().whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
   }
 
   private void configureElevatorDebugBindings()
@@ -269,7 +270,38 @@ public class RobotContainer
 
   private void configureElevatorShooterDebugBindings()
   {
-    // Empty for now.
+    Drivetrain drivetrain = m_Manager.getSubsystemOfType(Drivetrain.class).get();
+
+    Elevator elevator = m_Manager.getSubsystemOfType(Elevator.class).get();
+    SmartDashboard.putData(elevator);
+
+    Wrist wrist = m_Manager.getSubsystemOfType(Wrist.class).get();
+    SmartDashboard.putData(wrist);
+
+    DataStuff dataStuff = m_Manager.getSubsystemOfType(DataStuff.class).get();
+    SmartDashboard.putData(dataStuff);
+
+    Wheels wheels = m_Manager.getSubsystemOfType(Wheels.class).get();
+    SmartDashboard.putData(wheels);
+
+    drivetrain.setDefaultCommand
+    (
+        drivetrain.DefaultDrive(() -> m_DriverController.getLeftY(), () -> m_DriverController.getLeftX(), () -> m_DriverController.getRightX())
+    );
+
+    m_DriverController.rightTrigger().whileTrue(new ParallelCommandGroup(wrist.MoveToSelectedCoralDeployment(), elevator.MoveToDataLevel()))
+                                     .onFalse(new SequentialCommandGroup(wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.TRAVEL)));
+
+    m_DriverController.leftTrigger().onTrue(new SequentialCommandGroup(new SequentialCommandGroup(wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.INTAKE), wrist.MoveToAngle(ANGLES.INTAKE)).withDeadline(wheels.BeginCoralIntakeRoutine()), new ParallelCommandGroup(new SequentialCommandGroup(wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.TRAVEL)), wheels.CenterCoral())))
+                                    .onFalse(new ParallelCommandGroup(new SequentialCommandGroup(wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.TRAVEL)), wheels.CenterCoral()));
+
+    m_DriverController.a().whileTrue(wheels.DeployCoralLow());
+    m_DriverController.b().whileTrue(wheels.DeployCoralHigh());
+
+    m_CoDriverController.leftBumper().onTrue(dataStuff.Left().ignoringDisable(true));
+    m_CoDriverController.rightBumper().onTrue(dataStuff.Right().ignoringDisable(true));
+    m_CoDriverController.povUp().onTrue(dataStuff.Up().ignoringDisable(true));
+    m_CoDriverController.povDown().onTrue(dataStuff.Down().ignoringDisable(true));
   }
 
   public Command getAutonomousCommand() 

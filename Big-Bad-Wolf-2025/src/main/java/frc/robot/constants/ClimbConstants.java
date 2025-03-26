@@ -4,22 +4,74 @@
 
 package frc.robot.constants;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
 // Initializing constants for Climb.
 public class ClimbConstants 
 {
     public static final double CLIMB_WRIST_VOLTAGE = 2;
-    public static final double CLIMB_ROLLER_VOLTAGE = 2;
+    public static final double CLIMB_ROLLER_VOLTAGE = 4;
+
+    public static final double CLIMB_RESTING_POSITION = 0.0;
+    public static final double CLIMB_CLIMB_POSITION = 0.0;
+    public static final double CLIMB_TAKING_POSITION = 0.0;
 
     public static final MotorOutputConfigs CLIMB_WRIST_MOTOR_OUTPUT = new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive);
     public static final MotorOutputConfigs CLIMB_ROLLER_MOTOR_OUTPUT = new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive);
     public static final MotorOutputConfigs CORAL_FUNNEL_MOTOR_OUTPUT = new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive);
 
+
+    public static final MagnetSensorConfigs MAG_SENSOR_CONFIGS = new MagnetSensorConfigs().withMagnetOffset(0.217529296875);
+
+    public static final CANcoderConfiguration CANCODER_CONFIG = new CANcoderConfiguration().withMagnetSensor(MAG_SENSOR_CONFIGS);
+
+    public static final FeedbackConfigs WRIST_FEEDBACK_CONFIGS = new FeedbackConfigs()
+                                                                     .withFeedbackRemoteSensorID(Hardware.CLIMB_ENCODER)
+                                                                     .withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder);
+
+    public static final CurrentLimitsConfigs WRIST_MOTOR_CURRENT_LIMIT_CONFIG = new CurrentLimitsConfigs()
+                                                                                    .withStatorCurrentLimit(120)
+                                                                                    .withStatorCurrentLimitEnable(true)
+                                                                                    .withSupplyCurrentLimit(20)
+                                                                                    .withSupplyCurrentLimitEnable(true)
+                                                                                    .withSupplyCurrentLowerLimit(30)
+                                                                                    .withSupplyCurrentLowerTime(1);
+
+    public static final Slot0Configs WRIST_MOTOR_SLOT_0_CONFIG = new Slot0Configs()
+                                                                    .withGravityType(GravityTypeValue.Elevator_Static)
+                                                                    .withKA(0.0)
+                                                                    .withKD(0.0)
+                                                                    .withKG(0.0)
+                                                                    .withKI(0)
+                                                                    .withKP(30)
+                                                                    .withKS(0.0)
+                                                                    .withKV(0.0)
+                                                                    .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
+
+    public static final MotionMagicConfigs WRIST_MOTOR_MOTION_MAGIC_CONFIG = new MotionMagicConfigs()
+                                                                                .withMotionMagicAcceleration(5)
+                                                                                .withMotionMagicCruiseVelocity(5)
+                                                                                .withMotionMagicExpo_kA(0.014085)
+                                                                                .withMotionMagicExpo_kV(0.11636)
+                                                                                .withMotionMagicJerk(0);
+
     public static final TalonFXConfiguration WRIST_MOTOR_CONFIG = new TalonFXConfiguration()
-        .withMotorOutput(CLIMB_WRIST_MOTOR_OUTPUT);
+        .withMotorOutput(CLIMB_WRIST_MOTOR_OUTPUT)
+        .withSlot0(WRIST_MOTOR_SLOT_0_CONFIG)
+        .withMotionMagic(WRIST_MOTOR_MOTION_MAGIC_CONFIG)
+        .withFeedback(WRIST_FEEDBACK_CONFIGS)
+        .withCurrentLimits(WRIST_MOTOR_CURRENT_LIMIT_CONFIG);
 
     public static final TalonFXConfiguration ROLLER_MOTOR_CONFIG = new TalonFXConfiguration()
         .withMotorOutput(CLIMB_ROLLER_MOTOR_OUTPUT);
