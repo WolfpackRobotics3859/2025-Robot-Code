@@ -13,6 +13,7 @@ public class Global
     {
         COMPETITION,
         FIELD_CALIBRATION,
+        COMPETITION_NO_VISION,
         DRIVETRAIN_DEBUG,
         ELEVATOR_DEBUG,
         SHOOTER_DEBUG,

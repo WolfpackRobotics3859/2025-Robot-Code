@@ -5,9 +5,11 @@
 package frc.robot;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static edu.wpi.first.units.Units.Degrees;
 
+import java.io.File;
 import java.lang.System.Logger.Level;
 
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -39,9 +41,9 @@ import frc.robot.subsystems.ShooterCoral;
 import frc.robot.utilities.AlgaeCommandBuilder;
 import frc.robot.utilities.CoralCommandBuilder;
 import frc.robot.utilities.DataStuff;
-import frc.robot.utilities.FieldCalibrator;
 import frc.robot.utilities.PackLog;
 import frc.robot.utilities.SubsystemManager;
+import frc.robot.utilities.fieldCalibration.FieldCalibrator;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.Climb;
@@ -102,11 +104,21 @@ public class RobotContainer
         m_Manager.addSubsystem(new Climb());
         m_Manager.addSubsystem(new Shooter());
         m_Manager.addSubsystem(new DataStuff());
+      break;
+
+      case COMPETITION_NO_VISION:
+        m_Manager.addSubsystem(new Drivetrain(TunerConstants.DrivetrainConstants, TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight));
+        m_Manager.addSubsystem(new ShooterCoral());
+        m_Manager.addSubsystem(new ShooterAlgae());
+        m_Manager.addSubsystem(new Elevator());
+        m_Manager.addSubsystem(new Climb());
+        m_Manager.addSubsystem(new Shooter());
+        m_Manager.addSubsystem(new DataStuff());
         this.configureCompetitionBindings();
       break;
 
       case FIELD_CALIBRATION:
-        m_Manager.addSubsystem(TunerConstants.createDrivetrain());
+        m_Manager.addSubsystem(new Drivetrain(TunerConstants.DrivetrainConstants, TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight));
         this.configureFieldCalibrationBindings();
         break;
 
@@ -252,9 +264,28 @@ public class RobotContainer
   {
     CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
     FieldCalibrator fieldCalibrator = new FieldCalibrator(drivetrain);
+
     m_DriverController.a().onTrue(new InstantCommand(() -> 
     {
       System.out.printf("Current X: %f, Current Y: %f, Current Rotation: %s \n",fieldCalibrator.getPose2d().getX(), fieldCalibrator.getPose2d().getY(), fieldCalibrator.getPose2d().getRotation());
+    }).ignoringDisable(true));
+
+
+    m_DriverController.b().onTrue(new InstantCommand(() -> 
+    {
+        fieldCalibrator.calibratePosition();
+    }).ignoringDisable(true));
+
+    m_DriverController.y().onTrue(new InstantCommand(() ->
+    {
+      ObjectMapper mapper = new ObjectMapper();
+      try {
+        mapper.writeValue(new File("/home/lvuser/FieldCalibrationConstants.json"), fieldCalibrator);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+
+      fieldCalibrator.generateConstantsFile(new File("/home/lvuser/FieldCalibrationConstants.java"));
     }).ignoringDisable(true));
   }
 
