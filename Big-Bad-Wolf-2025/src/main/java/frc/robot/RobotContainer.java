@@ -4,6 +4,10 @@
 
 package frc.robot;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.File;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -12,6 +16,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -29,6 +34,7 @@ import frc.robot.subsystems.Wheels;
 import frc.robot.utilities.DataStuff;
 import frc.robot.utilities.PackLog;
 import frc.robot.utilities.SubsystemManager;
+import frc.robot.utilities.fieldCalibration.FieldCalibrator;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.Climb;
@@ -70,6 +76,11 @@ public class RobotContainer
         m_Manager.addSubsystem(new DataStuff());
         this.configureCompetitionBindings();
       break;
+
+      case FIELD_CALIBRATION:
+        m_Manager.addSubsystem(new Drivetrain(TunerConstants.DrivetrainConstants, TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight));
+        this.configureFieldCalibrationBindings();
+        break;
 
       case DRIVETRAIN_DEBUG:
         m_Manager.addSubsystem(new Drivetrain(TunerConstants.DrivetrainConstants, TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight));
@@ -193,6 +204,40 @@ public class RobotContainer
        e.printStackTrace();
      }
   }
+
+  /**
+   * Method is used to get exact coordinates for different targets on the field. Align robot with spot you want to remember in the correct orientation, and press 
+   * "A" on the driver controller. This prints out the current X, Y, and rotation of the bot for the user to note for getting accurate position data.
+   */
+  private void configureFieldCalibrationBindings()
+  {
+    CommandSwerveDrivetrain drivetrain = m_Manager.getSubsystemOfType(CommandSwerveDrivetrain.class).get();
+    FieldCalibrator fieldCalibrator = new FieldCalibrator(drivetrain);
+
+    m_DriverController.a().onTrue(new InstantCommand(() -> 
+    {
+      System.out.printf("Current X: %f, Current Y: %f, Current Rotation: %s \n",fieldCalibrator.getPose2d().getX(), fieldCalibrator.getPose2d().getY(), fieldCalibrator.getPose2d().getRotation());
+    }).ignoringDisable(true));
+
+
+    m_DriverController.b().onTrue(new InstantCommand(() -> 
+    {
+        fieldCalibrator.calibratePosition();
+    }).ignoringDisable(true));
+
+    m_DriverController.y().onTrue(new InstantCommand(() ->
+    {
+      ObjectMapper mapper = new ObjectMapper();
+      try {
+        mapper.writeValue(new File("/home/lvuser/FieldCalibrationConstants.json"), fieldCalibrator);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+
+      fieldCalibrator.generateConstantsFile(new File("/home/lvuser/FieldCalibrationConstants.java"));
+    }).ignoringDisable(true));
+  }
+
 
   private void configureDrivetrainDebugBindings()
   {

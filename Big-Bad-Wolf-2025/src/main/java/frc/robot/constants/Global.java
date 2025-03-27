@@ -12,7 +12,7 @@ public class Global
     public static enum BUILD_TYPE
     {
         COMPETITION,
-        COMPETITION_NO_VISION,
+        FIELD_CALIBRATION,
         DRIVETRAIN_DEBUG,
         ELEVATOR_DEBUG,
         SHOOTER_DEBUG,
@@ -21,5 +21,5 @@ public class Global
         ELEVATOR_SHOOTER_DEBUG
     }
 
-    public static BUILD_TYPE ACTIVE_BUILD = BUILD_TYPE.COMPETITION;
+    public static BUILD_TYPE ACTIVE_BUILD = BUILD_TYPE.FIELD_CALIBRATION;
 }
