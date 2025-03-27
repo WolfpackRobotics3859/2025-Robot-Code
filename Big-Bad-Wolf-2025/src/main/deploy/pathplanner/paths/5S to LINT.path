@@ -3,45 +3,34 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.1992500000000001,
-        "y": 0.9244999999999993
+        "x": 3.705,
+        "y": 5.43875
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.6275790874992884,
-        "y": 1.9298538133487027
+        "x": 4.298096533490951,
+        "y": 4.985389121196404
       },
       "isLocked": false,
-      "linkedName": "RINT"
+      "linkedName": "5S"
     },
     {
       "anchor": {
-        "x": 3.198,
-        "y": 4.161499999999999
+        "x": 1.365,
+        "y": 7.25225
       },
       "prevControl": {
-        "x": 2.9073848402973255,
-        "y": 3.5249890525194627
+        "x": 1.1621542230444781,
+        "y": 7.409536429390969
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "4L"
+      "linkedName": "LINT"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "pointTowardsZones": [
-    {
-      "fieldPosition": {
-        "x": 3.5,
-        "y": 4.0
-      },
-      "rotationOffset": 0.0,
-      "minWaypointRelativePos": 0.25,
-      "maxWaypointRelativePos": 0.75,
-      "name": "Point Towards Zone"
-    }
-  ],
+  "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 4.0,
@@ -53,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -53.56914187983765
   },
   "reversed": false,
-  "folder": "RINT TO X",
+  "folder": "STAGING TO INTAKE",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 52.43140797117256
+    "rotation": -59.99999999999999
   },
   "useDefaultConstraints": true
 }

@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.ElevatorConstants.HEIGHTS;
+import frc.robot.lib.Positions.Face;
 import frc.robot.lib.Positions.Level;
 import frc.robot.constants.Hardware;
 import frc.robot.utilities.DataStuff;
@@ -101,6 +102,29 @@ public class Elevator extends SubsystemBase
   {
     return new FunctionalCommand(
       () -> this.ApplyPosition(DataStuff.GetLevel()),
+      () -> {},
+      interrupted -> this.LogClosedLoopResults(interrupted),
+      () -> this.isReady(ElevatorConstants.POSITION_ERROR_TOLERANCE, ElevatorConstants.POSITION_DERIVATIVE_TOLERANCE),
+      this
+    );
+  }
+
+  public Command MoveToDataClean()
+  {
+    return new FunctionalCommand(
+      () -> {
+              Face face = DataStuff.GetFace();
+              HEIGHTS goalHeight;
+              if((face == Face.ONE) || (face == Face.THREE) || (face == Face.FIVE))
+              {
+                goalHeight = HEIGHTS.LOW_CLEAN;
+              }
+              else
+              {
+                goalHeight = HEIGHTS.HIGH_CLEAN;
+              }
+              this.ApplyPosition(goalHeight);
+            },
       () -> {},
       interrupted -> this.LogClosedLoopResults(interrupted),
       () -> this.isReady(ElevatorConstants.POSITION_ERROR_TOLERANCE, ElevatorConstants.POSITION_DERIVATIVE_TOLERANCE),

@@ -26,14 +26,14 @@ public class ElevatorConstants
     public enum HEIGHTS 
     {
         ZERO(0),
-        TRAVEL(1),
+        TRAVEL(5),
         ONE(10),
         TWO(20),
         THREE(35),
         FOUR(58),
         INTAKE(1),
-        LOW_CLEAN(25),
-        HIGH_CLEAN(35),
+        LOW_CLEAN(15),
+        HIGH_CLEAN(30),
         BARGE(55),
         PROCESS(2);
 

@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.InchesPerSecond;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Rotation;
 
 import java.util.List;
 import java.util.Optional;
@@ -61,6 +62,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
     private SwerveRequest.FieldCentricFacingAngle m_SwerveFieldCentricFacingAngle;
     private SwerveRequest.RobotCentric m_SwerveRequestRobot;
     private SwerveRequest.ApplyRobotSpeeds m_SwerveRequestSpeeds;
+    SwerveRequest.SwerveDriveBrake m_BrakeRequest;
 
     private final SwerveRequest.FieldCentric m_OperatorDriveRequest = new SwerveRequest.FieldCentric()
         .withDeadband(TunerConstants.MaxSpeed * 0.05).withRotationalDeadband(TunerConstants.MaxAngularRate * 0.05) // Add a 10% deadband
@@ -186,6 +188,11 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                      this);
     }
 
+    public Command Brake()
+    {
+        return this.runOnce(() -> this.applyRequest(() -> this.m_BrakeRequest));
+    }
+
     public Command AlignToFace(int side, int face)
     {
         return new FunctionalCommand(() -> 
@@ -218,11 +225,11 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                             
                                             this.m_XController.setSetpoint(goalPose.getX());
                                             this.m_YController.setSetpoint(goalPose.getY());
-                                            this.m_SwerveFieldCentricFacingAngle.TargetDirection = goalPose.getRotation();
+                                            this.m_SwerveFieldCentricFacingAngle.TargetDirection = goalPose.getRotation().rotateBy(Rotation2d.k180deg);
                                         }, 
                                      () -> UpdateRequest(), 
                                      interrupted -> {}, 
-                                     () -> false, 
+                                     () -> this.IsAlignmentComplete(), 
                                      this);
     }
 
@@ -230,17 +237,19 @@ public class Drivetrain extends CommandSwerveDrivetrain
     {
         return new FunctionalCommand(() -> 
                                         {
-                                            Pose2d goalPose = this.GetGoalCoralPose();
+                                            Pose2d goalPose = this.GetGoalCleanPose();
                                             this.m_XController.reset();
                                             this.m_YController.reset();
                                             this.m_XController.setSetpoint(goalPose.getX());
                                             this.m_YController.setSetpoint(goalPose.getY());
+                                            this.m_SwerveFieldCentricFacingAngle.TargetDirection = goalPose.getRotation().rotateBy(Rotation2d.k180deg);
                                         }, 
                                      () -> UpdateRequest(), 
                                      interrupted -> {
                                                         m_PackLog.Log("Alignment command finished.");
+                                                        this.applyRequest(() -> this.m_BrakeRequest);
                                                     }, 
-                                     () -> IsAlignmentComplete(), 
+                                     () -> false, 
                                      this);
     }
 
@@ -290,8 +299,6 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                      this);
     }
 
-
-
     private Pose2d GetGoalCoralPose()
     {
         if(alliance == Alliance.Blue)
@@ -319,25 +326,94 @@ public class Drivetrain extends CommandSwerveDrivetrain
         return DrivetrainConstants.RED_CENTER_ALIGNMENTS[DataStuff.GetFace().getValue()];
     }
 
-    public Command PathfindToPose(Pose2d goalPose)
+    private Pose2d GetGoalStagingPose()
+    {
+        if(alliance == Alliance.Blue)
+        {
+            return DrivetrainConstants.BLUE_STAGING_POSES[DataStuff.GetFace().getValue()];
+        }
+        return DrivetrainConstants.RED_STAGING_POSES[DataStuff.GetFace().getValue()];
+    }
+
+    private Pose2d GetGoalStagingPoseUniversal()
+    {
+            return DrivetrainConstants.BLUE_STAGING_POSES[DataStuff.GetFace().getValue()];
+    }
+
+    public Command PathfindToStaging(double velocity, double acceleration, double endVelocity)
     {
         // Create the constraints to use while pathfinding
         PathConstraints constraints = new PathConstraints(
-            3.0, 4.0,
+            velocity, acceleration,
+            Units.degreesToRadians(540), Units.degreesToRadians(720));
+
+        // Since AutoBuilder is configured, we can use it to build pathfinding commands
+        return AutoBuilder.pathfindToPose(
+            this.GetGoalStagingPose(),
+            constraints,
+            endVelocity // Goal end velocity in meters/sec
+        );
+    }
+
+    public Command PathfindToStagingUniversal(double velocity, double acceleration, double endVelocity)
+    {
+        // Create the constraints to use while pathfinding
+        PathConstraints constraints = new PathConstraints(
+            velocity, acceleration,
+            Units.degreesToRadians(540), Units.degreesToRadians(720));
+
+        if(this.alliance == Alliance.Red)
+        {
+            // Since AutoBuilder is configured, we can use it to build pathfinding commands
+            return AutoBuilder.pathfindToPoseFlipped(
+                this.GetGoalStagingPoseUniversal(),
+                constraints,
+                endVelocity // Goal end velocity in meters/sec
+        );
+        }
+
+        // Since AutoBuilder is configured, we can use it to build pathfinding commands
+        return AutoBuilder.pathfindToPose(
+            this.GetGoalStagingPoseUniversal(),
+            constraints,
+            endVelocity // Goal end velocity in meters/sec
+        );
+    }
+
+    public Command PathfindToCoral(double velocity, double acceleration, double endVelocity)
+    {
+        // Create the constraints to use while pathfinding
+        PathConstraints constraints = new PathConstraints(
+            velocity, acceleration,
+            Units.degreesToRadians(540), Units.degreesToRadians(720));
+
+        // Since AutoBuilder is configured, we can use it to build pathfinding commands
+        return AutoBuilder.pathfindToPose(
+            this.GetGoalCoralPose(),
+            constraints,
+            endVelocity // Goal end velocity in meters/sec
+        );
+    }
+
+    public Command PathfindToPose(Pose2d goalPose, double velocity, double acceleration, double endVelocity)
+    {
+        // Create the constraints to use while pathfinding
+        PathConstraints constraints = new PathConstraints(
+            velocity, acceleration,
             Units.degreesToRadians(540), Units.degreesToRadians(720));
 
         // Since AutoBuilder is configured, we can use it to build pathfinding commands
         return AutoBuilder.pathfindToPose(
             goalPose,
             constraints,
-            0.0 // Goal end velocity in meters/sec
+            endVelocity // Goal end velocity in meters/sec
         );
     }
 
-    public Command PathfindThenFollowPath(PathPlannerPath path)
+    public Command PathfindThenFollowPath(PathPlannerPath path, double approachVelocity, double approachAcceleration)
     {
         PathConstraints constraints = new PathConstraints(
-        3.0, 4.0,
+        approachVelocity, approachAcceleration,
         Units.degreesToRadians(540), Units.degreesToRadians(720));
 
         return AutoBuilder.pathfindThenFollowPath(path, constraints);
@@ -348,6 +424,25 @@ public class Drivetrain extends CommandSwerveDrivetrain
         return this.applyRequest(() -> this.m_OperatorDriveRequest.withVelocityX(-thrust.get() * TunerConstants.MaxSpeed * 0.8)
                                                                   .withVelocityY(-strafe.get() * TunerConstants.MaxSpeed * 0.8)
                                                                   .withRotationalRate(-rotation.get() * TunerConstants.MaxAngularRate));
+    }
+
+    public Command RearDriveSnap(Supplier<Double> thrust, Supplier<Double> strafe)
+    {
+        return this.run(() -> {
+            Rotation2d goalRotation;
+            if(this.alliance == Alliance.Blue)
+            {
+                goalRotation = Rotation2d.k180deg;
+            }
+            else
+            {
+                goalRotation = Rotation2d.kZero;
+            }
+            this.setControl(this.m_SwerveFieldCentricFacingAngle.withVelocityX(-thrust.get() * TunerConstants.MaxSpeed * 0.8)
+                                                                .withVelocityY(-strafe.get() * TunerConstants.MaxSpeed * 0.8)
+                                                                .withTargetDirection(goalRotation));
+
+        });
     }
 
     private void UpdateRequest()
@@ -441,13 +536,14 @@ public class Drivetrain extends CommandSwerveDrivetrain
         this.m_SwerveFieldCentricFacingAngle = m_SwerveFieldCentricFacingAngle.withSteerRequestType(SteerRequestType.Position);
         this.m_SwerveRequestRobot = new SwerveRequest.RobotCentric();
         this.m_SwerveRequestSpeeds = new SwerveRequest.ApplyRobotSpeeds();
+        this.m_BrakeRequest = new SwerveRequest.SwerveDriveBrake();
 
         this.m_PackLog.Log("End configuration.");
     }
 
     private void ConfigurePIDControllers()
     {
-        this.m_XController = new PIDController(5, 10,0.7); // 20 0.1 0.025
+        this.m_XController = new PIDController(5, 10,0.7); // 5 10 0.7
         this.m_XController.setTolerance(Meters.convertFrom(0.5, Inches), MetersPerSecond.convertFrom(3, InchesPerSecond));
         this.m_XController.setIZone(0.1); // 0.0762
         SmartDashboard.putData(this.m_XController);
@@ -478,7 +574,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
                 (speeds, feedforwards) -> this.setControl(m_SwerveRequestSpeeds.withSpeeds(speeds).withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesX()).withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesY())), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
                 new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
                         new PIDConstants(15, 0.0, 0.0), // Translation PID constants
-                        new PIDConstants(1.0474, 0.0, 0.0) // Rotation PID constants  // 5.0 0.0 0.0
+                        new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants  // 5.0 0.0 0.0  // 1.074
                 ),
                 config,
                 () -> {

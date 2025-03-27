@@ -13,11 +13,14 @@
     "FAR RIGHT STARTS",
     "LINT TO X",
     "MIDDLE STARTS",
+    "STAGING TO INTAKE",
+    "RINT TO X",
     "Shop Paths",
-    "RINT TO X"
+    "TELEOP AUTOMATION PATHS"
   ],
   "autoFolders": [
-    "Cross Only"
+    "Cross Only",
+    "TELEOP AUTO"
   ],
   "defaultMaxVel": 4.0,
   "defaultMaxAccel": 3.0,

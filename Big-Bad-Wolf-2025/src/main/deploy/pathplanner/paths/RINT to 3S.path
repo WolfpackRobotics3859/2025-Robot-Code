@@ -8,40 +8,29 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.6275790874992884,
-        "y": 1.9298538133487027
+        "x": 2.150174219419842,
+        "y": 1.5925208957639403
       },
       "isLocked": false,
       "linkedName": "RINT"
     },
     {
       "anchor": {
-        "x": 3.198,
-        "y": 4.161499999999999
+        "x": 3.6855,
+        "y": 2.5917499999999993
       },
       "prevControl": {
-        "x": 2.9073848402973255,
-        "y": 3.5249890525194627
+        "x": 3.0325883575126005,
+        "y": 2.171401650704219
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "4L"
+      "linkedName": "3S"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "pointTowardsZones": [
-    {
-      "fieldPosition": {
-        "x": 3.5,
-        "y": 4.0
-      },
-      "rotationOffset": 0.0,
-      "minWaypointRelativePos": 0.25,
-      "maxWaypointRelativePos": 0.75,
-      "name": "Point Towards Zone"
-    }
-  ],
+  "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 4.0,
@@ -53,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 59.99999999999999
   },
   "reversed": false,
   "folder": "RINT TO X",

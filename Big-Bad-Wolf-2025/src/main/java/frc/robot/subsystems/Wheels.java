@@ -24,6 +24,8 @@ import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import frc.robot.constants.Hardware;
 import frc.robot.constants.WheelConstants;
 import frc.robot.constants.WheelConstants.VoltageSpeeds;
+import frc.robot.lib.Positions.Level;
+import frc.robot.utilities.DataStuff;
 import frc.robot.utilities.MotorManager;
 import frc.robot.utilities.PackLog;
 
@@ -81,7 +83,10 @@ public class Wheels extends SubsystemBase
     {
         return new FunctionalCommand(() -> this.SetVoltage(VoltageSpeeds.INTAKE),
                                      () -> {},
-                                     interrupted -> {}, 
+                                     interrupted -> 
+                                     {
+                                        this.SetVoltage(VoltageSpeeds.ZERO);
+                                     }, 
                                      () -> this.ForwardActive(),
                                      this);
     }
@@ -109,6 +114,27 @@ public class Wheels extends SubsystemBase
                                         this.SetPosition(this.m_PositionSignal.refresh().getValueAsDouble());
                                      }, 
                                      () -> this.SenseAlgae() || this.AnyActive(),
+                                     this);
+    }
+
+    public Command DeployCoral()
+    {
+        return new FunctionalCommand(() -> {
+                                             if(DataStuff.GetLevel() == Level.FOUR)
+                                             {
+                                                this.SetVoltage(VoltageSpeeds.DEPLOY_HIGH);
+                                             }
+                                             else
+                                             {
+                                                this.SetVoltage(VoltageSpeeds.DEPLOY_LOW);
+                                             }
+                                           },
+                                     () -> {},
+                                     interrupted -> 
+                                     {
+                                        this.SetVoltage(VoltageSpeeds.ZERO);
+                                     }, 
+                                     () -> !this.AnyActive(),
                                      this);
     }
 
@@ -146,6 +172,11 @@ public class Wheels extends SubsystemBase
                                      }, 
                                      () -> this.AnyActive(),
                                      this);
+    }
+
+    public Command ApplyVoltage(VoltageSpeeds speed)
+    {
+        return this.runOnce(() -> this.SetVoltage(speed));
     }
 
 

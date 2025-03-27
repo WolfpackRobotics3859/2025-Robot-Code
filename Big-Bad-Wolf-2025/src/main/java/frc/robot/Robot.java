@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.Lights.LIGHT_CODES;
 import frc.robot.utilities.PackLog;
 
 public class Robot extends TimedRobot 
@@ -28,6 +29,10 @@ public class Robot extends TimedRobot
     m_robotContainer = new RobotContainer();
     // Set the logger to log to the first flashdrive plugged in
     SignalLogger.setPath("/media/sda1/");
+
+    m_robotContainer.GetLights().ifPresent(value -> {
+                                                      value.LightChooser(LIGHT_CODES.SOLID_RED);
+                                                    });
   }
 
   @Override
@@ -39,6 +44,9 @@ public class Robot extends TimedRobot
   @Override
   public void disabledInit() 
   {
+    m_robotContainer.GetLights().ifPresent(value -> {
+      value.LightChooser(LIGHT_CODES.SOLID_RED);
+    });
     this.m_PackLog.Log("Entering DISABLED mode.");
     SignalLogger.stop();
   }
@@ -59,6 +67,9 @@ public class Robot extends TimedRobot
   @Override
   public void autonomousInit() 
   {
+    m_robotContainer.GetLights().ifPresent(value -> {
+      value.LightChooser(LIGHT_CODES.SOLID_ORANGE);
+    });
     this.m_PackLog.Log("Entering AUTONOMOUS mode.");
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
@@ -82,6 +93,9 @@ public class Robot extends TimedRobot
   @Override
   public void teleopInit() 
   {
+    m_robotContainer.GetLights().ifPresent(value -> {
+      value.LightChooser(LIGHT_CODES.SOLID_BLUE);
+    });
     this.m_PackLog.Log("Entering TELEOP mode.");
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();

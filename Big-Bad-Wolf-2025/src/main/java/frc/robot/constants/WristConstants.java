@@ -25,12 +25,12 @@ public class WristConstants
         ZERO(-0.077637),
         TRAVEL(-0.065918),
         DEPLOY_LOW(-0.053955),
-        DEPLOY_HIGH(-0.077637),
+        DEPLOY_HIGH(-0.07),
         INTAKE(-0.077637),
-        SWEEP(0.049561),
+        SWEEP(0.042561),
         BARGE(-0.065918),
         PROCESSOR(0.107666),
-        GRAB(0.161865);
+        GRAB(0.171865);
 
         private double levelValue;
 

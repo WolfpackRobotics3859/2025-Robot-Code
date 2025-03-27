@@ -21,13 +21,20 @@ import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 public class ClimbConstants 
 {
     public static final double CLIMB_WRIST_VOLTAGE = 2;
-    public static final double CLIMB_ROLLER_VOLTAGE = 4;
+    public static final double CLIMB_ROLLER_VOLTAGE = -8;
 
-    public static final double CLIMB_RESTING_POSITION = 0.0;
-    public static final double CLIMB_CLIMB_POSITION = 0.0;
-    public static final double CLIMB_TAKING_POSITION = 0.0;
+    public static final double FUNNEL_RELEASE_VOLTAGE = 0.5;
+    public static final double FOOT_RELEASE_VOTLAGE = -0.5;
 
-    public static final MotorOutputConfigs CLIMB_WRIST_MOTOR_OUTPUT = new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive);
+    public static final double CLIMB_RESTING_POSITION = 0.060547;
+    public static final double CLIMB_CLIMB_POSITION = 0.085;
+    public static final double CLIMB_TAKING_POSITION = -0.125244;
+
+    public static final double CLIMB_STOP_POSITION = 0.09;
+
+    public static final double TOF_IN_RANGE_THRESHOLD = 140.0;
+
+    public static final MotorOutputConfigs CLIMB_WRIST_MOTOR_OUTPUT = new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive);
     public static final MotorOutputConfigs CLIMB_ROLLER_MOTOR_OUTPUT = new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive);
     public static final MotorOutputConfigs CORAL_FUNNEL_MOTOR_OUTPUT = new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive);
 
@@ -54,7 +61,7 @@ public class ClimbConstants
                                                                     .withKD(0.0)
                                                                     .withKG(0.0)
                                                                     .withKI(0)
-                                                                    .withKP(30)
+                                                                    .withKP(200)
                                                                     .withKS(0.0)
                                                                     .withKV(0.0)
                                                                     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);

@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.1992500000000001,
-        "y": 0.9244999999999993
+        "x": 7.5855,
+        "y": 0.5929999999999995
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.6275790874992884,
-        "y": 1.9298538133487027
+        "x": 8.188842232143854,
+        "y": 0.32639647831728674
       },
       "isLocked": false,
-      "linkedName": "RINT"
+      "linkedName": "FAR_RIGHT_START"
     },
     {
       "anchor": {
-        "x": 3.198,
-        "y": 4.161499999999999
+        "x": 3.6855,
+        "y": 2.5917499999999993
       },
       "prevControl": {
-        "x": 2.9073848402973255,
-        "y": 3.5249890525194627
+        "x": 3.4449283357463725,
+        "y": 2.659759369635659
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "4L"
+      "linkedName": "3S"
     }
   ],
   "rotationTargets": [],
@@ -33,8 +33,8 @@
   "pointTowardsZones": [
     {
       "fieldPosition": {
-        "x": 3.5,
-        "y": 4.0
+        "x": 5.0,
+        "y": 3.0
       },
       "rotationOffset": 0.0,
       "minWaypointRelativePos": 0.25,
@@ -53,13 +53,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 59.99999999999999
   },
   "reversed": false,
-  "folder": "RINT TO X",
+  "folder": "FAR RIGHT STARTS",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 52.43140797117256
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

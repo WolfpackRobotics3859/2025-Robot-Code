@@ -23,18 +23,18 @@ public class WheelConstants
     public static final double SAFETY_SIGNAL_DEBOUNCE_SECONDS = 0.0625;
     public static final double MOTOR_RESISTANCE_SENSE_DEBOUNCE_SECONDS = 0.125;
 
-    public static final double ALGAE_RESISTANCE_VELOCITY_THRESHOLD = 0.5;
+    public static final double ALGAE_RESISTANCE_VELOCITY_THRESHOLD = 0.1;
 
     public enum VoltageSpeeds
     {
         ZERO(0),
         INTAKE(2),
-        SWEEP(2),
+        SWEEP(3),
         FORWARD_CENTERING(1.5),
         REVERSE_CENTERING(-1.5),
-        DEPLOY_LOW(6),
+        DEPLOY_LOW(6), // 6
         DEPLOY_HIGH(8),
-        BARGE(9);
+        BARGE(-3);
 
         private double value;
 
@@ -60,7 +60,7 @@ public class WheelConstants
                                                                     .withKD(0)
                                                                     .withKG(0)
                                                                     .withKI(0)
-                                                                    .withKP(15)
+                                                                    .withKP(5)
                                                                     .withKS(0)
                                                                     .withKV(0)
                                                                     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);

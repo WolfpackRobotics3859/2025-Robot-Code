@@ -1,0 +1,161 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "FlashingGreen"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FRIGHT to 3S"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Align3L"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CoralFourDeploy"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "FlashingOrange"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "FlashingGreen"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "DeployCoralHigh"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "3S to RINT"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "StartIntake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "IntakeFlag"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "RINT to 3S"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CenterCoral"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "FlashingGreen"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Align3R"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CoralFourDeploy"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "FlashingOrange"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "FlashingGreen"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "DeployCoralHigh"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stow"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WeeWoo"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

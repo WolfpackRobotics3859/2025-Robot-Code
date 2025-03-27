@@ -9,7 +9,7 @@ public class DrivetrainConstants
     {
         new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0)), // 1
         new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0)), // 2
-        new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0)), // 3
+        new Pose2d(13.758, 5.263, Rotation2d.fromDegrees(-114.29)), // 3
         new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0)), // 4
         new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0)), // 5
         new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0))  // 6 
@@ -33,6 +33,16 @@ public class DrivetrainConstants
         new Pose2d(14.4367, 4.2321, Rotation2d.fromDegrees(-172.337)), // 4
         new Pose2d(13.9304, 2.9429, Rotation2d.fromDegrees(127.817)), // 5
         new Pose2d(12.5739, 2.71538, Rotation2d.fromDegrees(68.597))  // 6 
+    };
+
+    public static Pose2d[] RED_STAGING_POSES =
+    {
+        new Pose2d(5.866, 4.2277, Rotation2d.fromDegrees(-172.806)), // 1
+        new Pose2d(5.352, 2.9334, Rotation2d.fromDegrees(127.567)), // 2
+        new Pose2d(3.9863, 2.7228, Rotation2d.fromDegrees(66.934)), // 3
+        new Pose2d(3.1134, 3.8326, Rotation2d.fromDegrees(7.867)), // 4
+        new Pose2d(3.631, 5.1179, Rotation2d.fromDegrees(-53.098)), // 5
+        new Pose2d(4.9986, 5.3219, Rotation2d.fromDegrees(-112.247))  // 6 
     };
 
     public static Pose2d[] BLUE_CENTER_ALIGNMENTS = 
@@ -63,5 +73,15 @@ public class DrivetrainConstants
         new Pose2d(3.1134, 3.8326, Rotation2d.fromDegrees(7.867)), // 4
         new Pose2d(3.631, 5.1179, Rotation2d.fromDegrees(-53.098)), // 5
         new Pose2d(4.9986, 5.3219, Rotation2d.fromDegrees(-112.247))  // 6 
+    };
+
+    public static Pose2d[] BLUE_STAGING_POSES =
+    {
+        new Pose2d(6.115, 4.025, Rotation2d.fromDegrees(180)), // 1
+        new Pose2d(5.319, 2.580, Rotation2d.fromDegrees(120)), // 2
+        new Pose2d(3.665, 2.601, Rotation2d.fromDegrees(60)), // 3
+        new Pose2d(2.890, 4.025, Rotation2d.fromDegrees(0)), // 4
+        new Pose2d(3.686, 5.407, Rotation2d.fromDegrees(-60)), // 5
+        new Pose2d(5.278, 5.428, Rotation2d.fromDegrees(-120))  // 6 
     };
 }
