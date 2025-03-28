@@ -238,9 +238,13 @@ public class RobotContainer
     m_DriverController.a().whileTrue(new SequentialCommandGroup(flashingRed.get(), wheels.ApplyVoltage(VoltageSpeeds.SWEEP), new WaitCommand(0.1), new ParallelDeadlineGroup(wheels.IntakeAlgae(), elevator.MoveToLevel(HEIGHTS.INTAKE), wrist.MoveToAngle(ANGLES.GRAB)), flashingGreen.get()))
                           .onFalse(new SequentialCommandGroup(idle.get(), wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.TRAVEL)));
 
-    m_DriverController.b().whileTrue(new SequentialCommandGroup(flashingOrange.get(), new PathPlannerAuto("ProcessRoutine"), flashingGreen.get()))
-                          .onFalse(new ParallelCommandGroup(idle.get(), wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.TRAVEL)));
+    m_DriverController.b().whileTrue(new SequentialCommandGroup(flashingOrange.get(), wrist.MoveToAngle(ANGLES.PROCESSOR), elevator.MoveToLevel(HEIGHTS.PROCESS), flashingGreen.get()))
+                          .onFalse(new ParallelCommandGroup(idle.get(), wheels.DeployAlgae().withTimeout(1), wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.TRAVEL)));
 
+                          // m_DriverController.b().whileTrue(new SequentialCommandGroup(flashingOrange.get(), new PathPlannerAuto("ProcessRoutine"), flashingGreen.get()))
+                          // .onFalse(new ParallelCommandGroup(idle.get(), wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.TRAVEL)));
+
+    
     m_DriverController.povLeft().whileTrue(new SequentialCommandGroup(flashingOrange.get(), new PathPlannerAuto("LeftBargeRoutine"), flashingGreen.get()))
                           .onFalse(new ParallelCommandGroup(idle.get(), wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.TRAVEL)));
 
@@ -256,9 +260,13 @@ public class RobotContainer
     m_CoDriverController.povUp().onTrue(dataStuff.Up().ignoringDisable(true));
     m_CoDriverController.povDown().onTrue(dataStuff.Down().ignoringDisable(true));
 
-    m_CoDriverController.leftStick().onTrue(latches.setLatchVoltage(ClimbConstants.FUNNEL_RELEASE_VOLTAGE)).onFalse(latches.setLatchVoltage(0));
-    m_CoDriverController.rightStick().onTrue(latches.setLatchVoltage(ClimbConstants.FOOT_RELEASE_VOTLAGE)).onFalse(latches.setLatchVoltage(0));
+    m_CoDriverController.leftStick().onTrue(latches.setLatchVoltage(ClimbConstants.FUNNEL_RELEASE_VOLTAGE).withTimeout(2)).onFalse(latches.setLatchVoltage(0));
+    m_CoDriverController.rightStick().onTrue(latches.setLatchVoltage(ClimbConstants.FOOT_RELEASE_VOTLAGE).withTimeout(2)).onFalse(latches.setLatchVoltage(0));
 
+    // m_CoDriverController.rightTrigger().onTrue(new ParallelCommandGroup(drivetrain.RearDriveSnap(() -> m_DriverController.getLeftY(), () -> m_DriverController.getLeftX()) ,elevator.MoveToLevel(HEIGHTS.ONE), wrist.MoveToAngle(ANGLES.TRAVEL), climb.GoWristPosition(ClimbConstants.CLIMB_TAKING_POSITION), climb.ApplyRollerVoltage(ClimbConstants.CLIMB_ROLLER_VOLTAGE)))
+    //                                    .onFalse(climb.ApplyRollerVoltage(0));
+
+    
     m_CoDriverController.rightTrigger().onTrue(new ParallelCommandGroup(drivetrain.RearDriveSnap(() -> m_DriverController.getLeftY(), () -> m_DriverController.getLeftX()) ,elevator.MoveToLevel(HEIGHTS.ONE), wrist.MoveToAngle(ANGLES.TRAVEL), climb.GoWristPosition(ClimbConstants.CLIMB_TAKING_POSITION), climb.ApplyRollerVoltage(ClimbConstants.CLIMB_ROLLER_VOLTAGE)))
                                        .onFalse(climb.ApplyRollerVoltage(0));
 

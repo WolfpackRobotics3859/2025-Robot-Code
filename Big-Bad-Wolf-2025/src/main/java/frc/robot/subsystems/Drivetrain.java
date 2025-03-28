@@ -138,6 +138,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
     {
         return new FunctionalCommand(() -> 
                                         {
+                                            Lights.HeadlightsHigh();
                                             this.m_XController.reset();
                                             this.m_YController.reset();
                                             this.m_XController.setSetpoint(goalPose.getX());
@@ -154,6 +155,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                         }, 
                                      () -> UpdateRequest(), 
                                      interrupted -> {
+                                                        Lights.HeadlightsLow();
                                                         m_PackLog.Log("Alignment command finished.");
                                                     }, 
                                      () -> IsAlignmentComplete(), 
@@ -164,6 +166,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
     {
         return new FunctionalCommand(() -> 
                                         {
+                                            Lights.HeadlightsHigh();
                                             Pose2d goalPose = this.GetGoalCoralPose();
                                             this.m_XController.reset();
                                             this.m_YController.reset();
@@ -182,6 +185,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                         }, 
                                      () -> UpdateRequest(), 
                                      interrupted -> {
+                                                        Lights.HeadlightsLow();
                                                         m_PackLog.Log("Alignment command finished.");
                                                     }, 
                                      () -> IsAlignmentComplete(), 
@@ -192,6 +196,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
     {
         return new FunctionalCommand(() -> 
                                         {
+                                            Lights.HeadlightsHigh();
                                             Pose2d goalPose = this.GetGoalCoralPose();
                                             this.m_XController.reset();
                                             this.m_YController.reset();
@@ -208,7 +213,10 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                             }
                                         }, 
                                      () -> UpdateRequest(), 
-                                     interrupted -> {}, 
+                                     interrupted -> 
+                                     {
+                                        Lights.HeadlightsLow();
+                                     }, 
                                      () -> false, 
                                      this);
     }
@@ -222,6 +230,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
     {
         return new FunctionalCommand(() -> 
                                         {
+                                            Lights.HeadlightsHigh();
                                             this.m_XController.reset();
                                             this.m_YController.reset();
                                             Pose2d goalPose;
@@ -261,7 +270,9 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                             }
                                         }, 
                                      () -> UpdateRequest(), 
-                                     interrupted -> {}, 
+                                     interrupted -> {
+                                        Lights.HeadlightsLow();
+                                     }, 
                                      () -> this.IsAlignmentComplete(), 
                                      this);
     }
@@ -270,6 +281,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
     {
         return new FunctionalCommand(() -> 
                                         {
+                                            Lights.HeadlightsHigh();
                                             Pose2d goalPose = this.GetGoalCleanPose();
                                             this.m_XController.reset();
                                             this.m_YController.reset();
@@ -287,6 +299,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                         }, 
                                      () -> UpdateRequest(), 
                                      interrupted -> {
+                                                        Lights.HeadlightsLow();
                                                         m_PackLog.Log("Alignment command finished.");
                                                         this.applyRequest(() -> this.m_BrakeRequest);
                                                     }, 

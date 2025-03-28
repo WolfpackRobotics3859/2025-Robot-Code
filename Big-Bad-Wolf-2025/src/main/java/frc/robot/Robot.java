@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Lights.LIGHT_CODES;
 import frc.robot.utilities.PackLog;
 
@@ -33,6 +34,8 @@ public class Robot extends TimedRobot
     m_robotContainer.GetLights().ifPresent(value -> {
                                                       value.LightChooser(LIGHT_CODES.SOLID_RED);
                                                     });
+
+    Lights.HeadlightsLow();
   }
 
   @Override
@@ -45,7 +48,7 @@ public class Robot extends TimedRobot
   public void disabledInit() 
   {
     m_robotContainer.GetLights().ifPresent(value -> {
-      value.LightChooser(LIGHT_CODES.SOLID_RED);
+      value.LightChooser(LIGHT_CODES.FADING_BLUE);
     });
     this.m_PackLog.Log("Entering DISABLED mode.");
     SignalLogger.stop();

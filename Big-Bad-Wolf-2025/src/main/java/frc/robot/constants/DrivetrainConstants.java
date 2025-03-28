@@ -1,11 +1,7 @@
 package frc.robot.constants;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.PathConstraints;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 
 public class DrivetrainConstants 
 {
@@ -21,43 +17,23 @@ public class DrivetrainConstants
 
     public static Pose2d[] RED_LEFT_ALIGNMENTS = 
     {
-        new Pose2d(11.6411, 4.1927, new Rotation2d(0.0192)), // 1
-        new Pose2d(12.5106, 5.3501, new Rotation2d(-1.0089)), // 2
-        new Pose2d(13.9130, 5.1462, new Rotation2d(-2.0602)), // 3
-        new Pose2d(14.4761, 3.8383, new Rotation2d(-3.1078)), // 4
-        new Pose2d(13.6073, 2.7019, new Rotation2d(2.1216)), // 5
-        new Pose2d(12.2590, 2.8357, new Rotation2d(1.0835))  // 6 
+        new Pose2d(11.6384, 4.1981, new Rotation2d(0.0387)), // 1
+        new Pose2d(12.4914, 5.3364, new Rotation2d(-1.0100)), // 2
+        new Pose2d(13.9099, 5.1726, new Rotation2d(-2.0438)), // 3
+        new Pose2d(14.4779, 3.8453, new Rotation2d(-3.1086)), // 4
+        new Pose2d(13.6189, 2.7097, new Rotation2d(2.1411)), // 5
+        new Pose2d(12.2047, 2.8825, new Rotation2d(1.0877))  // 6 
     };
 
     public static Pose2d[] RED_RIGHT_ALIGNMENTS =
     {
-        new Pose2d(11.6376, 3.8101, new Rotation2d(0.1349)), // 1
-        new Pose2d(12.1613, 5.1443,new Rotation2d(-0.9318)), // 2
-        new Pose2d(13.5839, 5.3569, new Rotation2d(-1.9752)), // 3
-        new Pose2d(14.4785, 4.2318, new Rotation2d(-3.0317)), // 4
-        new Pose2d(13.9674, 2.9187, new Rotation2d(2.2138)), // 5
-        new Pose2d(12.5394, 2.6933, new Rotation2d(1.1639))  // 6 
+        new Pose2d(11.6408, 3.8164, new Rotation2d(0.0936)), // 1
+        new Pose2d(12.1273, 5.0967, new Rotation2d(-0.9292)), // 2
+        new Pose2d(13.5690, 5.3686, new Rotation2d(-1.9993)), // 3
+        new Pose2d(14.5375, 3.6529, new Rotation2d(3.1047)), // 4
+        new Pose2d(13.9747, 2.9172, new Rotation2d(2.2303)), // 5
+        new Pose2d(12.8102, 2.6742, new Rotation2d(1.1241))  // 6 
     };
-
-    // public static Pose2d[] RED_LEFT_ALIGNMENTS = 
-    // {
-    //     new Pose2d(11.6775, 4.1806, Rotation2d.fromDegrees(3.62)), // 1
-    //     new Pose2d(12.515, 5.298, Rotation2d.fromDegrees(-57.031)), // 2
-    //     new Pose2d(13.919, 5.164, Rotation2d.fromDegrees(-117.00)), // 3
-    //     new Pose2d(14.438, 3.8534, Rotation2d.fromDegrees(-177.109)), // 4
-    //     new Pose2d(13.6126, 2.7547, Rotation2d.fromDegrees(123.3357)), // 5
-    //     new Pose2d(12.2162, 2.9196, Rotation2d.fromDegrees(62.457))  // 6 
-    // };
-
-    // public static Pose2d[] RED_RIGHT_ALIGNMENTS =
-    // {
-    //     new Pose2d(11.6852, 3.8255, Rotation2d.fromDegrees(7.061)), // 1
-    //     new Pose2d(12.202, 5.1099, Rotation2d.fromDegrees(-52.049)), // 2
-    //     new Pose2d(13.58, 5.32, Rotation2d.fromDegrees(-120)), // 3
-    //     new Pose2d(14.4367, 4.2321, Rotation2d.fromDegrees(-172.337)), // 4
-    //     new Pose2d(13.9304, 2.9429, Rotation2d.fromDegrees(127.817)), // 5
-    //     new Pose2d(12.5739, 2.71538, Rotation2d.fromDegrees(68.597))  // 6 
-    // };
 
     public static Pose2d[] RED_STAGING_POSES =
     {
@@ -81,43 +57,23 @@ public class DrivetrainConstants
 
     public static Pose2d[] BLUE_LEFT_ALIGNMENTS = 
     {
-        new Pose2d(5.9075, 3.8526, new Rotation2d(-3.1122)), // 1
-        new Pose2d(5.0364, 2.7044, new Rotation2d(2.1396)), // 2
-        new Pose2d(3.6183, 2.8929, new Rotation2d(1.0857)), // 3
-        new Pose2d(3.071, 4.1822, new Rotation2d(0.0406)), // 4
-        new Pose2d(3.9407, 5.3384, new Rotation2d(-1.0301)), // 5
-        new Pose2d(5.1622, 5.456, new Rotation2d(-2.0262))  // 6 
+        new Pose2d(5.9105, 3.8580, new Rotation2d(-3.1110)), // 1
+        new Pose2d(5.0433, 2.7087, new Rotation2d(2.1325)), // 2
+        new Pose2d(3.6119, 2.8963, new Rotation2d(1.0707)), // 3
+        new Pose2d(3.0689, 4.1881, new Rotation2d(0.0403)), // 4
+        new Pose2d(3.9143, 5.3328, new Rotation2d(-1.0027)), // 5
+        new Pose2d(5.1461, 5.4529, new Rotation2d(-2.0111))  // 6 
     };
 
     public static Pose2d[] BLUE_RIGHT_ALIGNMENTS =
     {
-        new Pose2d(5.8924, 4.2067, new Rotation2d(-3.0188)), // 1
-        new Pose2d(5.3779, 2.9192, new Rotation2d(2.1986)), // 2
-        new Pose2d(3.9742, 2.688, new Rotation2d(1.1524)), // 3
-        new Pose2d(3.0867, 3.8162, new Rotation2d(0.0760)), // 4
-        new Pose2d(3.6056, 5.1271, new Rotation2d(-0.9183)), // 5
-        new Pose2d(5.0189, 5.3573, new Rotation2d(-1.9701))  // 6 
+        new Pose2d(5.8339, 4.0699, new Rotation2d(-3.0899)), // 1
+        new Pose2d(5.3681, 2.9003, new Rotation2d(2.2217)), // 2
+        new Pose2d(3.9547, 2.6963, new Rotation2d(1.1752)), // 3
+        new Pose2d(3.0673, 4.0466, new Rotation2d(0.0294)), // 4
+        new Pose2d(3.5822, 5.1185, new Rotation2d(-0.9280)), // 5
+        new Pose2d(4.9860, 5.3797, new Rotation2d(-1.9858))  // 6 
     };
-
-    // public static Pose2d[] BLUE_LEFT_ALIGNMENTS = 
-    // {
-    //     new Pose2d(5.8676, 3.8377, Rotation2d.fromDegrees(-177.372)), // 1
-    //     new Pose2d(5.0277, 2.7457, Rotation2d.fromDegrees(122.435)), // 2
-    //     new Pose2d(3.6498, 2.9169, Rotation2d.fromDegrees(63.016)), // 3
-    //     new Pose2d(3.1139, 4.2322, Rotation2d.fromDegrees(1.873)), // 4
-    //     new Pose2d(3.9715, 5.3166, Rotation2d.fromDegrees(-57.771)), // 5
-    //     new Pose2d(5.3302, 5.1324, Rotation2d.fromDegrees(-116.487))  // 6 
-    // };
-
-    // public static Pose2d[] BLUE_RIGHT_ALIGNMENTS =
-    // {
-    //     new Pose2d(5.866, 4.2277, Rotation2d.fromDegrees(-172.806)), // 1
-    //     new Pose2d(5.352, 2.9334, Rotation2d.fromDegrees(127.567)), // 2
-    //     new Pose2d(3.9863, 2.7228, Rotation2d.fromDegrees(66.934)), // 3
-    //     new Pose2d(3.1134, 3.8326, Rotation2d.fromDegrees(7.867)), // 4
-    //     new Pose2d(3.631, 5.1179, Rotation2d.fromDegrees(-53.098)), // 5
-    //     new Pose2d(4.9986, 5.3219, Rotation2d.fromDegrees(-112.247))  // 6 
-    // };
 
     public static Pose2d[] BLUE_STAGING_POSES =
     {

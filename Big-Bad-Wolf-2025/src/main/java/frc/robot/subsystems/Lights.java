@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import java.util.Map;
 
+import edu.wpi.first.units.measure.Dimensionless;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
@@ -15,6 +16,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Percent;
 import static edu.wpi.first.units.Units.InchesPerSecond;
 import static edu.wpi.first.units.Units.Meters;
@@ -33,6 +35,10 @@ public class Lights extends SubsystemBase
   private final AddressableLEDBufferView m_centerData = m_ledBuffer1.createView(8, 14);
   private final AddressableLEDBufferView m_centerBackData = m_ledBuffer1.createView(32, 38);
 
+
+  private static final AddressableLED m_Headlights = new AddressableLED(1);
+  private static final AddressableLEDBuffer m_HeadLightBuffer = new AddressableLEDBuffer(20);
+
   AddressableLED m_led = new AddressableLED(0);
   private int m_BrightnessCount;
   private boolean m_IsGoingUp = true;
@@ -49,8 +55,23 @@ public class Lights extends SubsystemBase
     m_RicochetTimer.start();
     m_led.setLength(m_ledBuffer1.getLength());
 
-    this.LightChooser(LIGHT_CODES.FLASHING_RED);
-    m_CurrentCode = LIGHT_CODES.FADING_ORANGE_AND_BLUE;
+    m_CurrentCode = LIGHT_CODES.FADING_BLUE;
+  }
+
+  public static void HeadlightsHigh()
+  {
+    LEDPattern pattern = LEDPattern.solid(Color.kWhite).atBrightness(Percent.of(100));
+    pattern.applyTo(m_HeadLightBuffer);
+    m_Headlights.setData(m_HeadLightBuffer);
+  }
+
+  public static void HeadlightsLow()
+  {
+    LEDPattern base = LEDPattern.solid(Color.kWhite).atBrightness(Percent.of(30));
+    LEDPattern pattern = base.breathe(Seconds.of(2));
+
+    pattern.applyTo(m_HeadLightBuffer);
+    m_Headlights.setData(m_HeadLightBuffer);
   }
 
   @Override
