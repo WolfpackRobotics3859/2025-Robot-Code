@@ -7,6 +7,8 @@ package frc.robot;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import javax.security.auth.kerberos.DelegationPermission;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -41,6 +43,7 @@ import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Wrist;
 import frc.robot.subsystems.Lights.LIGHT_CODES;
 import frc.robot.subsystems.Wheels;
+import frc.robot.utilities.CoralDeploymentBuilder;
 import frc.robot.utilities.DataStuff;
 import frc.robot.utilities.PackLog;
 import frc.robot.utilities.SubsystemManager;
@@ -133,6 +136,8 @@ public class RobotContainer
     return m_Manager.getSubsystemOfType(Lights.class);
   }
 
+  private CoralDeploymentBuilder deployBuilder;
+
   private void configureCompetitionBindings()
   {
     Drivetrain drivetrain = m_Manager.getSubsystemOfType(Drivetrain.class).get();
@@ -158,12 +163,45 @@ public class RobotContainer
     Lights lights = m_Manager.getSubsystemOfType(Lights.class).get();
     SmartDashboard.putData(lights);
 
-    Supplier<Command> flashingGreen = () -> new InstantCommand(() -> lights.LightChooser(LIGHT_CODES.FLASHING_GREEN));
-    Supplier<Command> flashingRed = () -> new InstantCommand(() -> lights.LightChooser(LIGHT_CODES.FLASHING_RED));
-    Supplier<Command> idle = () -> new InstantCommand(() -> lights.LightChooser(LIGHT_CODES.FADING_ORANGE_AND_BLUE));
-    Supplier<Command> flashingOrange = () -> new InstantCommand(() -> lights.LightChooser(LIGHT_CODES.FLASHING_ORANGE));
-    Supplier<Command> intakeFlags = () -> new InstantCommand(() -> lights.LightChooser(LIGHT_CODES.CENTER_INTAKE_FLASH));
-    Supplier<Command> weeWoo = () -> new InstantCommand(() -> lights.LightChooser(LIGHT_CODES.FLASH_ALTERNATE_ORANGE_AND_BLUE));
+    Supplier<Command> flashingGreen = () -> new InstantCommand(() -> lights.SetLightCode(LIGHT_CODES.FLASHING_GREEN));
+    Supplier<Command> flashingRed = () -> new InstantCommand(() -> lights.SetLightCode(LIGHT_CODES.FLASHING_RED));
+    Supplier<Command> idle = () -> new InstantCommand(() -> lights.SetLightCode(LIGHT_CODES.FLASHING_BLUE));
+    Supplier<Command> flashingOrange = () -> new InstantCommand(() -> lights.SetLightCode(LIGHT_CODES.FLASHING_ORANGE));
+    Supplier<Command> intakeFlags = () -> new InstantCommand(() -> lights.SetLightCode(LIGHT_CODES.CENTER_INTAKE_FLASH));
+    Supplier<Command> weeWoo = () -> new InstantCommand(() -> lights.SetLightCode(LIGHT_CODES.FLASH_ALTERNATE_ORANGE_AND_BLUE));
+
+    NamedCommands.registerCommand("FlashingGreen", flashingGreen.get());
+    NamedCommands.registerCommand("IntakeFlag", intakeFlags.get());
+    NamedCommands.registerCommand("FlashingOrange", flashingOrange.get());
+    NamedCommands.registerCommand("WeeWoo", weeWoo.get());
+
+    NamedCommands.registerCommand("ElevatorTravel", elevator.MoveToLevel(HEIGHTS.TRAVEL));
+    NamedCommands.registerCommand("ElevatorIntake", elevator.MoveToLevel(HEIGHTS.INTAKE));
+    NamedCommands.registerCommand("CoralTwoDeploy", new ParallelCommandGroup(elevator.MoveToLevel(HEIGHTS.TWO), wrist.MoveToAngle(ANGLES.DEPLOY_LOW)));
+    NamedCommands.registerCommand("CoralThreeDeploy", new ParallelCommandGroup(elevator.MoveToLevel(HEIGHTS.THREE), wrist.MoveToAngle(ANGLES.DEPLOY_LOW)));
+    NamedCommands.registerCommand("CoralFourDeploy", new ParallelCommandGroup(elevator.MoveToLevel(HEIGHTS.FOUR), wrist.MoveToAngle(ANGLES.DEPLOY_HIGH)));
+    NamedCommands.registerCommand("DeployCoralHigh", wheels.DeployCoralHigh());
+    NamedCommands.registerCommand("DeployCoralLow", wheels.DeployCoralLow());
+    NamedCommands.registerCommand("AlgaeBarge", new ParallelCommandGroup(elevator.MoveToLevel(HEIGHTS.BARGE), wrist.MoveToAngle(ANGLES.BARGE)));
+    NamedCommands.registerCommand("AlgaeProcessor", new ParallelCommandGroup(elevator.MoveToLevel(HEIGHTS.INTAKE), wrist.MoveToAngle(ANGLES.PROCESSOR)));
+    NamedCommands.registerCommand("DeployAlgae", wheels.DeployAlgae().withTimeout(0.5));
+    NamedCommands.registerCommand("Stow", new ParallelCommandGroup(elevator.MoveToLevel(HEIGHTS.TRAVEL), wrist.MoveToAngle(ANGLES.TRAVEL)));
+
+    NamedCommands.registerCommand("Align1L", drivetrain.AlignToFace(0, 1));
+    NamedCommands.registerCommand("Align1R", drivetrain.AlignToFace(1, 1));
+    NamedCommands.registerCommand("Align2L", drivetrain.AlignToFace(0, 2));
+    NamedCommands.registerCommand("Align2R", drivetrain.AlignToFace(1, 2));
+    NamedCommands.registerCommand("Align3L", drivetrain.AlignToFace(0, 3));
+    NamedCommands.registerCommand("Align3R", drivetrain.AlignToFace(1, 3));
+    NamedCommands.registerCommand("Align4L", drivetrain.AlignToFace(0, 4));
+    NamedCommands.registerCommand("Align4R", drivetrain.AlignToFace(1, 4));
+    NamedCommands.registerCommand("Align5L", drivetrain.AlignToFace(0, 5));
+    NamedCommands.registerCommand("Align5R", drivetrain.AlignToFace(1, 5));
+    NamedCommands.registerCommand("Align6L", drivetrain.AlignToFace(0, 6));
+    NamedCommands.registerCommand("Align6R", drivetrain.AlignToFace(1, 6));
+
+    NamedCommands.registerCommand("StartIntake", new ParallelDeadlineGroup(wheels.BeginCoralIntakeRoutine(), intakeFlags.get(), elevator.MoveToLevel(HEIGHTS.INTAKE), wrist.MoveToAngle(ANGLES.INTAKE)));
+    NamedCommands.registerCommand("CenterCoral", wheels.CenterCoral());
 
     drivetrain.setDefaultCommand
     (
@@ -181,10 +219,15 @@ public class RobotContainer
     // // PATHFIND TO STAGING THEN PATHFIND TO CORAL
     // m_DriverController.rightTrigger().whileTrue(new SequentialCommandGroup(flashingRed.get(), drivetrain.PathfindToStagingUniversal(4, 3, 1), new ParallelCommandGroup(drivetrain.PathfindToCoral(1, 0.5, 0), wrist.MoveToSelectedCoralDeployment(), elevator.MoveToDataLevel()), wheels.DeployCoral(), flashingGreen.get()))
     //     .onFalse(new SequentialCommandGroup(idle.get(), wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.TRAVEL)));
+
+    deployBuilder = new CoralDeploymentBuilder(flashingRed, flashingGreen, drivetrain, wrist, wheels, elevator);
+    m_DriverController.rightTrigger().onTrue(deployBuilder.ScheduleCoralCommand())
+      .onFalse(new SequentialCommandGroup(idle.get(), wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.TRAVEL)));
+
     
     // PATHFIND TO STAGING THEN PID ALIGN
-    m_DriverController.rightTrigger().whileTrue(new SequentialCommandGroup(flashingRed.get(), drivetrain.PathfindToStagingUniversal(4, 3, 1), new ParallelCommandGroup(drivetrain.AlignCoral(), wrist.MoveToSelectedCoralDeployment(), elevator.MoveToDataLevel()), wheels.DeployCoral(), flashingGreen.get()))
-        .onFalse(new SequentialCommandGroup(idle.get(), wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.TRAVEL)));
+    // m_DriverController.rightTrigger().whileTrue(new SequentialCommandGroup(flashingRed.get(), new ParallelCommandGroup(drivetrain.AlignCoral(), wrist.MoveToSelectedCoralDeployment(), elevator.MoveToDataLevel()), wheels.DeployCoral(), flashingGreen.get()))
+    //     .onFalse(new SequentialCommandGroup(idle.get(), wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.TRAVEL)));
 
     m_DriverController.leftTrigger().whileTrue(new SequentialCommandGroup(intakeFlags.get(), new ParallelDeadlineGroup(wheels.BeginCoralIntakeRoutine(), elevator.MoveToLevel(HEIGHTS.INTAKE), wrist.MoveToAngle(ANGLES.INTAKE)), flashingGreen.get()))
                                     .onFalse(new SequentialCommandGroup(flashingOrange.get(), wheels.CenterCoral(), flashingGreen.get(), new ParallelCommandGroup(elevator.MoveToLevel(HEIGHTS.TRAVEL), wrist.MoveToAngle(ANGLES.TRAVEL)), idle.get()));
@@ -216,7 +259,7 @@ public class RobotContainer
     m_CoDriverController.leftStick().onTrue(latches.setLatchVoltage(ClimbConstants.FUNNEL_RELEASE_VOLTAGE)).onFalse(latches.setLatchVoltage(0));
     m_CoDriverController.rightStick().onTrue(latches.setLatchVoltage(ClimbConstants.FOOT_RELEASE_VOTLAGE)).onFalse(latches.setLatchVoltage(0));
 
-    m_CoDriverController.rightTrigger().onTrue(new ParallelCommandGroup(drivetrain.RearDriveSnap(() -> m_DriverController.getLeftY(), () -> m_DriverController.getLeftX()) ,elevator.MoveToLevel(HEIGHTS.ONE), wrist.MoveToAngle(ANGLES.TRAVEL), climb.GoWristPosition(ClimbConstants.CLIMB_TAKING_POSITION)).andThen(climb.ApplyRollerVoltage(ClimbConstants.CLIMB_ROLLER_VOLTAGE)))
+    m_CoDriverController.rightTrigger().onTrue(new ParallelCommandGroup(drivetrain.RearDriveSnap(() -> m_DriverController.getLeftY(), () -> m_DriverController.getLeftX()) ,elevator.MoveToLevel(HEIGHTS.ONE), wrist.MoveToAngle(ANGLES.TRAVEL), climb.GoWristPosition(ClimbConstants.CLIMB_TAKING_POSITION), climb.ApplyRollerVoltage(ClimbConstants.CLIMB_ROLLER_VOLTAGE)))
                                        .onFalse(climb.ApplyRollerVoltage(0));
 
     m_CoDriverController.a().onTrue(climb.GoWristPosition(ClimbConstants.CLIMB_RESTING_POSITION));
@@ -225,39 +268,6 @@ public class RobotContainer
     m_CoDriverController.x().onTrue(climb.setClimbVoltage(0));
 
     climb.setDefaultCommand(climb.DefaultSafety());
-
-    NamedCommands.registerCommand("FlashingGreen", flashingGreen.get());
-    NamedCommands.registerCommand("IntakeFlag", intakeFlags.get());
-    NamedCommands.registerCommand("FlashingOrange", flashingOrange.get());
-    NamedCommands.registerCommand("WeeWoo", weeWoo.get());
-
-    NamedCommands.registerCommand("ElevatorTravel", elevator.MoveToLevel(HEIGHTS.TRAVEL));
-    NamedCommands.registerCommand("ElevatorIntake", elevator.MoveToLevel(HEIGHTS.INTAKE));
-    NamedCommands.registerCommand("CoralTwoDeploy", new ParallelCommandGroup(elevator.MoveToLevel(HEIGHTS.TWO), wrist.MoveToAngle(ANGLES.DEPLOY_LOW)));
-    NamedCommands.registerCommand("CoralThreeDeploy", new ParallelCommandGroup(elevator.MoveToLevel(HEIGHTS.THREE), wrist.MoveToAngle(ANGLES.DEPLOY_LOW)));
-    NamedCommands.registerCommand("CoralFourDeploy", new ParallelCommandGroup(elevator.MoveToLevel(HEIGHTS.FOUR), wrist.MoveToAngle(ANGLES.DEPLOY_HIGH)));
-    NamedCommands.registerCommand("DeployCoralHigh", wheels.DeployCoralHigh());
-    NamedCommands.registerCommand("DeployCoralLow", wheels.DeployCoralLow());
-    NamedCommands.registerCommand("AlgaeBarge", new ParallelCommandGroup(elevator.MoveToLevel(HEIGHTS.BARGE), wrist.MoveToAngle(ANGLES.BARGE)));
-    NamedCommands.registerCommand("AlgaeProcessor", new ParallelCommandGroup(elevator.MoveToLevel(HEIGHTS.INTAKE), wrist.MoveToAngle(ANGLES.GRAB)));
-    NamedCommands.registerCommand("DeployAlgae", wheels.DeployAlgae().withTimeout(0.5));
-    NamedCommands.registerCommand("Stow", new ParallelCommandGroup(elevator.MoveToLevel(HEIGHTS.TRAVEL), wrist.MoveToAngle(ANGLES.TRAVEL)));
-
-    NamedCommands.registerCommand("Align1L", drivetrain.AlignToFace(0, 1));
-    NamedCommands.registerCommand("Align1R", drivetrain.AlignToFace(1, 1));
-    NamedCommands.registerCommand("Align2L", drivetrain.AlignToFace(0, 2));
-    NamedCommands.registerCommand("Align2R", drivetrain.AlignToFace(1, 2));
-    NamedCommands.registerCommand("Align3L", drivetrain.AlignToFace(0, 3));
-    NamedCommands.registerCommand("Align3R", drivetrain.AlignToFace(1, 3));
-    NamedCommands.registerCommand("Align4L", drivetrain.AlignToFace(0, 4));
-    NamedCommands.registerCommand("Align4R", drivetrain.AlignToFace(1, 4));
-    NamedCommands.registerCommand("Align5L", drivetrain.AlignToFace(0, 5));
-    NamedCommands.registerCommand("Align5R", drivetrain.AlignToFace(1, 5));
-    NamedCommands.registerCommand("Align6L", drivetrain.AlignToFace(0, 6));
-    NamedCommands.registerCommand("Align6R", drivetrain.AlignToFace(1, 6));
-
-    NamedCommands.registerCommand("StartIntake", new ParallelDeadlineGroup(wheels.BeginCoralIntakeRoutine(), intakeFlags.get(), elevator.MoveToLevel(HEIGHTS.INTAKE), wrist.MoveToAngle(ANGLES.INTAKE)));
-    NamedCommands.registerCommand("CenterCoral", wheels.CenterCoral());
     
     try 
     {

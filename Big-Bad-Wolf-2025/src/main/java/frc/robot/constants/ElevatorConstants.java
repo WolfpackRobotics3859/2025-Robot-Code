@@ -34,7 +34,7 @@ public class ElevatorConstants
         INTAKE(1),
         LOW_CLEAN(15),
         HIGH_CLEAN(30),
-        BARGE(55),
+        BARGE(58),
         PROCESS(2);
 
         private double levelValue;

@@ -37,6 +37,8 @@ public class Lights extends SubsystemBase
   private int m_BrightnessCount;
   private boolean m_IsGoingUp = true;
 
+  private LIGHT_CODES m_CurrentCode;
+
   /**
    * Lights subsystem constructor.
    */
@@ -48,6 +50,7 @@ public class Lights extends SubsystemBase
     m_led.setLength(m_ledBuffer1.getLength());
 
     this.LightChooser(LIGHT_CODES.FLASHING_RED);
+    m_CurrentCode = LIGHT_CODES.FADING_ORANGE_AND_BLUE;
   }
 
   @Override
@@ -62,6 +65,8 @@ public class Lights extends SubsystemBase
     {
       m_RicochetTimer.reset();
     }
+
+    this.LightChooser(m_CurrentCode);
   }
 
 
@@ -85,6 +90,11 @@ public class Lights extends SubsystemBase
     FADING_ORANGE_AND_BLUE,
     BOOT_UP_PATTERN,
     CENTER_INTAKE_FLASH;
+  }
+
+  public void SetLightCode(LIGHT_CODES code)
+  {
+    this.m_CurrentCode = code;
   }
 
   /**

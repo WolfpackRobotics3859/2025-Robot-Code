@@ -28,13 +28,13 @@ public class WheelConstants
     public enum VoltageSpeeds
     {
         ZERO(0),
-        INTAKE(2),
+        INTAKE(1.5),
         SWEEP(3),
-        FORWARD_CENTERING(1.5),
+        FORWARD_CENTERING(1.0),
         REVERSE_CENTERING(-1.5),
         DEPLOY_LOW(6), // 6
         DEPLOY_HIGH(8),
-        BARGE(-3);
+        BARGE(-12);
 
         private double value;
 

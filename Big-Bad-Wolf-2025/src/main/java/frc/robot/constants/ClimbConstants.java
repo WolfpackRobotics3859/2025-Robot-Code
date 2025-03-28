@@ -23,8 +23,8 @@ public class ClimbConstants
     public static final double CLIMB_WRIST_VOLTAGE = 2;
     public static final double CLIMB_ROLLER_VOLTAGE = -8;
 
-    public static final double FUNNEL_RELEASE_VOLTAGE = 0.5;
-    public static final double FOOT_RELEASE_VOTLAGE = -0.5;
+    public static final double FUNNEL_RELEASE_VOLTAGE = 2;
+    public static final double FOOT_RELEASE_VOTLAGE = -2;
 
     public static final double CLIMB_RESTING_POSITION = 0.060547;
     public static final double CLIMB_CLIMB_POSITION = 0.085;

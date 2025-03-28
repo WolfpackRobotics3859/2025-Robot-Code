@@ -142,7 +142,15 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                             this.m_YController.reset();
                                             this.m_XController.setSetpoint(goalPose.getX());
                                             this.m_YController.setSetpoint(goalPose.getY());
-                                            this.m_SwerveFieldCentricFacingAngle.TargetDirection = goalPose.getRotation().rotateBy(Rotation2d.k180deg);
+                                            
+                                            if (alliance == Alliance.Blue)
+                                            {
+                                                this.m_SwerveFieldCentricFacingAngle.TargetDirection = goalPose.getRotation();
+                                            }
+                                            else
+                                            {
+                                                this.m_SwerveFieldCentricFacingAngle.TargetDirection = goalPose.getRotation().rotateBy(Rotation2d.k180deg);
+                                            }
                                         }, 
                                      () -> UpdateRequest(), 
                                      interrupted -> {
@@ -161,7 +169,16 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                             this.m_YController.reset();
                                             this.m_XController.setSetpoint(goalPose.getX());
                                             this.m_YController.setSetpoint(goalPose.getY());
-                                            this.m_SwerveFieldCentricFacingAngle.TargetDirection = goalPose.getRotation().rotateBy(Rotation2d.k180deg);
+
+                                            if (alliance == Alliance.Blue)
+                                            {
+                                                this.m_SwerveFieldCentricFacingAngle.TargetDirection = goalPose.getRotation();
+                                            }
+                                            else
+                                            {
+                                                this.m_SwerveFieldCentricFacingAngle.TargetDirection = goalPose.getRotation().rotateBy(Rotation2d.k180deg);
+                                            }
+                                            
                                         }, 
                                      () -> UpdateRequest(), 
                                      interrupted -> {
@@ -180,7 +197,15 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                             this.m_YController.reset();
                                             this.m_XController.setSetpoint(goalPose.getX());
                                             this.m_YController.setSetpoint(goalPose.getY());
-                                            this.m_SwerveFieldCentricFacingAngle.TargetDirection = goalPose.getRotation().rotateBy(Rotation2d.k180deg);
+                                            
+                                            if (alliance == Alliance.Blue)
+                                            {
+                                                this.m_SwerveFieldCentricFacingAngle.TargetDirection = goalPose.getRotation();
+                                            }
+                                            else
+                                            {
+                                                this.m_SwerveFieldCentricFacingAngle.TargetDirection = goalPose.getRotation().rotateBy(Rotation2d.k180deg);
+                                            }
                                         }, 
                                      () -> UpdateRequest(), 
                                      interrupted -> {}, 
@@ -225,7 +250,15 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                             
                                             this.m_XController.setSetpoint(goalPose.getX());
                                             this.m_YController.setSetpoint(goalPose.getY());
-                                            this.m_SwerveFieldCentricFacingAngle.TargetDirection = goalPose.getRotation().rotateBy(Rotation2d.k180deg);
+                                            
+                                            if (alliance == Alliance.Blue)
+                                            {
+                                                this.m_SwerveFieldCentricFacingAngle.TargetDirection = goalPose.getRotation();
+                                            }
+                                            else
+                                            {
+                                                this.m_SwerveFieldCentricFacingAngle.TargetDirection = goalPose.getRotation().rotateBy(Rotation2d.k180deg);
+                                            }
                                         }, 
                                      () -> UpdateRequest(), 
                                      interrupted -> {}, 
@@ -242,7 +275,15 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                             this.m_YController.reset();
                                             this.m_XController.setSetpoint(goalPose.getX());
                                             this.m_YController.setSetpoint(goalPose.getY());
-                                            this.m_SwerveFieldCentricFacingAngle.TargetDirection = goalPose.getRotation().rotateBy(Rotation2d.k180deg);
+                                            
+                                            if (alliance == Alliance.Blue)
+                                            {
+                                                this.m_SwerveFieldCentricFacingAngle.TargetDirection = goalPose.getRotation();
+                                            }
+                                            else
+                                            {
+                                                this.m_SwerveFieldCentricFacingAngle.TargetDirection = goalPose.getRotation().rotateBy(Rotation2d.k180deg);
+                                            }
                                         }, 
                                      () -> UpdateRequest(), 
                                      interrupted -> {

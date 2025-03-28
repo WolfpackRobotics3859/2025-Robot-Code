@@ -32,7 +32,7 @@
       ]
     }
   },
-  "resetOdom": true,
+  "resetOdom": false,
   "folder": "TELEOP AUTO",
   "choreoAuto": false
 }
