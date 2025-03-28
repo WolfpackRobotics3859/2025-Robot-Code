@@ -267,8 +267,8 @@ public class RobotContainer
     //                                    .onFalse(climb.ApplyRollerVoltage(0));
 
     
-    m_CoDriverController.rightTrigger().onTrue(new ParallelCommandGroup(drivetrain.RearDriveSnap(() -> m_DriverController.getLeftY(), () -> m_DriverController.getLeftX()) ,elevator.MoveToLevel(HEIGHTS.ONE), wrist.MoveToAngle(ANGLES.TRAVEL), climb.GoWristPosition(ClimbConstants.CLIMB_TAKING_POSITION), climb.ApplyRollerVoltage(ClimbConstants.CLIMB_ROLLER_VOLTAGE)))
-                                       .onFalse(climb.ApplyRollerVoltage(0));
+    // m_CoDriverController.rightTrigger().onTrue(new ParallelCommandGroup(drivetrain.RearDriveSnap(() -> m_DriverController.getLeftY(), () -> m_DriverController.getLeftX()) ,elevator.MoveToLevel(HEIGHTS.ONE), wrist.MoveToAngle(ANGLES.TRAVEL), climb.GoWristPosition(ClimbConstants.CLIMB_TAKING_POSITION), climb.ApplyRollerVoltage(ClimbConstants.CLIMB_ROLLER_VOLTAGE)))
+    //                                    .onFalse(climb.ApplyRollerVoltage(0));
 
     m_CoDriverController.a().onTrue(climb.GoWristPosition(ClimbConstants.CLIMB_RESTING_POSITION));
     m_CoDriverController.b().onTrue(climb.GoWristPosition(ClimbConstants.CLIMB_TAKING_POSITION));
