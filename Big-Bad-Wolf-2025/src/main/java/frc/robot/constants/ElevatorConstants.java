@@ -28,9 +28,9 @@ public class ElevatorConstants
         ZERO(0),
         TRAVEL(5),
         ONE(10),
-        TWO(20),
-        THREE(35),
-        FOUR(58),
+        TWO(19.5), // 20
+        THREE(34),
+        FOUR(59), // 58
         INTAKE(1),
         LOW_CLEAN(15),
         HIGH_CLEAN(30),

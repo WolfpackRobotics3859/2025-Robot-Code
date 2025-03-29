@@ -490,7 +490,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
             }
             else
             {
-                goalRotation = Rotation2d.kZero;
+                goalRotation = Rotation2d.k180deg;
             }
             this.setControl(this.m_SwerveFieldCentricFacingAngle.withVelocityX(-thrust.get() * TunerConstants.MaxSpeed * 0.8)
                                                                 .withVelocityY(-strafe.get() * TunerConstants.MaxSpeed * 0.8)
@@ -598,12 +598,12 @@ public class Drivetrain extends CommandSwerveDrivetrain
     private void ConfigurePIDControllers()
     {
         this.m_XController = new PIDController(5, 10,0.7); // 5 10 0.7
-        this.m_XController.setTolerance(Meters.convertFrom(0.5, Inches), MetersPerSecond.convertFrom(3, InchesPerSecond));
+        this.m_XController.setTolerance(Meters.convertFrom(0.5, Inches), MetersPerSecond.convertFrom(1, InchesPerSecond)); // 3 inches per second
         this.m_XController.setIZone(0.1); // 0.0762
         SmartDashboard.putData(this.m_XController);
 
         this.m_YController = new PIDController (5, 10,0.7);
-        this.m_YController.setTolerance(Meters.convertFrom(0.5, Inches), MetersPerSecond.convertFrom(3, InchesPerSecond));
+        this.m_YController.setTolerance(Meters.convertFrom(0.5, Inches), MetersPerSecond.convertFrom(1, InchesPerSecond));
         this.m_XController.setIZone(0.1);
         SmartDashboard.putData(this.m_YController);
     }

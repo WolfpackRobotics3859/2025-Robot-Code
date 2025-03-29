@@ -33,8 +33,9 @@ public class WheelConstants
         FORWARD_CENTERING(1.0),
         REVERSE_CENTERING(-1.5),
         DEPLOY_LOW(6), // 6
-        DEPLOY_HIGH(8),
-        BARGE(-12);
+        DEPLOY_HIGH(5), 
+        BARGE(-12),
+        PROCESS(-6);
 
         private double value;
 

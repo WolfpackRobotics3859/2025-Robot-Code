@@ -25,7 +25,7 @@ public class WristConstants
         ZERO(-0.077637),
         TRAVEL(-0.065918),
         DEPLOY_LOW(-0.053955),
-        DEPLOY_HIGH(-0.07),
+        DEPLOY_HIGH(-0.06), // -0.07
         INTAKE(-0.077637),
         SWEEP(0.042561),
         BARGE(-0.065918),

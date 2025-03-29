@@ -6,7 +6,6 @@ package frc.robot.subsystems;
 
 import java.util.Map;
 
-import edu.wpi.first.units.measure.Dimensionless;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
@@ -27,19 +26,24 @@ public class Lights extends SubsystemBase
   private final Timer m_LightTimer = new Timer();
   private final Timer m_BootUpTimer = new Timer();
   private final Timer m_RicochetTimer = new Timer();
-  AddressableLEDBuffer m_ledBuffer1 = new AddressableLEDBuffer(46);
+  //AddressableLEDBuffer m_ledBuffer1 = new AddressableLEDBuffer(46);
+  static AddressableLEDBuffer m_ledBuffer1 = new AddressableLEDBuffer(67);
 
-  private final AddressableLEDBufferView m_leftData = m_ledBuffer1.createView(0, 23);
-  private final AddressableLEDBufferView m_rightData = m_ledBuffer1.createView(24, 45).reversed();
+  private static AddressableLEDBufferView m_HeadlightData;
+  private static final AddressableLEDBufferView m_leftData = m_ledBuffer1.createView(21, 41);
+  private static final AddressableLEDBufferView m_rightData = m_ledBuffer1.createView(42, 62).reversed();
 
-  private final AddressableLEDBufferView m_centerData = m_ledBuffer1.createView(8, 14);
-  private final AddressableLEDBufferView m_centerBackData = m_ledBuffer1.createView(32, 38);
+  private static final AddressableLEDBufferView m_centerData = m_ledBuffer1.createView(26, 36);
+  private static final AddressableLEDBufferView m_centerBackData = m_ledBuffer1.createView(46, 57);
 
 
-  // private static final AddressableLED m_Headlights = new AddressableLED(1);
-  // private static final AddressableLEDBuffer m_HeadLightBuffer = new AddressableLEDBuffer(20);
+  // private final AddressableLEDBufferView m_leftData = m_ledBuffer1.createView(0, 23);
+  // private final AddressableLEDBufferView m_rightData = m_ledBuffer1.createView(24, 45).reversed();
 
-  AddressableLED m_led = new AddressableLED(0);
+  // private final AddressableLEDBufferView m_centerData = m_ledBuffer1.createView(8, 14);
+  // private final AddressableLEDBufferView m_centerBackData = m_ledBuffer1.createView(32, 38);
+
+  static AddressableLED m_led = new AddressableLED(0);
   private int m_BrightnessCount;
   private boolean m_IsGoingUp = true;
 
@@ -56,22 +60,23 @@ public class Lights extends SubsystemBase
     m_led.setLength(m_ledBuffer1.getLength());
 
     m_CurrentCode = LIGHT_CODES.FADING_BLUE;
+    m_HeadlightData =  m_ledBuffer1.createView(0, 20);
   }
 
   public static void HeadlightsHigh()
   {
-    // LEDPattern pattern = LEDPattern.solid(Color.kWhite).atBrightness(Percent.of(100));
-    // pattern.applyTo(m_HeadLightBuffer);
-    // m_Headlights.setData(m_HeadLightBuffer);
+    LEDPattern pattern = LEDPattern.solid(Color.kWhite).atBrightness(Percent.of(100));
+    pattern.applyTo(m_HeadlightData);
+    m_led.setData(m_ledBuffer1);
   }
 
   public static void HeadlightsLow()
   {
-    // LEDPattern base = LEDPattern.solid(Color.kWhite).atBrightness(Percent.of(30));
-    // LEDPattern pattern = base.breathe(Seconds.of(2));
+    LEDPattern base = LEDPattern.solid(Color.kWhite).atBrightness(Percent.of(30));
+    LEDPattern pattern = base.breathe(Seconds.of(2));
 
-    // pattern.applyTo(m_HeadLightBuffer);
-    // m_Headlights.setData(m_HeadLightBuffer);
+    pattern.applyTo(m_HeadlightData);
+    m_led.setData(m_ledBuffer1);
   }
 
   @Override
@@ -215,12 +220,19 @@ public class Lights extends SubsystemBase
    */
   public void setSolidColor(int hue, int saturation, int brightness)
   {
-    for(int i = 0; i < m_ledBuffer1.getLength(); i++) 
+    for(int i = 21; i < m_ledBuffer1.getLength(); i++) 
     {
       m_ledBuffer1.setHSV(i, hue, saturation, brightness);
     }
     m_led.setData(m_ledBuffer1);
     m_led.start();
+
+    // for(int i = 0; i < m_ledBuffer1.getLength(); i++) 
+    // {
+    //   m_ledBuffer1.setHSV(i, hue, saturation, brightness);
+    // }
+    // m_led.setData(m_ledBuffer1);
+    // m_led.start();
   }
 
   /**
@@ -267,7 +279,7 @@ public class Lights extends SubsystemBase
       }
     else
       {
-        for(int x = 0; x < m_ledBuffer1.getLength(); x++)
+        for(int x = 21; x < m_ledBuffer1.getLength(); x++)
         {
           m_ledBuffer1.setHSV(x, hue, saturation, brightness);
         }
@@ -301,7 +313,7 @@ public class Lights extends SubsystemBase
           m_IsGoingUp = true;
         }
       }
-      for(int x = 0; x < m_ledBuffer1.getLength(); x++)
+      for(int x = 21; x < m_ledBuffer1.getLength(); x++)
       {
         m_ledBuffer1.setHSV(x, hue, saturation, m_BrightnessCount);
       }
@@ -360,7 +372,7 @@ public class Lights extends SubsystemBase
   {
     if(m_LightTimer.get() > .25)
       {
-        for(int x = 0; x < m_ledBuffer1.getLength(); x++)
+        for(int x = 21; x < m_ledBuffer1.getLength(); x++)
         {
           m_ledBuffer1.setHSV(x, hue, saturation, brightness);
         }
@@ -368,7 +380,7 @@ public class Lights extends SubsystemBase
       }
     else
       {
-        for(int x = 0; x < m_ledBuffer1.getLength(); x++)
+        for(int x = 21; x < m_ledBuffer1.getLength(); x++)
         {
           m_ledBuffer1.setHSV(x, hue, saturation, brightness);
         }
@@ -422,7 +434,7 @@ public class Lights extends SubsystemBase
    */
   public void setOffLights()
   {
-    for (int x = 0; x < m_ledBuffer1.getLength(); x++)
+    for (int x = 21; x < m_ledBuffer1.getLength(); x++)
     {
       m_ledBuffer1.setHSV(x, 0, 0, 0);
     }

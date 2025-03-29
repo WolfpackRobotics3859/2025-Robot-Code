@@ -17,23 +17,45 @@ public class DrivetrainConstants
 
     public static Pose2d[] RED_LEFT_ALIGNMENTS = 
     {
-        new Pose2d(11.6384, 4.1981, new Rotation2d(0.0387)), // 1
-        new Pose2d(12.4914, 5.3364, new Rotation2d(-1.0100)), // 2
-        new Pose2d(13.9099, 5.1726, new Rotation2d(-2.0438)), // 3
-        new Pose2d(14.4779, 3.8453, new Rotation2d(-3.1086)), // 4
-        new Pose2d(13.6189, 2.7097, new Rotation2d(2.1411)), // 5
-        new Pose2d(12.2047, 2.8825, new Rotation2d(1.0877))  // 6 
+        new Pose2d(11.646, 4.222, new Rotation2d(0.045)), // 1
+        new Pose2d(12.516, 5.343, new Rotation2d(-0.996)), // 2
+        new Pose2d(13.923, 5.162, new Rotation2d(-2.049)), // 3 
+        new Pose2d(14.473, 3.839, new Rotation2d(-3.085)), // 4
+        new Pose2d(13.604, 2.707, new Rotation2d(2.604)), // 5
+        new Pose2d(12.187, 2.896, new Rotation2d(1.101))  // 6 
     };
 
     public static Pose2d[] RED_RIGHT_ALIGNMENTS =
     {
-        new Pose2d(11.6408, 3.8164, new Rotation2d(0.0936)), // 1
-        new Pose2d(12.1273, 5.0967, new Rotation2d(-0.9292)), // 2
-        new Pose2d(13.5690, 5.3686, new Rotation2d(-1.9993)), // 3
-        new Pose2d(14.5375, 3.6529, new Rotation2d(3.1047)), // 4
-        new Pose2d(13.9747, 2.9172, new Rotation2d(2.2303)), // 5
-        new Pose2d(12.8102, 2.6742, new Rotation2d(1.1241))  // 6 
+        new Pose2d(11.648, 3.851, new Rotation2d(0.119)), // 1
+        new Pose2d(12.204, 5.159,new Rotation2d(-0.927)), // 2
+        new Pose2d(13.602, 5.347, new Rotation2d(-1.977)), // 3 
+        new Pose2d(14.472, 4.217, new Rotation2d(-3.008)), // 4
+        new Pose2d(13.929, 2.894, new Rotation2d(2.208)), // 5
+        new Pose2d(12.505, 2.719, new Rotation2d(1.170))  // 6 
     };
+
+    // public static Pose2d[] RED_LEFT_ALIGNMENTS = 
+    // {
+    //     new Pose2d(11.6384, 4.1981, new Rotation2d(0.0387)), // 1
+    //     new Pose2d(12.4914, 5.3364, new Rotation2d(-1.0100)), // 2
+    //     new Pose2d(13.9099, 5.1726, new Rotation2d(-2.0438)), // 3
+    //     new Pose2d(14.4779, 3.8453, new Rotation2d(-3.1086)), // 4
+    //     new Pose2d(13.6189, 2.7097, new Rotation2d(2.1411)), // 5
+    //     new Pose2d(12.2047, 2.8825, new Rotation2d(1.0877))  // 6 
+    // };
+
+    // public static Pose2d[] RED_RIGHT_ALIGNMENTS =
+    // {
+    //     new Pose2d(11.6408, 3.8164, new Rotation2d(0.0936)), // 1
+    //     new Pose2d(12.1273, 5.0967, new Rotation2d(-0.9292)), // 2
+    //     new Pose2d(13.5690, 5.3686, new Rotation2d(-1.9993)), // 3
+    //     new Pose2d(14.4785, 4.2318, new Rotation2d(-3.0317)), // 4
+    //     new Pose2d(13.9747, 2.9172, new Rotation2d(2.2303)), // 5
+    //     new Pose2d(12.8102, 2.6742, new Rotation2d(1.1241))  // 6 
+    // };
+
+    
 
     public static Pose2d[] RED_STAGING_POSES =
     {

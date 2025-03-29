@@ -174,6 +174,18 @@ public class Wheels extends SubsystemBase
                                      this);
     }
 
+    public Command DeployAlgaeProcessor()
+    {
+        return new FunctionalCommand(() -> this.SetVoltage(VoltageSpeeds.PROCESS),
+                                     () -> {},
+                                     interrupted -> 
+                                     {
+                                        this.SetVoltage(VoltageSpeeds.ZERO);
+                                     }, 
+                                     () -> this.AnyActive(),
+                                     this);
+    }
+
     public Command ApplyVoltage(VoltageSpeeds speed)
     {
         return this.runOnce(() -> this.SetVoltage(speed));
