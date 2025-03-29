@@ -1,10 +1,15 @@
 package frc.robot.constants;
 
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 public class DrivetrainConstants 
 {
+    public static double TRANSLATION_TOLERANCE = Meters.convertFrom(0.5, Inches);
+
     public static Pose2d[] RED_CENTER_ALIGNMENTS = 
     {
         new Pose2d(11.749, 4.005, Rotation2d.fromDegrees(0)), // 1

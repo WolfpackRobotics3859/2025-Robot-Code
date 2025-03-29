@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.InchesPerSecond;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Rotation;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,11 +32,15 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
@@ -58,6 +61,9 @@ public class Drivetrain extends CommandSwerveDrivetrain
 
     private PIDController m_XController;
     private PIDController m_YController;
+
+    private ProfiledPIDController m_FeedbackX;
+    private ProfiledPIDController m_FeedbackY;
 
     private SwerveRequest.FieldCentricFacingAngle m_SwerveFieldCentricFacingAngle;
     private SwerveRequest.RobotCentric m_SwerveRequestRobot;
@@ -155,6 +161,7 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                         }, 
                                      () -> UpdateRequest(), 
                                      interrupted -> {
+                                                        this.setControl(this.m_BrakeRequest);
                                                         Lights.HeadlightsLow();
                                                         m_PackLog.Log("Alignment command finished.");
                                                     }, 
@@ -186,23 +193,22 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                      () -> UpdateRequest(), 
                                      interrupted -> {
                                                         Lights.HeadlightsLow();
+                                                        this.setControl(m_BrakeRequest);
                                                         m_PackLog.Log("Alignment command finished.");
                                                     }, 
                                      () -> IsAlignmentComplete(), 
                                      this);
     }
 
-    public Command AlignCoralNoEnd()
+    public Command AlignCoralProfiled()
     {
         return new FunctionalCommand(() -> 
                                         {
                                             Lights.HeadlightsHigh();
                                             Pose2d goalPose = this.GetGoalCoralPose();
-                                            this.m_XController.reset();
-                                            this.m_YController.reset();
-                                            this.m_XController.setSetpoint(goalPose.getX());
-                                            this.m_YController.setSetpoint(goalPose.getY());
-                                            
+                                            this.m_FeedbackX.setGoal(goalPose.getX());
+                                            this.m_FeedbackY.setGoal(goalPose.getY());
+
                                             if (alliance == Alliance.Blue)
                                             {
                                                 this.m_SwerveFieldCentricFacingAngle.TargetDirection = goalPose.getRotation();
@@ -211,19 +217,21 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                             {
                                                 this.m_SwerveFieldCentricFacingAngle.TargetDirection = goalPose.getRotation().rotateBy(Rotation2d.k180deg);
                                             }
+                                            
                                         }, 
-                                     () -> UpdateRequest(), 
-                                     interrupted -> 
-                                     {
-                                        Lights.HeadlightsLow();
-                                     }, 
-                                     () -> false, 
+                                     () -> UpdateProfiledRequest(), 
+                                     interrupted -> {
+                                                        Lights.HeadlightsLow();
+                                                        this.setControl(m_BrakeRequest);
+                                                        m_PackLog.Log("Alignment command finished.");
+                                                    }, 
+                                     () -> this.m_FeedbackX.atGoal() && this.m_FeedbackY.atGoal(), 
                                      this);
     }
 
     public Command Brake()
     {
-        return this.runOnce(() -> this.applyRequest(() -> this.m_BrakeRequest));
+        return this.runOnce(() -> this.setControl(m_BrakeRequest));
     }
 
     public Command AlignToFace(int side, int face)
@@ -277,6 +285,56 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                      this);
     }
 
+    public Command AlignToFaceModified(int side, int face)
+    {
+        return new FunctionalCommand(() -> 
+                                        {
+                                            Lights.HeadlightsHigh();
+                                            Pose2d goalPose;
+                                            if(alliance == Alliance.Blue)
+                                            {
+                                                if(side == 0)
+                                                {
+                                                    goalPose = DrivetrainConstants.BLUE_LEFT_ALIGNMENTS[face - 1];
+                                                }
+                                                else
+                                                {
+                                                    goalPose = DrivetrainConstants.BLUE_RIGHT_ALIGNMENTS[face - 1];
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if(side == 0)
+                                                {
+                                                    goalPose = DrivetrainConstants.RED_LEFT_ALIGNMENTS[face - 1];
+                                                }
+                                                else
+                                                {
+                                                    goalPose = DrivetrainConstants.RED_RIGHT_ALIGNMENTS[face -1];
+                                                }
+                                            }
+                                            
+                                            this.m_FeedbackX.setGoal(goalPose.getX());
+                                            this.m_FeedbackY.setGoal(goalPose.getY());
+                                            
+                                            if (alliance == Alliance.Blue)
+                                            {
+                                                this.m_SwerveFieldCentricFacingAngle.TargetDirection = goalPose.getRotation();
+                                            }
+                                            else
+                                            {
+                                                this.m_SwerveFieldCentricFacingAngle.TargetDirection = goalPose.getRotation().rotateBy(Rotation2d.k180deg);
+                                            }
+                                        }, 
+                                     () -> UpdateRequest(), 
+                                     interrupted -> {
+                                        this.setControl(m_BrakeRequest);
+                                        Lights.HeadlightsLow();
+                                     }, 
+                                     () -> this.m_FeedbackX.atGoal() && this.m_FeedbackY.atGoal(), 
+                                     this);
+    }
+
     public Command AlignCenter()
     {
         return new FunctionalCommand(() -> 
@@ -301,55 +359,9 @@ public class Drivetrain extends CommandSwerveDrivetrain
                                      interrupted -> {
                                                         Lights.HeadlightsLow();
                                                         m_PackLog.Log("Alignment command finished.");
-                                                        this.applyRequest(() -> this.m_BrakeRequest);
+                                                        this.setControl(m_BrakeRequest);
                                                     }, 
                                      () -> false, 
-                                     this);
-    }
-
-    public Command RotationTesting(Pose2d testPose)
-    {
-        return new FunctionalCommand(() -> 
-                                        {
-                                            this.m_SwerveFieldCentricFacingAngle.TargetDirection = Rotation2d.kZero;
-                                        }, 
-                                     () -> UpdateRotationOnly(), 
-                                     interrupted -> {
-                                                        m_PackLog.Log("Alignment command finished.");
-                                                    }, 
-                                     () -> false, 
-                                     this);
-    }
-
-    public Command AlignXTesting(Pose2d testPose)
-    {
-        return new FunctionalCommand(() -> 
-                                        {
-                                            this.m_XController.reset();
-                                            this.m_XController.setSetpoint(testPose.getX());
-                                            this.m_SwerveFieldCentricFacingAngle.TargetDirection = Rotation2d.kZero;
-                                        }, 
-                                     () -> UpdateXOnly(), 
-                                     interrupted -> {
-                                                        m_PackLog.Log("Alignment command finished.");
-                                                    }, 
-                                     () -> this.m_XController.atSetpoint(), 
-                                     this);
-    }
-
-    public Command AlignYTesting(Pose2d testPose)
-    {
-        return new FunctionalCommand(() -> 
-                                        {
-                                            this.m_YController.reset();
-                                            this.m_YController.setSetpoint(testPose.getY());
-                                            this.m_SwerveFieldCentricFacingAngle.TargetDirection = Rotation2d.kZero;
-                                        }, 
-                                     () -> UpdateYOnly(), 
-                                     interrupted -> {
-                                                        m_PackLog.Log("Alignment command finished.");
-                                                    }, 
-                                     () -> this.m_YController.atSetpoint(), 
                                      this);
     }
 
@@ -515,50 +527,48 @@ public class Drivetrain extends CommandSwerveDrivetrain
         }
     }
 
-    private void UpdateYOnly()
+    private void UpdateProfiledRequest()
     {
         if(alliance == Alliance.Red)
         {
-            this.m_SwerveFieldCentricFacingAngle.VelocityX = 0;
-            this.m_SwerveFieldCentricFacingAngle.VelocityY = -this.GetYOutput();
-            this.setControl(m_SwerveFieldCentricFacingAngle);
-        }
-        else
-        {
-            this.m_SwerveFieldCentricFacingAngle.VelocityX = 0;
-            this.m_SwerveFieldCentricFacingAngle.VelocityY = this.GetYOutput();
-            this.setControl(m_SwerveFieldCentricFacingAngle);
-        }
-    }
+            if(this.m_FeedbackX.atGoal())
+            {
+                this.m_SwerveFieldCentricFacingAngle.VelocityX = 0;
+            }
+            else
+            {
+                this.m_SwerveFieldCentricFacingAngle.VelocityX = -this.GetXProfiledOutput();
+            }
 
-    private void UpdateXOnly()
-    {
-        if(alliance == Alliance.Red)
-        {
-            this.m_SwerveFieldCentricFacingAngle.VelocityX = -this.GetXOutput();
-            this.m_SwerveFieldCentricFacingAngle.VelocityY = 0;
+            if(this.m_FeedbackY.atGoal())
+            {
+                this.m_SwerveFieldCentricFacingAngle.VelocityY = 0;
+            }
+            else
+            {
+                this.m_SwerveFieldCentricFacingAngle.VelocityY = -this.GetYProfiledOutput();    
+            }
             this.setControl(m_SwerveFieldCentricFacingAngle);
         }
         else
         {
-            this.m_SwerveFieldCentricFacingAngle.VelocityX = this.GetXOutput();
-            this.m_SwerveFieldCentricFacingAngle.VelocityY = 0;
-            this.setControl(m_SwerveFieldCentricFacingAngle);
-        }
-    }
+            if(this.m_FeedbackX.atGoal())
+            {
+                this.m_SwerveFieldCentricFacingAngle.VelocityX = 0;
+            }
+            else
+            {
+                this.m_SwerveFieldCentricFacingAngle.VelocityX = this.GetXProfiledOutput();
+            }
 
-    private void UpdateRotationOnly()
-    {
-        if(alliance == Alliance.Red)
-        {
-            this.m_SwerveFieldCentricFacingAngle.VelocityX = 0;
-            this.m_SwerveFieldCentricFacingAngle.VelocityY = 0;
-            this.setControl(m_SwerveFieldCentricFacingAngle);
-        }
-        else
-        {
-            this.m_SwerveFieldCentricFacingAngle.VelocityX = 0;
-            this.m_SwerveFieldCentricFacingAngle.VelocityY = 0;
+            if(this.m_FeedbackY.atGoal())
+            {
+                this.m_SwerveFieldCentricFacingAngle.VelocityY = 0;
+            }
+            else
+            {
+                this.m_SwerveFieldCentricFacingAngle.VelocityY = this.GetYProfiledOutput();    
+            }
             this.setControl(m_SwerveFieldCentricFacingAngle);
         }
     }
@@ -571,6 +581,16 @@ public class Drivetrain extends CommandSwerveDrivetrain
     private double GetYOutput()
     {
         return MathUtil.clamp(this.m_YController.calculate(this.getState().Pose.getY()), -TunerConstants.MaxSpeed, TunerConstants.MaxSpeed);
+    }
+
+    private double GetXProfiledOutput()
+    {
+        return MathUtil.clamp(this.m_FeedbackX.calculate(this.getState().Pose.getX()), -TunerConstants.MaxSpeed, TunerConstants.MaxSpeed);
+    }
+
+    private double GetYProfiledOutput()
+    {
+        return MathUtil.clamp(this.m_FeedbackY.calculate(this.getState().Pose.getY()), -TunerConstants.MaxSpeed, TunerConstants.MaxSpeed);
     }
 
     Debouncer debounce = new Debouncer(0.00, DebounceType.kRising);
@@ -591,6 +611,11 @@ public class Drivetrain extends CommandSwerveDrivetrain
         this.m_SwerveRequestRobot = new SwerveRequest.RobotCentric();
         this.m_SwerveRequestSpeeds = new SwerveRequest.ApplyRobotSpeeds();
         this.m_BrakeRequest = new SwerveRequest.SwerveDriveBrake();
+
+        this.m_FeedbackX = new ProfiledPIDController(4, 0, 0.05, new Constraints(0.5, 0.25));
+        this.m_FeedbackX.setTolerance(DrivetrainConstants.TRANSLATION_TOLERANCE);
+        this.m_FeedbackY = new ProfiledPIDController(4, 0, 0.05, new Constraints(0.5, 0.25));
+        this.m_FeedbackY.setTolerance(DrivetrainConstants.TRANSLATION_TOLERANCE);
 
         this.m_PackLog.Log("End configuration.");
     }

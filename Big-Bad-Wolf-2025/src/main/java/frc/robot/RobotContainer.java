@@ -199,6 +199,19 @@ public class RobotContainer
     NamedCommands.registerCommand("Align6L", drivetrain.AlignToFace(0, 6));
     NamedCommands.registerCommand("Align6R", drivetrain.AlignToFace(1, 6));
 
+    NamedCommands.registerCommand("Align1LMod", drivetrain.AlignToFaceModified(0, 1));
+    NamedCommands.registerCommand("Align1RMod", drivetrain.AlignToFaceModified(1, 1));
+    NamedCommands.registerCommand("Align2LMod", drivetrain.AlignToFaceModified(0, 2));
+    NamedCommands.registerCommand("Align2RMod", drivetrain.AlignToFaceModified(1, 2));
+    NamedCommands.registerCommand("Align3LMod", drivetrain.AlignToFaceModified(0, 3));
+    NamedCommands.registerCommand("Align3RMod", drivetrain.AlignToFaceModified(1, 3));
+    NamedCommands.registerCommand("Align4LMod", drivetrain.AlignToFaceModified(0, 4));
+    NamedCommands.registerCommand("Align4RMod", drivetrain.AlignToFaceModified(1, 4));
+    NamedCommands.registerCommand("Align5LMod", drivetrain.AlignToFaceModified(0, 5));
+    NamedCommands.registerCommand("Align5RMod", drivetrain.AlignToFaceModified(1, 5));
+    NamedCommands.registerCommand("Align6LMod", drivetrain.AlignToFaceModified(0, 6));
+    NamedCommands.registerCommand("Align6RMod", drivetrain.AlignToFaceModified(1, 6));
+
     NamedCommands.registerCommand("StartIntake", new ParallelDeadlineGroup(wheels.BeginCoralIntakeRoutine(), intakeFlags.get(), elevator.MoveToLevel(HEIGHTS.INTAKE), wrist.MoveToAngle(ANGLES.INTAKE)));
     NamedCommands.registerCommand("CenterCoral", wheels.CenterCoral());
 
@@ -223,6 +236,10 @@ public class RobotContainer
     m_DriverController.rightTrigger().onTrue(deployBuilder.ScheduleCoralCommand())
       .onFalse(new SequentialCommandGroup(idle.get(), wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.TRAVEL)));
 
+    // m_DriverController.rightTrigger().onTrue(deployBuilder.ScheduleModifiedCoralCommand())
+    //   .onFalse(new SequentialCommandGroup(idle.get(), wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.TRAVEL)));
+
+
     
     // PATHFIND TO STAGING THEN PID ALIGN
     // m_DriverController.rightTrigger().whileTrue(new SequentialCommandGroup(flashingRed.get(), new ParallelCommandGroup(drivetrain.AlignCoral(), wrist.MoveToSelectedCoralDeployment(), elevator.MoveToDataLevel()), wheels.DeployCoral(), flashingGreen.get()))
@@ -231,9 +248,14 @@ public class RobotContainer
     m_DriverController.leftTrigger().whileTrue(new SequentialCommandGroup(intakeFlags.get(), new ParallelDeadlineGroup(wheels.BeginCoralIntakeRoutine(), elevator.MoveToLevel(HEIGHTS.INTAKE), wrist.MoveToAngle(ANGLES.INTAKE)), flashingGreen.get()))
                                     .onFalse(new SequentialCommandGroup(flashingOrange.get(), wheels.CenterCoral(), flashingGreen.get(), new ParallelCommandGroup(elevator.MoveToLevel(HEIGHTS.TRAVEL), wrist.MoveToAngle(ANGLES.TRAVEL)), idle.get()));
 
+    // m_DriverController.leftBumper().whileTrue(deployBuilder.ScheduleAlgaeCommand())
+    //                                .onFalse(new SequentialCommandGroup(idle.get(), wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.TRAVEL)));
+                        
+    
     m_DriverController.leftBumper().whileTrue(new SequentialCommandGroup(flashingRed.get(), wheels.ApplyVoltage(VoltageSpeeds.SWEEP), Commands.waitSeconds(0.1), new ParallelDeadlineGroup(wheels.IntakeAlgae(), drivetrain.AlignCenter(), elevator.MoveToDataClean(), wrist.MoveToAngle(ANGLES.SWEEP)), flashingGreen.get()))
                                    .onFalse(new SequentialCommandGroup(idle.get(), wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.TRAVEL)));
-                        
+                                                    
+    
     m_DriverController.a().whileTrue(new SequentialCommandGroup(flashingRed.get(), wheels.ApplyVoltage(VoltageSpeeds.SWEEP), new WaitCommand(0.1), new ParallelDeadlineGroup(wheels.IntakeAlgae(), elevator.MoveToLevel(HEIGHTS.INTAKE), wrist.MoveToAngle(ANGLES.GRAB)), flashingGreen.get()))
                           .onFalse(new SequentialCommandGroup(idle.get(), wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.TRAVEL)));
 
@@ -309,10 +331,10 @@ public class RobotContainer
     //              .withRotationalRate(-m_DriverController.getRightX() * TunerConstants.MaxAngularRate)
     //     )
     // );
-     m_DriverController.x().onTrue(drivetrain.Align(new Pose2d(14.015, 5.1, Rotation2d.fromDegrees(-119.34))));
-     m_DriverController.a().whileTrue(drivetrain.AlignXTesting(new Pose2d(1, 1, Rotation2d.k180deg)));
-     m_DriverController.b().whileTrue(drivetrain.AlignYTesting(new Pose2d(1, 1, Rotation2d.k180deg)));
-     m_DriverController.y().whileTrue(drivetrain.RotationTesting(new Pose2d(1, 1, Rotation2d.k180deg)));
+    //  m_DriverController.x().onTrue(drivetrain.Align(new Pose2d(14.015, 5.1, Rotation2d.fromDegrees(-119.34))));
+    //  m_DriverController.a().whileTrue(drivetrain.AlignXTesting(new Pose2d(1, 1, Rotation2d.k180deg)));
+    //  m_DriverController.b().whileTrue(drivetrain.AlignYTesting(new Pose2d(1, 1, Rotation2d.k180deg)));
+    //  m_DriverController.y().whileTrue(drivetrain.RotationTesting(new Pose2d(1, 1, Rotation2d.k180deg)));
     // m_DriverController.x().whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
   }
 
