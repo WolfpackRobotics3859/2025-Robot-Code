@@ -1,0 +1,62 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "FlashingGreen"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "MCOMM to 1S"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Align1L"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CoralFourDeploy"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "FlashingOrange"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "DeployCoralHigh"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WeeWoo"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": false,
+  "folder": null,
+  "choreoAuto": false
+}

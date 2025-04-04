@@ -28,7 +28,7 @@ public class ClimbConstants
 
     public static final double CLIMB_RESTING_POSITION = 0.060547;
     public static final double CLIMB_CLIMB_POSITION = 0.085;
-    public static final double CLIMB_TAKING_POSITION = -0.125244;
+    public static final double CLIMB_TAKING_POSITION = -0.130752;
 
     public static final double CLIMB_STOP_POSITION = 0.09;
 
@@ -49,9 +49,9 @@ public class ClimbConstants
 
     public static final CurrentLimitsConfigs WRIST_MOTOR_CURRENT_LIMIT_CONFIG = new CurrentLimitsConfigs()
                                                                                     .withStatorCurrentLimit(120)
-                                                                                    .withStatorCurrentLimitEnable(true)
+                                                                                    .withStatorCurrentLimitEnable(false)
                                                                                     .withSupplyCurrentLimit(20)
-                                                                                    .withSupplyCurrentLimitEnable(true)
+                                                                                    .withSupplyCurrentLimitEnable(false)
                                                                                     .withSupplyCurrentLowerLimit(30)
                                                                                     .withSupplyCurrentLowerTime(1);
 
@@ -61,7 +61,7 @@ public class ClimbConstants
                                                                     .withKD(0.0)
                                                                     .withKG(0.0)
                                                                     .withKI(0)
-                                                                    .withKP(200)
+                                                                    .withKP(400)
                                                                     .withKS(0.0)
                                                                     .withKV(0.0)
                                                                     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);

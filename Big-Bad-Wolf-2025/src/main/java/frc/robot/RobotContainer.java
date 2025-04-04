@@ -251,7 +251,6 @@ public class RobotContainer
     // m_DriverController.leftBumper().whileTrue(deployBuilder.ScheduleAlgaeCommand())
     //                                .onFalse(new SequentialCommandGroup(idle.get(), wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.TRAVEL)));
                         
-    
     m_DriverController.leftBumper().whileTrue(new SequentialCommandGroup(flashingRed.get(), wheels.ApplyVoltage(VoltageSpeeds.SWEEP), Commands.waitSeconds(0.1), new ParallelDeadlineGroup(wheels.IntakeAlgae(), drivetrain.AlignCenter(), elevator.MoveToDataClean(), wrist.MoveToAngle(ANGLES.SWEEP)), flashingGreen.get()))
                                    .onFalse(new SequentialCommandGroup(idle.get(), wrist.MoveToAngle(ANGLES.TRAVEL), elevator.MoveToLevel(HEIGHTS.TRAVEL)));
                                                     
